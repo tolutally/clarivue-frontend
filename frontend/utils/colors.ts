@@ -1,3 +1,10 @@
+export const colors = {
+  primary: '#102C64',
+  accent: '#FE686D',
+  secondary: '#C8A0FE',
+  tertiary: '#B8CCF4',
+} as const;
+
 export const brandColors = {
   default: {
     primary: '#102C64',
