@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Users, TrendingUp, FileText, Award } from 'lucide-react';
 import type { Advisor } from '../../types';
 import { advisors as initialAdvisors, students } from '../../data/mock-data';
 import { AdvisorCard } from './AdvisorCard';
-import { AdvisorDetailView } from './AdvisorDetailView';
 import { StudentAssignmentDialog } from './StudentAssignmentDialog';
 import { backgrounds, borders, gradients, semantic } from '../../utils/colors';
+
+const AdvisorDetailView = lazy(() => import('./AdvisorDetailView').then(module => ({ default: module.AdvisorDetailView })));
 
 export function AdvisorsPage() {
   const [advisors, setAdvisors] = useState(initialAdvisors);
@@ -53,7 +54,14 @@ export function AdvisorsPage() {
 
   if (selectedAdvisor) {
     return (
-      <>
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+            <p className="mt-4 text-gray-600">Loading advisor details...</p>
+          </div>
+        </div>
+      }>
         <AdvisorDetailView
           advisor={selectedAdvisor}
           onBack={() => setSelectedAdvisor(null)}
@@ -67,7 +75,7 @@ export function AdvisorsPage() {
             onClose={() => setShowAssignmentDialog(false)}
           />
         )}
-      </>
+      </Suspense>
     );
   }
 

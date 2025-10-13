@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { semantic } from '../../utils/colors';
 import { GlobalControls } from './GlobalControls';
-import { CohortOutcomes } from './CohortOutcomes';
-import { CapacityCoverage } from './CapacityCoverage';
-import { SkillGapsMap } from './SkillGapsMap';
-import { RolePackReadiness } from './RolePackReadiness';
-import { InterventionImpact } from './InterventionImpact';
 import { AutoInsightsPanel } from './AutoInsightsPanel';
+
+const CohortOutcomes = lazy(() => import('./CohortOutcomes').then(module => ({ default: module.CohortOutcomes })));
+const CapacityCoverage = lazy(() => import('./CapacityCoverage').then(module => ({ default: module.CapacityCoverage })));
+const SkillGapsMap = lazy(() => import('./SkillGapsMap').then(module => ({ default: module.SkillGapsMap })));
+const RolePackReadiness = lazy(() => import('./RolePackReadiness').then(module => ({ default: module.RolePackReadiness })));
+const InterventionImpact = lazy(() => import('./InterventionImpact').then(module => ({ default: module.InterventionImpact })));
 import {
   getCohortData,
   mockCapacity,
@@ -91,20 +92,29 @@ export function ReportsPage() {
       <div className="px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
-            <div className="space-y-8">
-              {activeTab === 'cohort' && (
-                <CohortOutcomes 
-                  data={cohortAData} 
-                  compareData={cohortBData}
-                  cohortAName={cohortNames[selectedCohortA]}
-                  cohortBName={selectedCohortB ? cohortNames[selectedCohortB] : undefined}
-                />
-              )}
-              {activeTab === 'capacity' && <CapacityCoverage data={mockCapacity} />}
-              {activeTab === 'skills' && <SkillGapsMap data={mockSkillGaps} />}
-              {activeTab === 'roles' && <RolePackReadiness data={mockRolePack} />}
-              {activeTab === 'intervention' && <InterventionImpact data={mockIntervention} />}
-            </div>
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+                  <p className="mt-4 text-gray-600">Loading report...</p>
+                </div>
+              </div>
+            }>
+              <div className="space-y-8">
+                {activeTab === 'cohort' && (
+                  <CohortOutcomes 
+                    data={cohortAData} 
+                    compareData={cohortBData}
+                    cohortAName={cohortNames[selectedCohortA]}
+                    cohortBName={selectedCohortB ? cohortNames[selectedCohortB] : undefined}
+                  />
+                )}
+                {activeTab === 'capacity' && <CapacityCoverage data={mockCapacity} />}
+                {activeTab === 'skills' && <SkillGapsMap data={mockSkillGaps} />}
+                {activeTab === 'roles' && <RolePackReadiness data={mockRolePack} />}
+                {activeTab === 'intervention' && <InterventionImpact data={mockIntervention} />}
+              </div>
+            </Suspense>
           </div>
 
           <div className="lg:col-span-1">

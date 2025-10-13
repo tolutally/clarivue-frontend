@@ -1,13 +1,15 @@
+import { lazy, Suspense } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { semantic, gradients, shadows } from '../../utils/colors';
 import type { Student } from '../../types';
 import { ReadinessBreakdown } from './ReadinessBreakdown';
-import { InterviewInsights } from './InterviewInsights';
 import { AIFeedbackCard } from './AIFeedbackCard';
 import { TranscriptSnippets } from './TranscriptSnippets';
 import { RecommendationsPanel } from './RecommendationsPanel';
-import { InterviewReportsPanel } from '../interview-reports/InterviewReportsPanel';
 import { recommendations } from '../../data/mock-data';
+
+const InterviewInsights = lazy(() => import('./InterviewInsights').then(module => ({ default: module.InterviewInsights })));
+const InterviewReportsPanel = lazy(() => import('../interview-reports/InterviewReportsPanel').then(module => ({ default: module.InterviewReportsPanel })));
 
 interface StudentDetailViewProps {
   student: Student;
@@ -50,12 +52,20 @@ export function StudentDetailView({ student, onBack }: StudentDetailViewProps) {
         <div className="xl:col-span-2 space-y-6">
           <ReadinessBreakdown competencies={student.competencies} />
           
-          <InterviewInsights 
-            interviewCount={student.interviewCount}
-            improvement={student.improvement}
-            averageDuration={student.averageDuration}
-            confidenceTrend={student.confidenceTrend}
-          />
+          <Suspense fallback={
+            <div className="bg-white rounded-xl p-6 border border-gray-100">
+              <div className="flex items-center justify-center h-32">
+                <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
+              </div>
+            </div>
+          }>
+            <InterviewInsights 
+              interviewCount={student.interviewCount}
+              improvement={student.improvement}
+              averageDuration={student.averageDuration}
+              confidenceTrend={student.confidenceTrend}
+            />
+          </Suspense>
 
           {student.aiFeedback && (
             <AIFeedbackCard feedback={student.aiFeedback} />
@@ -69,7 +79,15 @@ export function StudentDetailView({ student, onBack }: StudentDetailViewProps) {
           )}
 
           {student.interviewReports && student.interviewReports.length > 0 && (
-            <InterviewReportsPanel reports={student.interviewReports} />
+            <Suspense fallback={
+              <div className="bg-white rounded-xl p-6 border border-gray-100">
+                <div className="flex items-center justify-center h-32">
+                  <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
+                </div>
+              </div>
+            }>
+              <InterviewReportsPanel reports={student.interviewReports} />
+            </Suspense>
           )}
         </div>
 
