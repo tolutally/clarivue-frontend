@@ -20,9 +20,7 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
       <div className="max-w-[1600px] mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradients.primary} flex items-center justify-center`}>
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
+            <img src="/clarivue-icon-sd.png" alt="Clarivue" className="w-10 h-10 rounded-xl" />
             <div>
               <h1 className="text-lg font-semibold text-[#001223]">Clarivue</h1>
             </div>
