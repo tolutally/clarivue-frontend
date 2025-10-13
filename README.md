@@ -30,11 +30,6 @@ Clarivue Intelligence is a comprehensive interview analytics platform designed t
 - **Progress Tracking**: Historical data and improvement trends
 - **Recommendations**: Personalized suggestions for student development
 
-### 🎓 **Advisor Tools**
-- **Advisor Dashboard**: Centralized view of assigned students
-- **Student Assignment**: Flexible student-advisor matching system
-- **Performance Analytics**: Detailed insights into student progress
-- **Intervention Tracking**: Monitor and measure intervention effectiveness
 
 ### 📈 **Reporting & Analytics**
 - **Cohort Outcomes**: Group-level performance analysis
