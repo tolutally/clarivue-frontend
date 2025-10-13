@@ -50,7 +50,7 @@ export function ReportsPage() {
       <div className={`${semantic.surface} border-b ${semantic.borderMedium}`}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">
-            <h1 className={`text-3xl font-bold ${semantic.textPrimary}`}>Reports</h1>
+            <h1 className={`text-3xl font-bold ${semantic.textPrimary}`}>Analytics</h1>
             <div className={`text-sm ${semantic.textTertiary}`}>
               Student outcomes, capacity & program insights
             </div>
