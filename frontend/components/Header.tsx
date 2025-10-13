@@ -33,7 +33,7 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
                 onClick={() => onTabChange(tab.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-[#001223] text-white'
+                    ? 'bg-[#102C64] text-white'
                     : `${semantic.textSecondary} hover:${semantic.textPrimary} ${semantic.bgHover}`
                 }`}
               >
