@@ -1,4 +1,3 @@
-import { GraduationCap } from 'lucide-react';
 import { semantic, backgrounds, gradients } from '../utils/colors';
 
 interface HeaderProps {
@@ -20,10 +19,7 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
       <div className="max-w-[1600px] mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <img src="/clarivue-icon-sd.png" alt="Clarivue" className="w-10 h-10 rounded-xl" />
-            <div>
-              <h1 className="text-lg font-semibold text-[#001223]">Clarivue</h1>
-            </div>
+            <img src="/clarivue -logo.png" alt="Clarivue" className="h-8" />
           </div>
           
           <nav className="flex gap-1">
