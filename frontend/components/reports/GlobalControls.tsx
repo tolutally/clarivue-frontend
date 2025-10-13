@@ -184,7 +184,16 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
             </Label>
           </div>
 
-
+          <div className="flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg border border-red-200">
+            <Switch
+              id="at-risk"
+              checked={filters.atRisk || false}
+              onCheckedChange={(checked) => onFiltersChange({ ...filters, atRisk: checked })}
+            />
+            <Label htmlFor="at-risk" className="text-sm font-medium cursor-pointer text-red-700">
+              Students at Risk
+            </Label>
+          </div>
         </div>
 
         <div className="relative">

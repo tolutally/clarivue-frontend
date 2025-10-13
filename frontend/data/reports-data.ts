@@ -5,6 +5,7 @@ export interface ReportFilters {
   cohort?: string;
   classYear?: string;
   firstGen?: boolean;
+  atRisk?: boolean;
   compareMode?: boolean;
   compareFilters?: Partial<ReportFilters>;
 }

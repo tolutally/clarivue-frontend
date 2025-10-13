@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { semantic } from '../../utils/colors';
 import { GlobalControls } from './GlobalControls';
 import { AutoInsightsPanel } from './AutoInsightsPanel';
+import { ReadinessTrends } from './ReadinessTrends';
 
 const CohortOutcomes = lazy(() => import('./CohortOutcomes').then(module => ({ default: module.CohortOutcomes })));
 const CapacityCoverage = lazy(() => import('./CapacityCoverage').then(module => ({ default: module.CapacityCoverage })));
@@ -20,6 +21,7 @@ import {
 
 const tabs = [
   { id: 'cohort', label: 'Cohort Outcomes' },
+  { id: 'readiness', label: 'Readiness Trends' },
   { id: 'capacity', label: 'Capacity & Coverage' },
   { id: 'skills', label: 'Skill Gaps Map' },
   { id: 'roles', label: 'Role-Pack Readiness' },
@@ -107,6 +109,12 @@ export function ReportsPage() {
                     compareData={cohortBData}
                     cohortAName={cohortNames[selectedCohortA]}
                     cohortBName={selectedCohortB ? cohortNames[selectedCohortB] : undefined}
+                  />
+                )}
+                {activeTab === 'readiness' && (
+                  <ReadinessTrends 
+                    cohortName={cohortNames[selectedCohortA]}
+                    showAtRiskOnly={filters.atRisk || false}
                   />
                 )}
                 {activeTab === 'capacity' && <CapacityCoverage data={mockCapacity} />}
