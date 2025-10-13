@@ -43,14 +43,7 @@ export interface InterviewReport {
   summaryNote: string;
   strengths: string[];
   concerns: string[];
-  toneMetrics: {
-    confidence: number;
-    clarity: number;
-    emotionalConsistency: number;
-    energyLevel: 'Low' | 'Moderate' | 'High';
-  };
   competencyBreakdown: CompetencyBreakdownItem[];
-  authenticitySignals: AuthenticitySignal[];
   transcript: string;
   aiFeedbackSummary: string;
   aiRecommendations: string[];
@@ -66,13 +59,6 @@ export interface CompetencyBreakdownItem {
   evidenceTimestamp?: string;
 }
 
-export interface AuthenticitySignal {
-  signal: string;
-  type: 'Behavioral' | 'Linguistic' | 'Audio' | 'Cognitive';
-  insight: string;
-  status: 'healthy' | 'minor-concern' | 'concern';
-  timestamp: string;
-}
 
 export interface AdvisorNote {
   id: string;

@@ -45,8 +45,6 @@ Clarivue Intelligence is a comprehensive interview analytics platform designed t
 
 ### 🤖 **AI-Powered Features**
 - **Interview Analysis**: Automated transcript analysis and insights
-- **Authenticity Detection**: AI-powered assessment of student responses
-- **Tone Analysis**: Emotional and communication style evaluation
 - **Competency Scoring**: Multi-dimensional skill assessment
 - **Recommendation Engine**: Personalized improvement suggestions
 

@@ -4,9 +4,7 @@ import { semantic, shadows, backgrounds, hover, gradients } from '../../utils/co
 import type { InterviewReport } from '../../types';
 import { SummaryNote } from './SummaryNote';
 import { StrengthsConcerns } from './StrengthsConcerns';
-import { ToneDetection } from './ToneDetection';
 import { CompetencyTable } from './CompetencyTable';
-import { AuthenticitySignals } from './AuthenticitySignals';
 import { TranscriptViewer } from './TranscriptViewer';
 import { AIFeedbackRecommendations } from './AIFeedbackRecommendations';
 import { AdvisorNotes } from './AdvisorNotes';
@@ -72,11 +70,7 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
 
           <StrengthsConcerns strengths={report.strengths} concerns={report.concerns} />
 
-          <ToneDetection metrics={report.toneMetrics} />
-
           <CompetencyTable competencies={report.competencyBreakdown} />
-
-          <AuthenticitySignals signals={report.authenticitySignals} />
 
           <div className="flex items-center gap-3">
             <TranscriptViewer 

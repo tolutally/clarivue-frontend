@@ -18,25 +18,12 @@ export const sampleInterviewReports: InterviewReport[] = [
     summaryNote: 'Improved structure and pacing. Responses were more grounded in outcomes, but clarity in quantifying results needs work.',
     strengths: ['Calm under pressure', 'Strong technical clarity', 'Improved STAR storytelling'],
     concerns: ['Overused filler phrases', 'Weak closing statements', 'Missing metrics in examples'],
-    toneMetrics: {
-      confidence: 78,
-      clarity: 81,
-      emotionalConsistency: 72,
-      energyLevel: 'Moderate'
-    },
     competencyBreakdown: [
       { competency: 'Communication', score: 84, change: 6, benchmark: 80, reason: 'Strong STAR storytelling with clear structure', evidenceTimestamp: '4:32 - 6:15' },
       { competency: 'Problem Solving', score: 71, change: 4, benchmark: 78, reason: 'Good problem identification but weak on solution depth', evidenceTimestamp: '8:45 - 10:20' },
       { competency: 'Technical', score: 76, change: 3, benchmark: 82, reason: 'Clear technical explanations but lacked depth in complex scenarios', evidenceTimestamp: '12:10 - 14:30' },
       { competency: 'Confidence', score: 65, change: 9, benchmark: 75, reason: 'Improved tone and reduced hesitation compared to previous sessions', evidenceTimestamp: '2:15 - 18:40' },
       { competency: 'Clarity', score: 80, change: 7, benchmark: 79, reason: 'Articulated ideas clearly with minimal filler words', evidenceTimestamp: '5:20 - 7:10' }
-    ],
-    authenticitySignals: [
-      { signal: 'Response Authenticity', type: 'Behavioral', insight: 'Detected natural pauses and uncoached phrasing', status: 'healthy', timestamp: '3:15, 9:40, 15:22' },
-      { signal: 'Rehearsed Indicators', type: 'Linguistic', insight: '3 repeated sentences from templates', status: 'minor-concern', timestamp: '6:30, 11:15, 17:05' },
-      { signal: 'Tone Congruence', type: 'Audio', insight: 'Confidence aligned with content', status: 'healthy', timestamp: 'Throughout session' },
-      { signal: 'Answer Consistency', type: 'Cognitive', insight: 'STAR sequence maintained 4/5 times', status: 'healthy', timestamp: 'Q1-Q4 strong, Q5 weak' },
-      { signal: 'Red Flags', type: 'Behavioral', insight: 'One overconfident exaggeration detected', status: 'minor-concern', timestamp: '13:42' }
     ],
     transcript: `Q: Tell me about a time you faced a challenging situation at work.\nA: The primary challenge involved analyzing complex customer data sets and presenting actionable insights to C-level stakeholders. I used the STAR framework: first, I identified the Situation where our customer retention was declining by 15%. My Task was to uncover root causes. I took Action by segmenting customer cohorts and running churn analysis, which revealed that onboarding delays were the key driver. The Result was a 23% improvement in retention after we streamlined the process.\n\nQ: How do you handle pressure?\nA: Um, I think I handle it pretty well. I usually, you know, try to stay calm and focus on what needs to be done. I prioritize tasks and make sure I'm not overwhelmed...`,
     aiFeedbackSummary: 'Your confidence improved by 17% and pacing stabilized after question 3. You demonstrated clear reasoning and examples for teamwork scenarios but struggled with quantifying outcomes. Focus on specific metrics next round.',
@@ -64,24 +51,12 @@ export const sampleInterviewReports: InterviewReport[] = [
     summaryNote: 'Good foundational understanding but struggled with depth. Improved confidence from first session but needs work on clarity.',
     strengths: ['Better eye contact', 'Reduced filler words from v1', 'Good energy'],
     concerns: ['Answers too brief', 'Missed follow-up opportunities', 'Lacked specific examples'],
-    toneMetrics: {
-      confidence: 74,
-      clarity: 68,
-      emotionalConsistency: 65,
-      energyLevel: 'Moderate'
-    },
     competencyBreakdown: [
       { competency: 'Communication', score: 78, change: 10, benchmark: 80, reason: 'Better eye contact and reduced filler words, but answers still too brief', evidenceTimestamp: '1:30 - 5:45' },
       { competency: 'Problem Solving', score: 67, change: 8, benchmark: 78, reason: 'Described problem but lacked analytical depth in solution', evidenceTimestamp: '7:20 - 9:10' },
       { competency: 'Technical', score: 73, change: 5, benchmark: 82, reason: 'Basic technical concepts explained but missing advanced details', evidenceTimestamp: '10:30 - 12:00' },
       { competency: 'Confidence', score: 56, change: 12, benchmark: 75, reason: 'Significant improvement from session 1, less nervous energy', evidenceTimestamp: 'Overall session' },
       { competency: 'Clarity', score: 73, change: 9, benchmark: 79, reason: 'Clearer articulation but needs more specific examples', evidenceTimestamp: '3:40 - 8:20' }
-    ],
-    authenticitySignals: [
-      { signal: 'Response Authenticity', type: 'Behavioral', insight: 'Some rehearsed elements but improving naturalness', status: 'healthy', timestamp: '2:10, 8:30, 14:50' },
-      { signal: 'Rehearsed Indicators', type: 'Linguistic', insight: '5 repeated phrases from practice templates', status: 'minor-concern', timestamp: '4:15, 6:40, 9:55, 12:30, 16:10' },
-      { signal: 'Tone Congruence', type: 'Audio', insight: 'Occasional mismatch between tone and content', status: 'minor-concern', timestamp: '7:22, 13:45' },
-      { signal: 'Answer Consistency', type: 'Cognitive', insight: 'STAR structure used 2/5 times', status: 'concern', timestamp: 'Q1 and Q3 only' }
     ],
     transcript: `Q: Describe a project where you had to collaborate with multiple teams.\nA: Well, um, I worked on a project where we had to work with marketing and engineering. It was challenging because everyone had different priorities. I tried to organize meetings and keep everyone aligned.\n\nQ: What was the outcome?\nA: It went well. We launched on time and the stakeholders were happy.`,
     aiFeedbackSummary: 'Confidence is building — great progress from session 1. You need to add depth and specific outcomes to your stories. Practice adding quantitative results.',
@@ -100,24 +75,12 @@ export const sampleInterviewReports: InterviewReport[] = [
     summaryNote: 'First session baseline. Noticeable nervousness and lack of structure. Clear potential with focused practice.',
     strengths: ['Friendly demeanor', 'Willing to learn', 'Good listening skills'],
     concerns: ['High filler word usage', 'Unstructured responses', 'Low confidence', 'Missed STAR framework'],
-    toneMetrics: {
-      confidence: 65,
-      clarity: 59,
-      emotionalConsistency: 58,
-      energyLevel: 'Low'
-    },
     competencyBreakdown: [
       { competency: 'Communication', score: 68, change: 0, benchmark: 80, reason: 'Baseline session - high filler word usage and unstructured responses', evidenceTimestamp: '0:45 - 4:20' },
       { competency: 'Problem Solving', score: 59, change: 0, benchmark: 78, reason: 'Mentioned problem but no clear solution or framework applied', evidenceTimestamp: '6:10 - 8:30' },
       { competency: 'Technical', score: 68, change: 0, benchmark: 82, reason: 'Basic understanding shown but lacked depth and specificity', evidenceTimestamp: '9:00 - 11:15' },
       { competency: 'Confidence', score: 44, change: 0, benchmark: 75, reason: 'Evident nervousness, frequent pauses, and uncertain tone throughout', evidenceTimestamp: 'Overall session' },
       { competency: 'Clarity', score: 64, change: 0, benchmark: 79, reason: 'Frequent filler words and vague language reduced clarity', evidenceTimestamp: '2:15 - 12:40' }
-    ],
-    authenticitySignals: [
-      { signal: 'Response Authenticity', type: 'Behavioral', insight: 'Very natural but unpolished responses', status: 'healthy', timestamp: 'Throughout session' },
-      { signal: 'Rehearsed Indicators', type: 'Linguistic', insight: 'No rehearsed patterns detected', status: 'healthy', timestamp: 'N/A' },
-      { signal: 'Tone Congruence', type: 'Audio', insight: 'Nervousness evident in voice patterns', status: 'concern', timestamp: '1:30, 5:45, 10:20, 14:55' },
-      { signal: 'Answer Consistency', type: 'Cognitive', insight: 'No consistent structure observed', status: 'concern', timestamp: 'All responses' }
     ],
     transcript: `Q: Tell me about yourself.\nA: Um, so I'm Jane, and I, like, studied business analytics. I've worked on a few projects, you know, with data and stuff. I think I'm pretty good at problem solving.\n\nQ: Can you give me an example?\nA: Um, well, there was this one time where we had to, like, analyze some customer data. It was pretty tough because, you know, there was a lot of information and we had to present it to our manager.`,
     aiFeedbackSummary: 'Baseline established. Focus on building confidence and learning the STAR framework. Practice structured storytelling with clear situation, task, action, and result.',
