@@ -7,14 +7,14 @@ export function StudentGrid() {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#001223] mb-4">Most Improved Student Performance</h3>
+      <h3 className="text-lg font-semibold text-[#001223] mb-4">Most Improved Interview Performance</h3>
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="py-3 px-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Student
+                  Candidate
                 </th>
                 <th className="py-3 px-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Readiness

@@ -7,7 +7,7 @@ interface HeaderProps {
 
 const tabs = [
   { id: 'overview', label: 'Overview' },
-  { id: 'students', label: 'Students' },
+  { id: 'students', label: 'Interviews' },
   { id: 'reports', label: 'Analytics' },
   { id: 'settings', label: 'Settings' },
 ];

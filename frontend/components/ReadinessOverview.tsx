@@ -62,7 +62,7 @@ export function ReadinessOverview() {
           </div>
           <h3 className="text-lg font-semibold text-[#001223] mb-2">Quick Insights</h3>
           <p className={`text-sm ${semantic.textSecondary}`}>
-            Students who complete 2+ mock interviews show an average improvement of 18 points in overall readiness.
+            Candidates who complete 2+ mock interviews show an average improvement of 18 points in overall readiness.
           </p>
         </div>
         <button className={`mt-4 w-full py-2.5 ${backgrounds.primary} text-white rounded-lg text-sm font-medium hover:bg-[#102c64]/90 transition-colors`}>

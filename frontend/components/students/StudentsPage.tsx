@@ -9,7 +9,7 @@ const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
     <div className="text-center">
       <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-      <p className="mt-4 text-gray-600">Loading student details...</p>
+      <p className="mt-4 text-gray-600">Loading interview details...</p>
     </div>
   </div>
 );
@@ -31,8 +31,8 @@ export function StudentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Students</h1>
-        <p className="text-gray-600">Track student progress and readiness across mock interviews</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Interviews</h1>
+        <p className="text-gray-600">Track progress and readiness across mock interviews</p>
       </div>
       
       <StudentOverview 

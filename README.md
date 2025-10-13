@@ -3,7 +3,7 @@
 <div align="center">
   <img src="frontend/public/clarivue-favicon/favicon.svg" alt="Clarivue Logo" width="120" height="120">
   
-  **Advanced Interview Analytics and Student Readiness Dashboard**
+  **Advanced Interview Analytics and Candidate Readiness Dashboard**
   
   [![Built with Encore](https://img.shields.io/badge/Built%20with-Encore-blue)](https://encore.dev)
   [![React](https://img.shields.io/badge/React-19.0.0-blue)](https://reactjs.org)
@@ -13,22 +13,22 @@
 
 ## 🎯 Overview
 
-Clarivue Intelligence is a comprehensive interview analytics platform designed to assess student readiness, track competency development, and provide actionable insights for educational institutions. The platform combines AI-powered analysis with intuitive visualizations to help advisors and educators make data-driven decisions.
+Clarivue Intelligence is a comprehensive interview analytics platform designed to assess candidate readiness, track competency development, and provide actionable insights for educational institutions. The platform combines AI-powered analysis with intuitive visualizations to help advisors and educators make data-driven decisions.
 
 ## ✨ Key Features
 
 ### 📊 **Analytics Dashboard**
-- **Readiness Overview**: Real-time student readiness scores and trends
+- **Readiness Overview**: Real-time candidate readiness scores and trends
 - **Competency Heatmap**: Visual representation of skill development across multiple dimensions
 - **Analytics Summary**: Key performance indicators and metrics
 - **Feedback Summary**: Aggregated insights from interview sessions
 
-### 👥 **Student Management**
-- **Student Profiles**: Comprehensive student information and progress tracking
-- **Readiness Index**: Dynamic scoring system for student preparedness
+### 👥 **Interview Management**
+- **Candidate Profiles**: Comprehensive candidate information and progress tracking
+- **Readiness Index**: Dynamic scoring system for candidate preparedness
 - **Interview Insights**: AI-powered analysis of interview performance
 - **Progress Tracking**: Historical data and improvement trends
-- **Recommendations**: Personalized suggestions for student development
+- **Recommendations**: Personalized suggestions for candidate development
 
 
 ### 📈 **Reporting & Analytics**
@@ -118,7 +118,7 @@ clarivue-OS/
 │   │   ├── charts/         # Data visualization components
 │   │   ├── interview-reports/ # Interview analysis components
 │   │   ├── reports/        # Reporting components
-│   │   ├── students/       # Student management components
+│   │   ├── students/       # Interview/candidate management components
 │   │   └── ui/            # Reusable UI components
 │   ├── contexts/          # React contexts
 │   ├── data/              # Mock data and test data
@@ -161,7 +161,7 @@ encore gen client --target leap  # Generate frontend client
 
 ### Code Organization
 
-- **Components**: Organized by feature area (students, advisors, reports)
+- **Components**: Organized by feature area (interviews, advisors, reports)
 - **Types**: Centralized TypeScript definitions
 - **Utils**: Reusable utility functions and helpers
 - **Styles**: Global styles and theme configuration
@@ -206,8 +206,8 @@ See the [Encore self-hosting documentation](https://encore.dev/docs/self-host/do
 
 ### Core Entities
 
-- **Student**: Individual student profiles with readiness metrics
-- **Advisor**: Faculty members managing student progress
+- **Candidate**: Individual candidate profiles with readiness metrics
+- **Advisor**: Faculty members managing candidate progress
 - **Interview Report**: Detailed analysis of interview sessions
 - **Competency**: Skill areas being assessed
 - **Recommendation**: AI-generated improvement suggestions
