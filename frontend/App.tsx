@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Header } from './components/Header';
 import { ReadinessOverview } from './components/ReadinessOverview';
 import { CompetencyHeatmap } from './components/CompetencyHeatmap';
@@ -9,12 +10,13 @@ import { AnalyticsSummary } from './components/AnalyticsSummary';
 import { StudentsPage } from './components/students/StudentsPage';
 import { AdvisorsPage } from './components/advisors/AdvisorsPage';
 import { ReportsPage } from './components/reports/ReportsPage';
+import './styles/theme.css';
 
-export default function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[var(--surface-hover)]">
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
       
       {activeTab === 'reports' ? (
@@ -54,5 +56,13 @@ export default function App() {
       </main>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
