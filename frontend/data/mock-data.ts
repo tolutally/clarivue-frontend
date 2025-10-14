@@ -40,7 +40,24 @@ export const sampleInterviewReports: InterviewReport[] = [
         content: 'Reviewed with Jane on Oct 6. Assigned 2 follow-up mocks focused on quantitative storytelling.',
         visibleToStudent: true
       }
-    ]
+    ],
+    technicalDepthIndex: {
+      score: 76,
+      level: 'Strong',
+      insight: 'Strong conceptual understanding of data analytics tools and methodologies. Clear articulation of SQL queries and cohort analysis. Needs more depth on statistical methods and A/B testing frameworks.'
+    },
+    detectedSkills: [
+      { skill: 'Python', confidence: 'high', category: 'Languages', evidenceTimestamp: '8:20' },
+      { skill: 'SQL', confidence: 'high', category: 'Languages', evidenceTimestamp: '9:45' },
+      { skill: 'Tableau', confidence: 'high', category: 'Tools', evidenceTimestamp: '12:30' },
+      { skill: 'Excel', confidence: 'high', category: 'Tools', evidenceTimestamp: '6:15' },
+      { skill: 'R', confidence: 'mentioned', category: 'Languages', evidenceTimestamp: '14:05' },
+      { skill: 'Power BI', confidence: 'mentioned', category: 'Tools', evidenceTimestamp: '13:22' },
+      { skill: 'A/B Testing', confidence: 'mentioned', category: 'Methods', evidenceTimestamp: '16:40' },
+      { skill: 'Machine Learning', confidence: 'missing', category: 'Methods' },
+      { skill: 'Git', confidence: 'missing', category: 'Tools' }
+    ],
+    technicalFeedback: 'Your SQL and Python explanations were clear and accurate. Consider adding specific examples of statistical significance testing when discussing A/B tests, and be prepared to explain time/space complexity for data processing algorithms.'
   },
   {
     id: 'report-2',
@@ -64,7 +81,24 @@ export const sampleInterviewReports: InterviewReport[] = [
       'Add specific metrics to each STAR answer',
       'Prepare 3-5 detailed stories with outcomes',
       'Practice delivering longer, more detailed responses'
-    ]
+    ],
+    technicalDepthIndex: {
+      score: 62,
+      level: 'Moderate',
+      insight: 'Demonstrates foundational knowledge of data tools and concepts. Mentioned SQL and Excel but lacked depth in explaining complex queries or advanced analytics techniques. Growing comfort with technical terminology.'
+    },
+    detectedSkills: [
+      { skill: 'Python', confidence: 'mentioned', category: 'Languages', evidenceTimestamp: '7:15' },
+      { skill: 'SQL', confidence: 'high', category: 'Languages', evidenceTimestamp: '8:30' },
+      { skill: 'Excel', confidence: 'high', category: 'Tools', evidenceTimestamp: '5:45' },
+      { skill: 'Tableau', confidence: 'mentioned', category: 'Tools', evidenceTimestamp: '11:20' },
+      { skill: 'R', confidence: 'missing', category: 'Languages' },
+      { skill: 'Power BI', confidence: 'missing', category: 'Tools' },
+      { skill: 'A/B Testing', confidence: 'missing', category: 'Methods' },
+      { skill: 'Machine Learning', confidence: 'missing', category: 'Methods' },
+      { skill: 'Git', confidence: 'missing', category: 'Tools' }
+    ],
+    technicalFeedback: 'Good progress on SQL fundamentals. When discussing data analysis, add more technical specifics: which SQL joins you used, data volume you handled, or optimization techniques you applied. Practice explaining your Python code line-by-line.'
   },
   {
     id: 'report-3',
@@ -97,7 +131,24 @@ export const sampleInterviewReports: InterviewReport[] = [
         content: 'Strong baseline. Jane shows great potential. Assigned STAR framework workshop and 2 practice sessions.',
         visibleToStudent: true
       }
-    ]
+    ],
+    technicalDepthIndex: {
+      score: 45,
+      level: 'Low',
+      insight: 'Baseline assessment shows familiarity with Excel and basic data analysis. Vague references to technical tools without concrete examples. Significant room for growth in articulating technical processes and methodologies.'
+    },
+    detectedSkills: [
+      { skill: 'Excel', confidence: 'mentioned', category: 'Tools', evidenceTimestamp: '4:50' },
+      { skill: 'SQL', confidence: 'mentioned', category: 'Languages', evidenceTimestamp: '10:05' },
+      { skill: 'Python', confidence: 'missing', category: 'Languages' },
+      { skill: 'R', confidence: 'missing', category: 'Languages' },
+      { skill: 'Tableau', confidence: 'missing', category: 'Tools' },
+      { skill: 'Power BI', confidence: 'missing', category: 'Tools' },
+      { skill: 'A/B Testing', confidence: 'missing', category: 'Methods' },
+      { skill: 'Machine Learning', confidence: 'missing', category: 'Methods' },
+      { skill: 'Git', confidence: 'missing', category: 'Tools' }
+    ],
+    technicalFeedback: 'Build your technical vocabulary. When you mention "analyzing data," specify the tools (Excel formulas, SQL queries, Python libraries) and methods (regression, cohort analysis, visualization) you used. Practice explaining one technical project in detail.'
   }
 ];
 

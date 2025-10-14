@@ -48,6 +48,9 @@ export interface InterviewReport {
   aiFeedbackSummary: string;
   aiRecommendations: string[];
   advisorNotes?: AdvisorNote[];
+  technicalDepthIndex?: TechnicalDepthIndex;
+  detectedSkills?: DetectedSkill[];
+  technicalFeedback?: string;
 }
 
 export interface CompetencyBreakdownItem {
@@ -66,6 +69,19 @@ export interface AdvisorNote {
   author: string;
   content: string;
   visibleToStudent: boolean;
+}
+
+export interface TechnicalDepthIndex {
+  score: number;
+  level: 'Low' | 'Moderate' | 'Strong' | 'Advanced';
+  insight: string;
+}
+
+export interface DetectedSkill {
+  skill: string;
+  confidence: 'high' | 'mentioned' | 'missing';
+  category: string;
+  evidenceTimestamp?: string;
 }
 
 export interface AuthenticitySignal {

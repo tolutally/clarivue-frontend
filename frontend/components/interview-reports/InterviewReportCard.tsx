@@ -8,6 +8,8 @@ import { CompetencyTable } from './CompetencyTable';
 import { TranscriptViewer } from './TranscriptViewer';
 import { AIFeedbackRecommendations } from './AIFeedbackRecommendations';
 import { AdvisorNotes } from './AdvisorNotes';
+import { TechnicalDepthIndex } from './TechnicalDepthIndex';
+import { SkillTagsPanel } from './SkillTagsPanel';
 
 interface InterviewReportCardProps {
   report: InterviewReport;
@@ -66,6 +68,14 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
 
       {isExpanded && (
         <div className={`border-t ${semantic.border} p-6 space-y-6 ${semantic.bgSubtle}`}>
+          {report.technicalDepthIndex && (
+            <TechnicalDepthIndex tdi={report.technicalDepthIndex} />
+          )}
+
+          {report.detectedSkills && report.detectedSkills.length > 0 && (
+            <SkillTagsPanel skills={report.detectedSkills} />
+          )}
+
           <SummaryNote note={report.summaryNote} />
 
           <StrengthsConcerns strengths={report.strengths} concerns={report.concerns} />
@@ -82,6 +92,7 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
           <AIFeedbackRecommendations 
             summary={report.aiFeedbackSummary}
             recommendations={report.aiRecommendations}
+            technicalFeedback={report.technicalFeedback}
           />
 
           <AdvisorNotes notes={report.advisorNotes} />

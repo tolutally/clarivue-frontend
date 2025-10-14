@@ -1,12 +1,13 @@
-import { Sparkles, Lightbulb } from 'lucide-react';
+import { Sparkles, Lightbulb, Code2 } from 'lucide-react';
 import { semantic, gradients, text } from '../../utils/colors';
 
 interface AIFeedbackRecommendationsProps {
   summary: string;
   recommendations: string[];
+  technicalFeedback?: string;
 }
 
-export function AIFeedbackRecommendations({ summary, recommendations }: AIFeedbackRecommendationsProps) {
+export function AIFeedbackRecommendations({ summary, recommendations, technicalFeedback }: AIFeedbackRecommendationsProps) {
   return (
     <div className="bg-gradient-to-br from-[#C8A0FE]/10 via-white to-[#B8CCF4]/10 rounded-xl p-5 border border-[#C8A0FE]/20">
       <div className="flex items-center gap-3 mb-4">
@@ -19,6 +20,22 @@ export function AIFeedbackRecommendations({ summary, recommendations }: AIFeedba
       <p className="text-gray-700 leading-relaxed mb-6 p-4 bg-white/50 rounded-lg border ${semantic.border}">
         {summary}
       </p>
+
+      {technicalFeedback && (
+        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-start gap-3">
+            <Code2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">
+                Technical Coaching
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                {technicalFeedback}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         <div className="flex items-center gap-2 mb-3">
