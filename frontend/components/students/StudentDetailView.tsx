@@ -57,7 +57,7 @@ export function StudentDetailView({ student, onBack }: StudentDetailViewProps) {
             <div className="text-white/90 text-sm mb-3">Average Readiness Score</div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-left">
               <div className="text-white/90 text-xs leading-relaxed">
-                Candidates above {READINESS_THRESHOLD} readiness reached employer interviews in an average of <span className="font-semibold">10 days</span>.
+                Candidates above {READINESS_THRESHOLD} readiness are <span className="font-semibold">2.3× more likely</span> to receive job offers within 30 days.
               </div>
               <div className="text-white font-semibold text-xs mt-1">
                 {student.name.split(' ')[0]}'s current score: {student.readinessScore}
