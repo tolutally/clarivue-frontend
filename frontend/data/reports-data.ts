@@ -272,10 +272,17 @@ export const mockIntervention: InterventionData = {
   },
 };
 
-export const autoInsights = [
-  'Students with advisor reviews within 24h improved +7 more on average.',
-  'First-gen students close the gap after 2 workshops; recommend targeted STAR sessions.',
-  'Confidence remains the limiting factor in Engineering; propose 3× micro-practice modules.',
-  'Business students excel in communication but lag in technical demos; consider paired practice.',
-  'Completion rate jumps +18% when first mock is scheduled within 3 days of signup.',
-];
+export const autoInsights = {
+  efficiency: [
+    'Advisor reviews within 24h → +7 point avg improvement',
+    'First mock within 3 days of signup → +18% completion rate',
+  ],
+  skillGaps: [
+    'Confidence limits Engineering candidates — recommend 3× micro-practice modules',
+    'Business candidates strong in communication, weak in technical demos',
+  ],
+  equity: [
+    'First-gen candidates close gap after 2 workshops',
+    'Recommend targeted STAR sessions for underrepresented groups',
+  ],
+};

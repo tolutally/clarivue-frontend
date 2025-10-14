@@ -56,7 +56,7 @@ export function ReportsPage() {
             </div>
           </div>
           <p className={`text-sm ${semantic.textSecondary} max-w-3xl`}>
-            Track student readiness, measure intervention effectiveness, and identify skill gaps to improve programs and placements.
+          Measure how readiness gains translate into job outcomes, and where to focus coaching time.
           </p>
         </div>
 

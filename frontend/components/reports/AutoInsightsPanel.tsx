@@ -1,4 +1,4 @@
-import { Lightbulb, Download, FileText, FileSpreadsheet, Mail, HelpCircle } from 'lucide-react';
+import { Lightbulb, Download, FileText, FileSpreadsheet, Mail, HelpCircle, Clock, Target, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { semantic, text } from '../../utils/colors';
 import {
@@ -8,10 +8,41 @@ import {
 } from '@/components/ui/popover';
 
 interface AutoInsightsPanelProps {
-  insights: string[];
+  insights: {
+    efficiency: string[];
+    skillGaps: string[];
+    equity: string[];
+  };
 }
 
 export function AutoInsightsPanel({ insights }: AutoInsightsPanelProps) {
+  const insightGroups = [
+    { 
+      theme: 'Efficiency', 
+      icon: Clock, 
+      color: 'text-green-600', 
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-100',
+      items: insights.efficiency 
+    },
+    { 
+      theme: 'Skill Gaps', 
+      icon: Target, 
+      color: 'text-blue-600', 
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-100',
+      items: insights.skillGaps 
+    },
+    { 
+      theme: 'Equity', 
+      icon: Users, 
+      color: 'text-purple-600', 
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-100',
+      items: insights.equity 
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
@@ -19,13 +50,23 @@ export function AutoInsightsPanel({ insights }: AutoInsightsPanelProps) {
           <Lightbulb className="w-5 h-5 text-[#C8A0FE]" />
           <h3 className={`text-sm font-semibold ${semantic.textPrimary}`}>Auto-Generated Insights</h3>
         </div>
-        <div className="space-y-3">
-          {insights.map((insight, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-lg px-4 py-3 text-sm text-gray-700 border border-[#C8A0FE]/20 shadow-sm hover:shadow-md transition-shadow"
-            >
-              {insight}
+        <div className="space-y-4">
+          {insightGroups.map((group) => (
+            <div key={group.theme}>
+              <div className="flex items-center gap-2 mb-2">
+                <group.icon className={`w-4 h-4 ${group.color}`} />
+                <h4 className={`text-xs font-semibold ${group.color} uppercase tracking-wide`}>{group.theme}</h4>
+              </div>
+              <div className="space-y-2">
+                {group.items.map((insight, i) => (
+                  <div
+                    key={i}
+                    className={`${group.bgColor} rounded-lg px-3 py-2 text-xs font-medium text-gray-800 border ${group.borderColor}`}
+                  >
+                    {insight}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -75,7 +116,7 @@ function DefinitionsPanel() {
     },
     {
       term: 'Offer Rate',
-      definition: 'Percentage of students who received job/internship offers (verified + self-reported; clearly labeled).',
+      definition: 'Percentage of candidates who received job/internship offers. Self-reported or verified with employer feedback.',
     },
   ];
 
