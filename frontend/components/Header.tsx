@@ -8,7 +8,7 @@ interface HeaderProps {
 const tabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'students', label: 'Interviews' },
-  { id: 'advisors', label: 'Advisors' },
+  { id: 'advisors', label: 'Advisors', disabled: true },
   { id: 'reports', label: 'Analytics' },
   { id: 'settings', label: 'Settings' },
 ];
@@ -26,9 +26,12 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => onTabChange(tab.id)}
+                onClick={() => !tab.disabled && onTabChange(tab.id)}
+                disabled={tab.disabled}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  activeTab === tab.id
+                  tab.disabled
+                    ? 'opacity-50 cursor-not-allowed text-gray-400'
+                    : activeTab === tab.id
                     ? 'bg-[#102C64] text-white'
                     : `${semantic.textSecondary} hover:${semantic.textPrimary} ${semantic.bgHover}`
                 }`}
