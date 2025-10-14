@@ -33,8 +33,13 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
  * Client is an API client for the  Encore application.
  */
 export class Client {
+    public readonly advisors: advisors.ServiceClient
+    public readonly analysis: analysis.ServiceClient
     public readonly health: health.ServiceClient
+    public readonly interviews: interviews.ServiceClient
     public readonly skills: skills.ServiceClient
+    public readonly students: students.ServiceClient
+    public readonly webhooks: webhooks.ServiceClient
     private readonly options: ClientOptions
     private readonly target: string
 
@@ -49,8 +54,13 @@ export class Client {
         this.target = target
         this.options = options ?? {}
         const base = new BaseClient(this.target, this.options)
+        this.advisors = new advisors.ServiceClient(base)
+        this.analysis = new analysis.ServiceClient(base)
         this.health = new health.ServiceClient(base)
+        this.interviews = new interviews.ServiceClient(base)
         this.skills = new skills.ServiceClient(base)
+        this.students = new students.ServiceClient(base)
+        this.webhooks = new webhooks.ServiceClient(base)
     }
 
     /**
@@ -84,6 +94,131 @@ export interface ClientOptions {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { assignStudent as api_advisors_assign_student_assignStudent } from "~backend/advisors/assign_student";
+import { create as api_advisors_create_create } from "~backend/advisors/create";
+import { deleteAdvisor as api_advisors_delete_deleteAdvisor } from "~backend/advisors/delete";
+import { get as api_advisors_get_get } from "~backend/advisors/get";
+import { list as api_advisors_list_list } from "~backend/advisors/list";
+import { update as api_advisors_update_update } from "~backend/advisors/update";
+
+export namespace advisors {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.assignStudent = this.assignStudent.bind(this)
+            this.create = this.create.bind(this)
+            this.deleteAdvisor = this.deleteAdvisor.bind(this)
+            this.get = this.get.bind(this)
+            this.list = this.list.bind(this)
+            this.update = this.update.bind(this)
+        }
+
+        public async assignStudent(params: RequestType<typeof api_advisors_assign_student_assignStudent>): Promise<ResponseType<typeof api_advisors_assign_student_assignStudent>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                studentId: params.studentId,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/advisors/${encodeURIComponent(params.id)}/assign-student`, {method: "POST", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_advisors_assign_student_assignStudent>
+        }
+
+        public async create(params: RequestType<typeof api_advisors_create_create>): Promise<ResponseType<typeof api_advisors_create_create>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/advisors`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_advisors_create_create>
+        }
+
+        public async deleteAdvisor(params: { id: number }): Promise<ResponseType<typeof api_advisors_delete_deleteAdvisor>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/advisors/${encodeURIComponent(params.id)}`, {method: "DELETE", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_advisors_delete_deleteAdvisor>
+        }
+
+        public async get(params: { id: number }): Promise<ResponseType<typeof api_advisors_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/advisors/${encodeURIComponent(params.id)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_advisors_get_get>
+        }
+
+        public async list(): Promise<ResponseType<typeof api_advisors_list_list>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/advisors`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_advisors_list_list>
+        }
+
+        public async update(params: RequestType<typeof api_advisors_update_update>): Promise<ResponseType<typeof api_advisors_update_update>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                avatarUrl:       params.avatarUrl,
+                capacity:        params.capacity,
+                email:           params.email,
+                name:            params.name,
+                specialization:  params.specialization,
+                yearsExperience: params.yearsExperience,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/advisors/${encodeURIComponent(params.id)}`, {method: "PATCH", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_advisors_update_update>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { get as api_analysis_get_get } from "~backend/analysis/get";
+import { getCompetencies as api_analysis_get_competencies_getCompetencies } from "~backend/analysis/get_competencies";
+import { getSkills as api_analysis_get_skills_getSkills } from "~backend/analysis/get_skills";
+import { trigger as api_analysis_trigger_trigger } from "~backend/analysis/trigger";
+
+export namespace analysis {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.get = this.get.bind(this)
+            this.getCompetencies = this.getCompetencies.bind(this)
+            this.getSkills = this.getSkills.bind(this)
+            this.trigger = this.trigger.bind(this)
+        }
+
+        public async get(params: { interviewId: number }): Promise<ResponseType<typeof api_analysis_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/analysis/${encodeURIComponent(params.interviewId)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_get_get>
+        }
+
+        public async getCompetencies(params: { interviewId: number }): Promise<ResponseType<typeof api_analysis_get_competencies_getCompetencies>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/analysis/${encodeURIComponent(params.interviewId)}/competencies`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_get_competencies_getCompetencies>
+        }
+
+        public async getSkills(params: { interviewId: number }): Promise<ResponseType<typeof api_analysis_get_skills_getSkills>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/analysis/${encodeURIComponent(params.interviewId)}/skills`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_get_skills_getSkills>
+        }
+
+        public async trigger(params: { interviewId: number }): Promise<ResponseType<typeof api_analysis_trigger_trigger>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/analysis/trigger/${encodeURIComponent(params.interviewId)}`, {method: "POST", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_trigger_trigger>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
 import { check as api_health_check_check } from "~backend/health/check";
 
 export namespace health {
@@ -107,6 +242,87 @@ export namespace health {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { create as api_interviews_create_create } from "~backend/interviews/create";
+import { deleteInterview as api_interviews_delete_deleteInterview } from "~backend/interviews/delete";
+import { get as api_interviews_get_get } from "~backend/interviews/get";
+import { list as api_interviews_list_list } from "~backend/interviews/list";
+import { listByStudent as api_interviews_list_by_student_listByStudent } from "~backend/interviews/list_by_student";
+import { updateStatus as api_interviews_update_status_updateStatus } from "~backend/interviews/update_status";
+
+export namespace interviews {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.create = this.create.bind(this)
+            this.deleteInterview = this.deleteInterview.bind(this)
+            this.get = this.get.bind(this)
+            this.list = this.list.bind(this)
+            this.listByStudent = this.listByStudent.bind(this)
+            this.updateStatus = this.updateStatus.bind(this)
+        }
+
+        public async create(params: RequestType<typeof api_interviews_create_create>): Promise<ResponseType<typeof api_interviews_create_create>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/interviews`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_create_create>
+        }
+
+        public async deleteInterview(params: { id: number }): Promise<ResponseType<typeof api_interviews_delete_deleteInterview>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/interviews/${encodeURIComponent(params.id)}`, {method: "DELETE", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_delete_deleteInterview>
+        }
+
+        public async get(params: { id: number }): Promise<ResponseType<typeof api_interviews_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/interviews/${encodeURIComponent(params.id)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_get_get>
+        }
+
+        public async list(params: RequestType<typeof api_interviews_list_list>): Promise<ResponseType<typeof api_interviews_list_list>> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                limit:     params.limit === undefined ? undefined : String(params.limit),
+                offset:    params.offset === undefined ? undefined : String(params.offset),
+                status:    params.status,
+                studentId: params.studentId === undefined ? undefined : String(params.studentId),
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/interviews`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_list_list>
+        }
+
+        public async listByStudent(params: { studentId: number }): Promise<ResponseType<typeof api_interviews_list_by_student_listByStudent>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/interviews/student/${encodeURIComponent(params.studentId)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_list_by_student_listByStudent>
+        }
+
+        public async updateStatus(params: RequestType<typeof api_interviews_update_status_updateStatus>): Promise<ResponseType<typeof api_interviews_update_status_updateStatus>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                duration:        params.duration,
+                recallBotId:     params.recallBotId,
+                recallMeetingId: params.recallMeetingId,
+                status:          params.status,
+                transcriptUrl:   params.transcriptUrl,
+                videoUrl:        params.videoUrl,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/interviews/${encodeURIComponent(params.id)}/status`, {method: "PATCH", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_update_status_updateStatus>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
 import { detect as api_skills_detect_detect } from "~backend/skills/detect";
 
 export namespace skills {
@@ -123,6 +339,104 @@ export namespace skills {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/skills/detect`, {method: "POST", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_skills_detect_detect>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { create as api_students_create_create } from "~backend/students/create";
+import { deleteStudent as api_students_delete_deleteStudent } from "~backend/students/delete";
+import { get as api_students_get_get } from "~backend/students/get";
+import { list as api_students_list_list } from "~backend/students/list";
+import { update as api_students_update_update } from "~backend/students/update";
+
+export namespace students {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.create = this.create.bind(this)
+            this.deleteStudent = this.deleteStudent.bind(this)
+            this.get = this.get.bind(this)
+            this.list = this.list.bind(this)
+            this.update = this.update.bind(this)
+        }
+
+        public async create(params: RequestType<typeof api_students_create_create>): Promise<ResponseType<typeof api_students_create_create>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/students`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_students_create_create>
+        }
+
+        public async deleteStudent(params: { id: number }): Promise<ResponseType<typeof api_students_delete_deleteStudent>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/students/${encodeURIComponent(params.id)}`, {method: "DELETE", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_students_delete_deleteStudent>
+        }
+
+        public async get(params: { id: number }): Promise<ResponseType<typeof api_students_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/students/${encodeURIComponent(params.id)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_students_get_get>
+        }
+
+        public async list(params: RequestType<typeof api_students_list_list>): Promise<ResponseType<typeof api_students_list_list>> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                advisorId: params.advisorId === undefined ? undefined : String(params.advisorId),
+                cohort:    params.cohort,
+                limit:     params.limit === undefined ? undefined : String(params.limit),
+                offset:    params.offset === undefined ? undefined : String(params.offset),
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/students`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_students_list_list>
+        }
+
+        public async update(params: RequestType<typeof api_students_update_update>): Promise<ResponseType<typeof api_students_update_update>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                advisorId:       params.advisorId,
+                behavioralScore: params.behavioralScore,
+                cohort:          params.cohort,
+                email:           params.email,
+                enrollmentDate:  params.enrollmentDate,
+                name:            params.name,
+                readinessScore:  params.readinessScore,
+                technicalScore:  params.technicalScore,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/students/${encodeURIComponent(params.id)}`, {method: "PATCH", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_students_update_update>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { recall as api_webhooks_recall_recall } from "~backend/webhooks/recall";
+
+export namespace webhooks {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.recall = this.recall.bind(this)
+        }
+
+        public async recall(params: RequestType<typeof api_webhooks_recall_recall>): Promise<ResponseType<typeof api_webhooks_recall_recall>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/webhooks/recall`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_webhooks_recall_recall>
         }
     }
 }
