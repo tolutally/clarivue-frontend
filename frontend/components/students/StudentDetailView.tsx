@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, TrendingUp, AlertCircle } from 'lucide-react';
 import { semantic, gradients, shadows } from '../../utils/colors';
 import type { Student } from '../../types';
 import { ReadinessBreakdown } from './ReadinessBreakdown';
@@ -21,6 +21,12 @@ export function StudentDetailView({ student, onBack }: StudentDetailViewProps) {
     return name.split(' ').map(n => n[0]).join('');
   };
 
+  const READINESS_THRESHOLD = 75;
+  const isLikelyToPlace = student.readinessScore >= READINESS_THRESHOLD;
+  const placementBadge = isLikelyToPlace 
+    ? { label: 'Likely to Place', color: 'bg-green-500', icon: TrendingUp }
+    : { label: 'Needs Development', color: 'bg-yellow-500', icon: AlertCircle };
+
   return (
     <div className="space-y-6">
       <button
@@ -41,8 +47,22 @@ export function StudentDetailView({ student, onBack }: StudentDetailViewProps) {
             <p className="text-white/90 text-lg">{student.role}</p>
           </div>
           <div className="text-right">
-            <div className="text-5xl font-bold mb-1">{student.readinessScore}</div>
-            <div className="text-white/90 text-sm">Average Readiness Score</div>
+            <div className="flex items-center justify-end gap-3 mb-2">
+              <div className="text-5xl font-bold">{student.readinessScore}</div>
+              <div className={`${placementBadge.color} text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-lg`}>
+                <placementBadge.icon className="w-3.5 h-3.5" />
+                {placementBadge.label}
+              </div>
+            </div>
+            <div className="text-white/90 text-sm mb-3">Average Readiness Score</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-left">
+              <div className="text-white/90 text-xs leading-relaxed">
+                Candidates above {READINESS_THRESHOLD} readiness reached employer interviews in an average of <span className="font-semibold">10 days</span>.
+              </div>
+              <div className="text-white font-semibold text-xs mt-1">
+                {student.name.split(' ')[0]}'s current score: {student.readinessScore}
+              </div>
+            </div>
             <div className="text-white/80 text-xs mt-2">Last updated: {student.lastInterviewDate}</div>
           </div>
         </div>
