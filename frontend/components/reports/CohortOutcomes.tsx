@@ -64,9 +64,11 @@ export function CohortOutcomes({ data, compareData, cohortAName, cohortBName }: 
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProgressCurve weeklyData={data.weeklyReadiness} compareWeeklyData={compareData?.weeklyReadiness} cohortAName={cohortAName} cohortBName={cohortBName} />
+        {/* Disabled for MVP
         <BeforeAfterBars data={data.beforeAfter} />
+        */}
         <DistributionHistogram data={data.distribution} compareData={compareData?.distribution} cohortAName={cohortAName} cohortBName={cohortBName} />
       </div>
 
