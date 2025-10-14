@@ -1,6 +1,7 @@
 import { api, APIError } from "encore.dev/api";
 import log from "encore.dev/log";
 import db from "../db";
+import { analysis } from "~encore/clients";
 
 interface TriggerAnalysisRequest {
   interviewId: number;
@@ -9,6 +10,7 @@ interface TriggerAnalysisRequest {
 interface TriggerAnalysisResponse {
   success: boolean;
   message: string;
+  analysisId?: number;
 }
 
 export const trigger = api<TriggerAnalysisRequest, TriggerAnalysisResponse>(
@@ -30,18 +32,17 @@ export const trigger = api<TriggerAnalysisRequest, TriggerAnalysisResponse>(
 
     log.info("Manual analysis triggered", { interview_id: req.interviewId });
 
-    await db.exec`
-      INSERT INTO interview_analysis (interview_id, processed_at)
-      VALUES (${req.interviewId}, NOW())
-      ON CONFLICT (interview_id) DO UPDATE 
-      SET processed_at = NOW()
-    `;
-
-    log.info("Analysis record created/updated", { interview_id: req.interviewId });
-
-    return {
-      success: true,
-      message: "Analysis triggered successfully. AI processing will be implemented in Phase 2.",
-    };
+    try {
+      const result = await analysis.process({ interviewId: req.interviewId });
+      
+      return {
+        success: true,
+        message: result.message,
+        analysisId: result.analysisId
+      };
+    } catch (error) {
+      log.error("Analysis processing failed", { interview_id: req.interviewId, error });
+      throw APIError.internal("Failed to process interview analysis");
+    }
   }
 );

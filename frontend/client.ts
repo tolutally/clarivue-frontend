@@ -175,6 +175,7 @@ export namespace advisors {
 import { get as api_analysis_get_get } from "~backend/analysis/get";
 import { getCompetencies as api_analysis_get_competencies_getCompetencies } from "~backend/analysis/get_competencies";
 import { getSkills as api_analysis_get_skills_getSkills } from "~backend/analysis/get_skills";
+import { process as api_analysis_process_process } from "~backend/analysis/process";
 import { trigger as api_analysis_trigger_trigger } from "~backend/analysis/trigger";
 
 export namespace analysis {
@@ -187,6 +188,7 @@ export namespace analysis {
             this.get = this.get.bind(this)
             this.getCompetencies = this.getCompetencies.bind(this)
             this.getSkills = this.getSkills.bind(this)
+            this.process = this.process.bind(this)
             this.trigger = this.trigger.bind(this)
         }
 
@@ -206,6 +208,12 @@ export namespace analysis {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/analysis/${encodeURIComponent(params.interviewId)}/skills`, {method: "GET", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_get_skills_getSkills>
+        }
+
+        public async process(params: { interviewId: number }): Promise<ResponseType<typeof api_analysis_process_process>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/analysis/process/${encodeURIComponent(params.interviewId)}`, {method: "POST", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_process_process>
         }
 
         public async trigger(params: { interviewId: number }): Promise<ResponseType<typeof api_analysis_trigger_trigger>> {

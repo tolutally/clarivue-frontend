@@ -163,6 +163,16 @@ async function handleTranscriptReady(data: any) {
   `;
 
   log.info("Transcript ready", { bot_id, interview_id: interview.id });
+  
+  if (transcriptUrl) {
+    try {
+      const { analysis } = await import("~encore/clients");
+      await analysis.process({ interviewId: Number(interview.id) });
+      log.info("Automated analysis triggered", { interview_id: interview.id });
+    } catch (error) {
+      log.error("Failed to trigger automated analysis", { interview_id: interview.id, error });
+    }
+  }
 }
 
 async function handleRecordingReady(data: any) {
@@ -173,8 +183,8 @@ async function handleRecordingReady(data: any) {
     return;
   }
 
-  const interview = await db.queryRow<{ id: bigint }>`
-    SELECT id FROM interviews WHERE recall_bot_id = ${bot_id}
+  const interview = await db.queryRow<{ id: bigint; transcript_url: string | null }>`
+    SELECT id, transcript_url FROM interviews WHERE recall_bot_id = ${bot_id}
   `;
 
   if (!interview) {
@@ -194,4 +204,14 @@ async function handleRecordingReady(data: any) {
   `;
 
   log.info("Recording ready", { bot_id, video_url: videoUrl });
+  
+  if (interview.transcript_url) {
+    try {
+      const { analysis } = await import("~encore/clients");
+      await analysis.process({ interviewId: Number(interview.id) });
+      log.info("Automated analysis triggered from recording.ready", { interview_id: interview.id });
+    } catch (error) {
+      log.error("Failed to trigger automated analysis", { interview_id: interview.id, error });
+    }
+  }
 }
