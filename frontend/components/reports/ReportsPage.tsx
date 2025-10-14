@@ -52,9 +52,6 @@ export function ReportsPage() {
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className={`text-3xl font-bold ${semantic.textPrimary}`}>Analytics</h1>
-            <div className={`text-sm ${semantic.textTertiary}`}>
-              Student outcomes, capacity & program insights
-            </div>
           </div>
           <p className={`text-sm ${semantic.textSecondary} max-w-3xl`}>
           Measure how readiness gains translate into job outcomes, and where to focus coaching time.
