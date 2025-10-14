@@ -1,4 +1,4 @@
-import { Lightbulb, Download, FileText, FileSpreadsheet, Mail, HelpCircle, Clock, Target, Users } from 'lucide-react';
+import { Lightbulb, Share2, FileText, FileSpreadsheet, Mail, HelpCircle, Clock, Target, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { semantic, text } from '../../utils/colors';
 import {
@@ -73,15 +73,15 @@ export function AutoInsightsPanel({ insights }: AutoInsightsPanelProps) {
       </div>
 
       <div className={`${semantic.surface} rounded-lg border ${semantic.borderMedium} p-5`}>
-        <h3 className={`text-sm font-semibold ${semantic.textPrimary} mb-4`}>Export & Schedule</h3>
+        <h3 className={`text-sm font-semibold ${semantic.textPrimary} mb-4`}>Share & Schedule</h3>
         <div className="space-y-2">
           <Button variant="outline" className="w-full justify-start gap-3">
             <FileText className="w-4 h-4 text-[#FE686D]" />
-            Export as PDF
+            Share as PDF
           </Button>
           <Button variant="outline" className="w-full justify-start gap-3">
             <FileSpreadsheet className="w-4 h-4 text-[#C8A0FE]" />
-            Export as CSV
+            Share as CSV
           </Button>
           <div className={`border-t ${semantic.borderMedium} my-3`} />
           <Button variant="outline" className="w-full justify-start gap-3">

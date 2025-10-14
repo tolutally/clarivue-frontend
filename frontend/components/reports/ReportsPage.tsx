@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { semantic } from '../../utils/colors';
 import { GlobalControls } from './GlobalControls';
+import { GlobalMetricRibbon } from './GlobalMetricRibbon';
 import { AutoInsightsPanel } from './AutoInsightsPanel';
 import { ReadinessTrends } from './ReadinessTrends';
 
@@ -47,6 +48,7 @@ export function ReportsPage() {
 
   return (
     <div className={`min-h-screen ${semantic.bgSubtle}`}>
+      <GlobalMetricRibbon />
       <div className={`${semantic.surface} border-b ${semantic.borderMedium}`}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">

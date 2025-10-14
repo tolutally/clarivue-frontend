@@ -274,15 +274,15 @@ export const mockIntervention: InterventionData = {
 
 export const autoInsights = {
   efficiency: [
-    'Advisor reviews within 24h → +7 point avg improvement',
-    'First mock within 3 days of signup → +18% completion rate',
+    '24h advisor reviews boost avg scores by +7 pts',
+    'Early mock scheduling accelerates completion by +18%',
   ],
   skillGaps: [
-    'Confidence limits Engineering candidates — recommend 3× micro-practice modules',
-    'Business candidates strong in communication, weak in technical demos',
+    'Engineering confidence gaps require 3× micro-practice modules',
+    'Business students excel in communication, struggle with technical demos',
   ],
   equity: [
-    'First-gen candidates close gap after 2 workshops',
-    'Recommend targeted STAR sessions for underrepresented groups',
+    'First-gen students close readiness gap after 2 workshops',
+    'STAR sessions accelerate gains for underrepresented groups',
   ],
 };

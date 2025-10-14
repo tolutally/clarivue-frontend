@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Download, Mail, FileText, FileSpreadsheet, X } from 'lucide-react';
+import { Share2, Mail, FileText, FileSpreadsheet, X } from 'lucide-react';
 import { semantic, text } from '../../utils/colors';
 import type { ReportFilters } from '../../data/reports-data';
 
@@ -202,18 +202,18 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
             className="gap-2"
             onClick={() => setShowExportMenu(!showExportMenu)}
           >
-            <Download className="w-4 h-4" />
-            Export
+            <Share2 className="w-4 h-4" />
+            Share Results
           </Button>
           {showExportMenu && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
               <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
                 <FileText className="w-4 h-4 text-red-600" />
-                Export as PDF
+                Share as PDF
               </button>
               <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
                 <FileSpreadsheet className="w-4 h-4 text-green-600" />
-                Export as CSV
+                Share as CSV
               </button>
               <div className="border-t border-gray-200 my-2" />
               <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
