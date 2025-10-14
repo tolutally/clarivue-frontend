@@ -82,6 +82,7 @@ export interface DetectedSkill {
   confidence: 'high' | 'mentioned' | 'missing';
   category: string;
   evidenceTimestamp?: string;
+  context?: string;
 }
 
 export interface AuthenticitySignal {

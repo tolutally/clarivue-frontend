@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp, ExternalLink, Clock, CheckCircle } from 'lucide-react';
 import { semantic, shadows, backgrounds, hover, gradients } from '../../utils/colors';
-import type { InterviewReport } from '../../types';
+import type { InterviewReport, DetectedSkill } from '../../types';
 import { SummaryNote } from './SummaryNote';
 import { StrengthsConcerns } from './StrengthsConcerns';
 import { CompetencyTable } from './CompetencyTable';
@@ -10,6 +10,8 @@ import { AIFeedbackRecommendations } from './AIFeedbackRecommendations';
 import { AdvisorNotes } from './AdvisorNotes';
 import { TechnicalDepthIndex } from './TechnicalDepthIndex';
 import { SkillTagsPanel } from './SkillTagsPanel';
+import { SkillsMentioned } from './SkillsMentioned';
+import backend from '~backend/client';
 
 interface InterviewReportCardProps {
   report: InterviewReport;
@@ -17,6 +19,29 @@ interface InterviewReportCardProps {
 
 export function InterviewReportCard({ report }: InterviewReportCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [detectedSkills, setDetectedSkills] = useState<DetectedSkill[]>(report.detectedSkills || []);
+  const [isDetecting, setIsDetecting] = useState(false);
+  const transcriptViewerRef = useRef<{ scrollToTimestamp: (timestamp: string) => void } | null>(null);
+
+  useEffect(() => {
+    if (isExpanded && !report.detectedSkills && report.transcript && !isDetecting) {
+      setIsDetecting(true);
+      backend.skills.detect({ transcript: report.transcript, interviewId: report.id })
+        .then(response => {
+          setDetectedSkills(response.skills);
+        })
+        .catch(err => {
+          console.error('Failed to detect skills:', err);
+        })
+        .finally(() => {
+          setIsDetecting(false);
+        });
+    }
+  }, [isExpanded, report.transcript, report.detectedSkills, report.id, isDetecting]);
+
+  const handleTimestampClick = (timestamp: string) => {
+    transcriptViewerRef.current?.scrollToTimestamp(timestamp);
+  };
 
   return (
     <div className={`${semantic.surface} rounded-xl ${shadows.sm} border ${semantic.border} overflow-hidden`}>
@@ -76,6 +101,22 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
             <SkillTagsPanel skills={report.detectedSkills} />
           )}
 
+          {(detectedSkills.length > 0 || isDetecting) && (
+            <div className={`${semantic.surface} rounded-xl p-6 border ${semantic.border}`}>
+              {isDetecting ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="ml-3 text-muted-foreground">Detecting skills...</span>
+                </div>
+              ) : (
+                <SkillsMentioned 
+                  skills={detectedSkills} 
+                  onTimestampClick={handleTimestampClick}
+                />
+              )}
+            </div>
+          )}
+
           <SummaryNote note={report.summaryNote} />
 
           <StrengthsConcerns strengths={report.strengths} concerns={report.concerns} />
@@ -84,6 +125,7 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
 
           <div className="flex items-center gap-3">
             <TranscriptViewer 
+              ref={transcriptViewerRef}
               transcript={report.transcript}
               interviewNumber={report.interviewNumber}
             />

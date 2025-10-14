@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
 import { FileText, Download, Mail, Share2, Search } from 'lucide-react';
 import { semantic, backgrounds, shadows } from '../../utils/colors';
 
@@ -7,10 +7,35 @@ interface TranscriptViewerProps {
   interviewNumber: number;
 }
 
-export function TranscriptViewer({ transcript, interviewNumber }: TranscriptViewerProps) {
+export interface TranscriptViewerHandle {
+  scrollToTimestamp: (timestamp: string) => void;
+}
+
+export const TranscriptViewer = forwardRef<TranscriptViewerHandle, TranscriptViewerProps>(
+  ({ transcript, interviewNumber }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'star' | 'weak'>('all');
+  const [highlightTimestamp, setHighlightTimestamp] = useState<string | null>(null);
+  const transcriptContentRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    scrollToTimestamp: (timestamp: string) => {
+      setIsOpen(true);
+      setHighlightTimestamp(timestamp);
+      setTimeout(() => {
+        const element = transcriptContentRef.current?.querySelector(`[data-timestamp="${timestamp}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }));
+
+  const extractTimestampFromSection = (section: string): string | null => {
+    const timestampMatch = section.match(/(\d{1,2}:\d{2}(?::\d{2})?)/);
+    return timestampMatch ? timestampMatch[1] : null;
+  };
 
   const highlightText = (text: string, query: string) => {
     if (!query) return text;
@@ -127,15 +152,27 @@ export function TranscriptViewer({ transcript, interviewNumber }: TranscriptView
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div ref={transcriptContentRef} className="flex-1 overflow-y-auto p-6">
               <div className="prose prose-sm max-w-none">
-                {filteredTranscript.map((section, index) => (
-                  <div key={index} className={`mb-4 p-4 ${semantic.bgSubtle} rounded-lg border ${semantic.border}`}>
-                    <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
-                      {highlightText(section, searchQuery)}
-                    </pre>
-                  </div>
-                ))}
+                {filteredTranscript.map((section, index) => {
+                  const sectionTimestamp = extractTimestampFromSection(section);
+                  const isHighlighted = highlightTimestamp && sectionTimestamp === highlightTimestamp;
+                  return (
+                    <div 
+                      key={index} 
+                      data-timestamp={sectionTimestamp || undefined}
+                      className={`mb-4 p-4 rounded-lg border transition-all ${
+                        isHighlighted 
+                          ? 'bg-amber-50 border-amber-300 shadow-md' 
+                          : `${semantic.bgSubtle} ${semantic.border}`
+                      }`}
+                    >
+                      <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
+                        {highlightText(section, searchQuery)}
+                      </pre>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -143,4 +180,4 @@ export function TranscriptViewer({ transcript, interviewNumber }: TranscriptView
       )}
     </>
   );
-}
+});
