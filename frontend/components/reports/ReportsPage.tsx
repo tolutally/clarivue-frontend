@@ -21,10 +21,10 @@ import {
 
 const tabs = [
   { id: 'cohort', label: 'Cohort Outcomes' },
-  { id: 'readiness', label: 'Readiness Trends' },
-  { id: 'capacity', label: 'Capacity & Coverage' },
+  // { id: 'readiness', label: 'Readiness Trends' }, // Disabled for MVP
+  // { id: 'capacity', label: 'Capacity & Coverage' }, // Disabled for MVP
   { id: 'skills', label: 'Skill Gaps Map' },
-  { id: 'roles', label: 'Role-Pack Readiness' },
+  // { id: 'roles', label: 'Role-Pack Readiness' }, // Disabled for MVP
   { id: 'intervention', label: 'Intervention Impact' },
 ];
 
@@ -111,15 +111,21 @@ export function ReportsPage() {
                     cohortBName={selectedCohortB ? cohortNames[selectedCohortB] : undefined}
                   />
                 )}
+                {/* Disabled for MVP
                 {activeTab === 'readiness' && (
                   <ReadinessTrends 
                     cohortName={cohortNames[selectedCohortA]}
                     showAtRiskOnly={filters.atRisk || false}
                   />
                 )}
+                */}
+                {/* Disabled for MVP
                 {activeTab === 'capacity' && <CapacityCoverage data={mockCapacity} />}
+                */}
                 {activeTab === 'skills' && <SkillGapsMap data={mockSkillGaps} />}
+                {/* Disabled for MVP
                 {activeTab === 'roles' && <RolePackReadiness data={mockRolePack} />}
+                */}
                 {activeTab === 'intervention' && <InterventionImpact data={mockIntervention} />}
               </div>
             </Suspense>
