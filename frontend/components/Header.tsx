@@ -18,7 +18,7 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
       <div className="max-w-[1600px] mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <img src="/clarivue -logo.png" alt="Clarivue" className="h-8" />
+            <img src="/clarivue-logo.png" alt="Clarivue" className="h-8" />
           </div>
           
           <nav className="flex gap-1">
