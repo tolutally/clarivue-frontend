@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, TrendingUp } from 'lucide-react';
 import type { SkillGapsData } from '../../data/reports-data';
 
 interface SkillGapsMapProps {
@@ -17,6 +17,35 @@ export function SkillGapsMap({ data }: SkillGapsMapProps) {
 
   return (
     <div className="space-y-6">
+      <div className="bg-gradient-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/20 p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <AlertTriangle className="w-4 h-4 text-[#FE686D]" />
+          <h3 className="text-sm font-semibold text-gray-900">Skill Gap Callouts</h3>
+          <div className="ml-auto flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-[#C8A0FE]/30 shadow-sm">
+            <TrendingUp className="w-4 h-4 text-[#C8A0FE]" />
+            <span className="text-sm text-gray-700">ROI Insight: Closing top 2 gaps improves placement probability by <span className="font-bold text-[#C8A0FE]">+18%</span></span>
+          </div>
+        </div>
+        <div className="space-y-2">
+          {data.callouts.map((callout, i) => {
+            const studentsAffected = i === 0 ? 40 : i === 1 ? 35 : 28;
+            return (
+              <div
+                key={i}
+                className="bg-white rounded-lg px-4 py-3 border border-[#FE686D]/20 shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700">{callout}</span>
+                  <span className="text-xs font-semibold text-[#FE686D] bg-[#FE686D]/10 px-3 py-1 rounded-full">
+                    Impact Potential: {studentsAffected} students affected
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="bg-white rounded-lg border border-gray-200 p-5">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-sm font-semibold text-gray-900">Skills Heatmap by Program</h3>
@@ -87,23 +116,6 @@ export function SkillGapsMap({ data }: SkillGapsMapProps) {
             <div className="w-8 h-4 rounded bg-[#C8A0FE]/20 border border-[#C8A0FE]" />
             <span className="text-gray-600">Above Target</span>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-gradient-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/20 p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <AlertTriangle className="w-4 h-4 text-[#FE686D]" />
-          <h3 className="text-sm font-semibold text-gray-900">Skill Gap Callouts</h3>
-        </div>
-        <div className="space-y-2">
-          {data.callouts.map((callout, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-lg px-4 py-3 text-sm text-gray-700 border border-[#FE686D]/20 shadow-sm"
-            >
-              {callout}
-            </div>
-          ))}
         </div>
       </div>
     </div>

@@ -68,6 +68,14 @@ export interface AdvisorNote {
   visibleToStudent: boolean;
 }
 
+export interface AuthenticitySignal {
+  signal: string;
+  status: 'healthy' | 'minor-concern' | 'major-concern';
+  type: 'Behavioral' | 'Linguistic' | 'Audio' | 'Cognitive';
+  insight: string;
+  timestamp?: string;
+}
+
 export interface Advisor {
   id: string;
   name: string;

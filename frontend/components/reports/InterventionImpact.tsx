@@ -11,6 +11,16 @@ export function InterventionImpact({ data }: InterventionImpactProps) {
 
   return (
     <div className="space-y-6">
+      <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-bold text-gray-900">Intervention Impact</h3>
+          <div className="text-sm text-gray-700 font-semibold bg-white px-4 py-2 rounded-lg border border-[#C8A0FE]/30 shadow-sm">
+            Compared to non-participants: <span className="text-[#C8A0FE] font-bold">+9 pts</span> higher readiness gain
+          </div>
+        </div>
+        <p className="text-xs text-gray-600 mb-5">Avg feedback time reduced by <span className="font-semibold text-[#C8A0FE]">32%</span> per student</p>
+      </div>
+
       <div className="bg-white rounded-lg border border-gray-200 p-5">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-sm font-semibold text-gray-900">Select Intervention</h3>
@@ -52,7 +62,7 @@ export function InterventionImpact({ data }: InterventionImpactProps) {
                 positive={true}
               />
               <ImpactCard
-                label="Red-Flag Rate"
+                label="Interview Confidence Flags"
                 value={intervention.beforeAfter.redFlagRateBefore - intervention.beforeAfter.redFlagRateAfter}
                 suffix="%"
                 beforeValue={intervention.beforeAfter.redFlagRateBefore}
@@ -81,7 +91,7 @@ export function InterventionImpact({ data }: InterventionImpactProps) {
                 change={intervention.beforeAfter.communication}
               />
               <BeforeAfterComparison
-                metric="Red-Flag Detection Rate"
+                metric="Interview Confidence Flags"
                 before={intervention.beforeAfter.redFlagRateBefore}
                 after={intervention.beforeAfter.redFlagRateAfter}
                 change={-(intervention.beforeAfter.redFlagRateBefore - intervention.beforeAfter.redFlagRateAfter)}
