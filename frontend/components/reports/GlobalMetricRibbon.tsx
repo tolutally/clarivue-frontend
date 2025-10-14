@@ -3,7 +3,7 @@ import { TrendingUp, Briefcase, Clock } from 'lucide-react';
 export function GlobalMetricRibbon() {
   return (
     <div className="bg-gradient-to-r from-[#102C64] to-[#102C64]/95 border-b border-[#C8A0FE]/30 px-6 py-4">
-      <div className="flex items-center justify-between max-w-7xl mx-auto">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-8">
           <MetricCard
             icon={<TrendingUp className="w-5 h-5 text-[#C8A0FE]" />}

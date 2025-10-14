@@ -48,7 +48,6 @@ export function ReportsPage() {
 
   return (
     <div className={`min-h-screen ${semantic.bgSubtle}`}>
-      <GlobalMetricRibbon />
       <div className={`${semantic.surface} border-b ${semantic.borderMedium}`}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">
@@ -70,6 +69,8 @@ export function ReportsPage() {
           onCohortAChange={setSelectedCohortA}
           onCohortBChange={setSelectedCohortB}
         />
+
+        <GlobalMetricRibbon />
 
         <div className="px-6">
           <div className={`flex gap-1 border-b ${semantic.borderMedium}`}>
