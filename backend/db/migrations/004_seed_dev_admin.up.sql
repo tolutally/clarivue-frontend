@@ -1,7 +1,7 @@
 INSERT INTO admins (email, password_hash, first_name, last_name, role)
 VALUES (
   'admin@clarivue.dev',
-  'dev_salt:8d2c3f23cf0e4f8cb3c4c7e9e4f8c4d7b6a5f4e3d2c1b0a9f8e7d6c5b4a3d2e1f0c9b8a7d6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9f8e7d6c5b4a3d2e1',
+  'dev_salt:6cf16bd85a21b1855efc8d64ba75d80414ff6e2f5ae37517301df579178d8dde89e95576a26af904ed9864245790f2da42ed84d2d02d09858e8e8a2356c12f59',
   'Dev',
   'Admin',
   'admin'
