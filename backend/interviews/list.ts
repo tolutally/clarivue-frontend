@@ -1,6 +1,6 @@
 import { api } from "encore.dev/api";
 import { Query } from "encore.dev/api";
-import db from "../db";
+import { db } from "../db";
 
 export interface Interview {
   id: number;

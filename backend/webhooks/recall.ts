@@ -1,6 +1,6 @@
 import { api, APIError } from "encore.dev/api";
 import log from "encore.dev/log";
-import db from "../db";
+import { db } from "../db";
 
 interface RecallWebhookRequest {
   event: string;
