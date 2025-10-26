@@ -8,6 +8,7 @@ export interface MagicLinkRequest {
 
 export interface MagicLinkResponse {
   success: boolean;
+  devToken?: string;
 }
 
 export const requestMagicLink = api<MagicLinkRequest, MagicLinkResponse>(
@@ -29,6 +30,6 @@ export const requestMagicLink = api<MagicLinkRequest, MagicLinkResponse>(
       VALUES (${req.email}, ${token}, ${expiresAt})
     `;
 
-    return { success: true };
+    return { success: true, devToken: token };
   }
 );
