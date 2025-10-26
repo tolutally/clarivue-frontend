@@ -35,6 +35,8 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
 export class Client {
     public readonly advisors: advisors.ServiceClient
     public readonly analysis: analysis.ServiceClient
+    public readonly auth: auth.ServiceClient
+    public readonly cohorts: cohorts.ServiceClient
     public readonly health: health.ServiceClient
     public readonly interviews: interviews.ServiceClient
     public readonly skills: skills.ServiceClient
@@ -56,6 +58,8 @@ export class Client {
         const base = new BaseClient(this.target, this.options)
         this.advisors = new advisors.ServiceClient(base)
         this.analysis = new analysis.ServiceClient(base)
+        this.auth = new auth.ServiceClient(base)
+        this.cohorts = new cohorts.ServiceClient(base)
         this.health = new health.ServiceClient(base)
         this.interviews = new interviews.ServiceClient(base)
         this.skills = new skills.ServiceClient(base)
@@ -77,6 +81,11 @@ export class Client {
 }
 
 /**
+ * Import the auth handler to be able to derive the auth type
+ */
+import type { auth as auth_auth } from "~backend/auth/auth";
+
+/**
  * ClientOptions allows you to override any default behaviour within the generated Encore client.
  */
 export interface ClientOptions {
@@ -89,6 +98,13 @@ export interface ClientOptions {
 
     /** Default RequestInit to be used for the client */
     requestInit?: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
+
+    /**
+     * Allows you to set the authentication data to be used for each
+     * request either by passing in a static object or by passing in
+     * a function which returns a new object for each request.
+     */
+    auth?: RequestType<typeof auth_auth> | AuthDataGenerator
 }
 
 /**
@@ -220,6 +236,110 @@ export namespace analysis {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/analysis/trigger/${encodeURIComponent(params.interviewId)}`, {method: "POST", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analysis_trigger_trigger>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { login as api_auth_login_login } from "~backend/auth/login";
+import { me as api_auth_me_me } from "~backend/auth/me";
+import {
+    completeOnboarding as api_auth_onboard_completeOnboarding,
+    verifyInvite as api_auth_onboard_verifyInvite
+} from "~backend/auth/onboard";
+import { requestMagicLink as api_auth_request_magic_link_requestMagicLink } from "~backend/auth/request_magic_link";
+import { verifyMagicLink as api_auth_verify_magic_link_verifyMagicLink } from "~backend/auth/verify_magic_link";
+
+export namespace auth {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.completeOnboarding = this.completeOnboarding.bind(this)
+            this.login = this.login.bind(this)
+            this.me = this.me.bind(this)
+            this.requestMagicLink = this.requestMagicLink.bind(this)
+            this.verifyInvite = this.verifyInvite.bind(this)
+            this.verifyMagicLink = this.verifyMagicLink.bind(this)
+        }
+
+        public async completeOnboarding(params: RequestType<typeof api_auth_onboard_completeOnboarding>): Promise<ResponseType<typeof api_auth_onboard_completeOnboarding>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/onboard/complete`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_onboard_completeOnboarding>
+        }
+
+        public async login(params: RequestType<typeof api_auth_login_login>): Promise<ResponseType<typeof api_auth_login_login>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/login`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_login_login>
+        }
+
+        public async me(): Promise<ResponseType<typeof api_auth_me_me>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/me`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_me_me>
+        }
+
+        public async requestMagicLink(params: RequestType<typeof api_auth_request_magic_link_requestMagicLink>): Promise<ResponseType<typeof api_auth_request_magic_link_requestMagicLink>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/magic-link`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_request_magic_link_requestMagicLink>
+        }
+
+        public async verifyInvite(params: RequestType<typeof api_auth_onboard_verifyInvite>): Promise<ResponseType<typeof api_auth_onboard_verifyInvite>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/onboard/verify`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_onboard_verifyInvite>
+        }
+
+        public async verifyMagicLink(params: RequestType<typeof api_auth_verify_magic_link_verifyMagicLink>): Promise<ResponseType<typeof api_auth_verify_magic_link_verifyMagicLink>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/magic-link/verify`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_verify_magic_link_verifyMagicLink>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { create as api_cohorts_create_create } from "~backend/cohorts/create";
+import { get as api_cohorts_get_get } from "~backend/cohorts/get";
+import { list as api_cohorts_list_list } from "~backend/cohorts/list";
+
+export namespace cohorts {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.create = this.create.bind(this)
+            this.get = this.get.bind(this)
+            this.list = this.list.bind(this)
+        }
+
+        public async create(params: RequestType<typeof api_cohorts_create_create>): Promise<ResponseType<typeof api_cohorts_create_create>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/cohorts`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_cohorts_create_create>
+        }
+
+        public async get(params: { id: string }): Promise<ResponseType<typeof api_cohorts_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/cohorts/${encodeURIComponent(params.id)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_cohorts_get_get>
+        }
+
+        public async list(): Promise<ResponseType<typeof api_cohorts_list_list>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/cohorts`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_cohorts_list_list>
         }
     }
 }
@@ -703,6 +823,11 @@ type CallParameters = Omit<RequestInit, "headers"> & {
     query?: Record<string, string | string[]>
 }
 
+// AuthDataGenerator is a function that returns a new instance of the authentication data required by this API
+export type AuthDataGenerator = () =>
+  | RequestType<typeof auth_auth>
+  | Promise<RequestType<typeof auth_auth> | undefined>
+  | undefined;
 
 // A fetcher is the prototype for the inbuilt Fetch function
 export type Fetcher = typeof fetch;
@@ -714,6 +839,7 @@ class BaseClient {
     readonly fetcher: Fetcher
     readonly headers: Record<string, string>
     readonly requestInit: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
+    readonly authGenerator?: AuthDataGenerator
 
     constructor(baseURL: string, options: ClientOptions) {
         this.baseURL = baseURL
@@ -733,9 +859,41 @@ class BaseClient {
         } else {
             this.fetcher = boundFetch
         }
+
+        // Setup an authentication data generator using the auth data token option
+        if (options.auth !== undefined) {
+            const auth = options.auth
+            if (typeof auth === "function") {
+                this.authGenerator = auth
+            } else {
+                this.authGenerator = () => auth
+            }
+        }
     }
 
     async getAuthData(): Promise<CallParameters | undefined> {
+        let authData: RequestType<typeof auth_auth> | undefined;
+
+        // If authorization data generator is present, call it and add the returned data to the request
+        if (this.authGenerator) {
+            const mayBePromise = this.authGenerator();
+            if (mayBePromise instanceof Promise) {
+                authData = await mayBePromise;
+            } else {
+                authData = mayBePromise;
+            }
+        }
+
+        if (authData) {
+            const data: CallParameters = {};
+
+            data.headers = makeRecord<string, string>({
+                authorization: authData.authorization,
+            });
+
+            return data;
+        }
+
         return undefined;
     }
 
