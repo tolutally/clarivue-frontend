@@ -39,6 +39,7 @@ export class Client {
     public readonly cohorts: cohorts.ServiceClient
     public readonly health: health.ServiceClient
     public readonly interviews: interviews.ServiceClient
+    public readonly mockinterviews: mockinterviews.ServiceClient
     public readonly skills: skills.ServiceClient
     public readonly students: students.ServiceClient
     public readonly webhooks: webhooks.ServiceClient
@@ -62,6 +63,7 @@ export class Client {
         this.cohorts = new cohorts.ServiceClient(base)
         this.health = new health.ServiceClient(base)
         this.interviews = new interviews.ServiceClient(base)
+        this.mockinterviews = new mockinterviews.ServiceClient(base)
         this.skills = new skills.ServiceClient(base)
         this.students = new students.ServiceClient(base)
         this.webhooks = new webhooks.ServiceClient(base)
@@ -444,6 +446,85 @@ export namespace interviews {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/interviews/${encodeURIComponent(params.id)}/status`, {method: "PATCH", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_interviews_update_status_updateStatus>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { completeProfile as api_mockinterviews_complete_profile_completeProfile } from "~backend/mockinterviews/complete_profile";
+import { createInterviewSession as api_mockinterviews_create_interview_session_createInterviewSession } from "~backend/mockinterviews/create_interview_session";
+import { getJDMetrics as api_mockinterviews_get_jd_metrics_getJDMetrics } from "~backend/mockinterviews/get_jd_metrics";
+import { getSampleJDs as api_mockinterviews_get_sample_jds_getSampleJDs } from "~backend/mockinterviews/get_sample_jds";
+import { parseJD as api_mockinterviews_parse_jd_parseJD } from "~backend/mockinterviews/parse_jd";
+import { submitConsent as api_mockinterviews_submit_consent_submitConsent } from "~backend/mockinterviews/submit_consent";
+import { updateJDMetrics as api_mockinterviews_update_jd_metrics_updateJDMetrics } from "~backend/mockinterviews/update_jd_metrics";
+import { verifyToken as api_mockinterviews_verify_token_verifyToken } from "~backend/mockinterviews/verify_token";
+
+export namespace mockinterviews {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.completeProfile = this.completeProfile.bind(this)
+            this.createInterviewSession = this.createInterviewSession.bind(this)
+            this.getJDMetrics = this.getJDMetrics.bind(this)
+            this.getSampleJDs = this.getSampleJDs.bind(this)
+            this.parseJD = this.parseJD.bind(this)
+            this.submitConsent = this.submitConsent.bind(this)
+            this.updateJDMetrics = this.updateJDMetrics.bind(this)
+            this.verifyToken = this.verifyToken.bind(this)
+        }
+
+        public async completeProfile(params: RequestType<typeof api_mockinterviews_complete_profile_completeProfile>): Promise<ResponseType<typeof api_mockinterviews_complete_profile_completeProfile>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/complete-profile`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_complete_profile_completeProfile>
+        }
+
+        public async createInterviewSession(params: RequestType<typeof api_mockinterviews_create_interview_session_createInterviewSession>): Promise<ResponseType<typeof api_mockinterviews_create_interview_session_createInterviewSession>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/create-interview-session`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_create_interview_session_createInterviewSession>
+        }
+
+        public async getJDMetrics(params: RequestType<typeof api_mockinterviews_get_jd_metrics_getJDMetrics>): Promise<ResponseType<typeof api_mockinterviews_get_jd_metrics_getJDMetrics>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/get-jd-metrics`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_get_jd_metrics_getJDMetrics>
+        }
+
+        public async getSampleJDs(): Promise<ResponseType<typeof api_mockinterviews_get_sample_jds_getSampleJDs>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/sample-jds`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_get_sample_jds_getSampleJDs>
+        }
+
+        public async parseJD(params: RequestType<typeof api_mockinterviews_parse_jd_parseJD>): Promise<ResponseType<typeof api_mockinterviews_parse_jd_parseJD>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/parse-jd`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_parse_jd_parseJD>
+        }
+
+        public async submitConsent(params: RequestType<typeof api_mockinterviews_submit_consent_submitConsent>): Promise<ResponseType<typeof api_mockinterviews_submit_consent_submitConsent>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/submit-consent`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_submit_consent_submitConsent>
+        }
+
+        public async updateJDMetrics(params: RequestType<typeof api_mockinterviews_update_jd_metrics_updateJDMetrics>): Promise<ResponseType<typeof api_mockinterviews_update_jd_metrics_updateJDMetrics>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/update-jd-metrics`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_update_jd_metrics_updateJDMetrics>
+        }
+
+        public async verifyToken(params: RequestType<typeof api_mockinterviews_verify_token_verifyToken>): Promise<ResponseType<typeof api_mockinterviews_verify_token_verifyToken>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/mockinterviews/verify-token`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_mockinterviews_verify_token_verifyToken>
         }
     }
 }

@@ -9,6 +9,12 @@ import { CohortsPage } from './pages/CohortsPage';
 import { CreateCohortPage } from './pages/CreateCohortPage';
 import { CohortDetailPage } from './pages/CohortDetailPage';
 import { AllStudentsPage } from './pages/AllStudentsPage';
+import { WelcomePage } from './pages/mockinterviews/WelcomePage';
+import { CompleteProfilePage } from './pages/mockinterviews/CompleteProfilePage';
+import { ConsentPage } from './pages/mockinterviews/ConsentPage';
+import { JDIntakePage } from './pages/mockinterviews/JDIntakePage';
+import { JDReviewPage } from './pages/mockinterviews/JDReviewPage';
+import { InterviewReadyPage } from './pages/mockinterviews/InterviewReadyPage';
 import './styles/theme.css';
 
 export default function App() {
@@ -51,6 +57,42 @@ export default function App() {
               <ProtectedRoute>
                 <AllStudentsPage />
               </ProtectedRoute>
+            } />
+            
+            <Route path="/mockinterviews/welcome/:token" element={
+              <PublicRoute>
+                <WelcomePage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/mockinterviews/profile/:token" element={
+              <PublicRoute>
+                <CompleteProfilePage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/mockinterviews/consent/:token" element={
+              <PublicRoute>
+                <ConsentPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/mockinterviews/jd-intake/:token" element={
+              <PublicRoute>
+                <JDIntakePage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/mockinterviews/jd-review/:token" element={
+              <PublicRoute>
+                <JDReviewPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/mockinterviews/ready/:token" element={
+              <PublicRoute>
+                <InterviewReadyPage />
+              </PublicRoute>
             } />
             
             <Route path="/" element={<Navigate to="/cohorts" replace />} />
