@@ -2,6 +2,7 @@ import { api, APIError } from "encore.dev/api";
 import log from "encore.dev/log";
 import { db } from "../db";
 import { skills } from "~encore/clients";
+import type { SentimentScores, TranscriptData, TranscriptSegment } from "../types/analysis";
 
 interface ProcessAnalysisRequest {
   interviewId: number;
@@ -19,20 +20,23 @@ async function fetchTranscript(transcriptUrl: string): Promise<string> {
     if (!response.ok) {
       throw new Error(`Failed to fetch transcript: ${response.statusText}`);
     }
-    const data: any = await response.json();
+    const data: unknown = await response.json();
     
     if (typeof data === 'string') {
       return data;
     }
     
-    if (data && data.transcript) {
-      return typeof data.transcript === 'string' 
-        ? data.transcript 
-        : JSON.stringify(data.transcript);
+    if (data && typeof data === 'object' && 'transcript' in data) {
+      const transcriptData = data as TranscriptData;
+      if (transcriptData.transcript) {
+        return typeof transcriptData.transcript === 'string' 
+          ? transcriptData.transcript 
+          : JSON.stringify(transcriptData.transcript);
+      }
     }
     
     if (Array.isArray(data) && data.length > 0) {
-      return data.map((segment: any) => segment.text || segment.content || '').join('\n');
+      return data.map((segment: TranscriptSegment) => segment.text || segment.content || '').join('\n');
     }
     
     return JSON.stringify(data);
@@ -48,20 +52,13 @@ interface CompetencyAnalysis {
   evidence: string;
 }
 
-interface SentimentScore {
-  confidence: number;
-  enthusiasm: number;
-  professionalism: number;
-  clarity: number;
-}
-
 async function analyzeTranscriptWithAI(transcript: string): Promise<{
   competencies: CompetencyAnalysis[];
   strengths: string[];
   concerns: string[];
   aiSummary: string;
   aiRecommendations: string;
-  sentimentScores: SentimentScore;
+  sentimentScores: SentimentScores;
   authenticityScore: number;
 }> {
   const competencies = analyzeCompetencies(transcript);
@@ -284,7 +281,7 @@ function generateRecommendations(
   return recommendations.join(" ");
 }
 
-function analyzeSentiment(transcript: string): SentimentScore {
+function analyzeSentiment(transcript: string): SentimentScores {
   const lower = transcript.toLowerCase();
   
   const positiveWords = ["excited", "love", "great", "amazing", "excellent", "enjoy", "passionate", "interested"];
@@ -320,7 +317,7 @@ function analyzeSentiment(transcript: string): SentimentScore {
   };
 }
 
-function calculateAuthenticityScore(transcript: string, sentiment: SentimentScore): number {
+function calculateAuthenticityScore(transcript: string, sentiment: SentimentScores): number {
   const lower = transcript.toLowerCase();
   
   const personalPronouns = lower.match(/\b(i|my|me|mine)\b/g)?.length || 0;
@@ -348,7 +345,7 @@ function calculateReadinessScore(
   competencies: CompetencyAnalysis[],
   skillsCount: number,
   authenticityScore: number,
-  sentimentScores: SentimentScore
+  sentimentScores: SentimentScores
 ): number {
   const avgCompetencyScore = competencies.length > 0
     ? competencies.reduce((sum, c) => sum + c.score, 0) / competencies.length
@@ -405,10 +402,15 @@ function calculateTechnicalDepthIndex(
 
 export const process = api<ProcessAnalysisRequest, ProcessAnalysisResponse>(
   { expose: true, method: "POST", path: "/analysis/process/:interviewId" },
-  async (req) => {
+  async (req): Promise<ProcessAnalysisResponse> => {
     log.info("Starting interview analysis", { interview_id: req.interviewId });
     
-    const interview = await db.queryRow<any>`
+    const interview = await db.queryRow<{
+      id: bigint;
+      student_id: bigint;
+      transcript_url: string | null;
+      status: string;
+    }>`
       SELECT id, student_id, transcript_url, status 
       FROM interviews 
       WHERE id = ${req.interviewId}

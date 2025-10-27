@@ -1,10 +1,11 @@
 import { api, APIError } from "encore.dev/api";
 import log from "encore.dev/log";
 import { db } from "../db";
+import type { BotStatusData, BotJoinedData, BotLeftData, TranscriptReadyData, RecordingReadyData } from "../types/webhook";
 
 interface RecallWebhookRequest {
   event: string;
-  data: any;
+  data: BotStatusData | BotJoinedData | BotLeftData | TranscriptReadyData | RecordingReadyData;
 }
 
 interface WebhookResponse {
@@ -13,29 +14,29 @@ interface WebhookResponse {
 
 export const recall = api<RecallWebhookRequest, WebhookResponse>(
   { expose: true, method: "POST", path: "/webhooks/recall" },
-  async (req) => {
+  async (req): Promise<WebhookResponse> => {
     log.info("Received Recall webhook", { event: req.event });
 
     try {
       switch (req.event) {
         case "bot.status_change":
-          await handleBotStatusChange(req.data);
+          await handleBotStatusChange(req.data as BotStatusData);
           break;
         
         case "bot.joined":
-          await handleBotJoined(req.data);
+          await handleBotJoined(req.data as BotJoinedData);
           break;
         
         case "bot.left":
-          await handleBotLeft(req.data);
+          await handleBotLeft(req.data as BotLeftData);
           break;
         
         case "transcript.ready":
-          await handleTranscriptReady(req.data);
+          await handleTranscriptReady(req.data as TranscriptReadyData);
           break;
         
         case "recording.ready":
-          await handleRecordingReady(req.data);
+          await handleRecordingReady(req.data as RecordingReadyData);
           break;
         
         default:
@@ -50,7 +51,7 @@ export const recall = api<RecallWebhookRequest, WebhookResponse>(
   }
 );
 
-async function handleBotStatusChange(data: any) {
+async function handleBotStatusChange(data: BotStatusData): Promise<void> {
   const { bot_id, status } = data;
   
   if (!bot_id) {
@@ -76,7 +77,7 @@ async function handleBotStatusChange(data: any) {
   log.info("Updated interview status", { bot_id, status });
 }
 
-async function handleBotJoined(data: any) {
+async function handleBotJoined(data: BotJoinedData): Promise<void> {
   const { bot_id, meeting_id } = data;
   
   if (!bot_id) {
@@ -105,7 +106,7 @@ async function handleBotJoined(data: any) {
   log.info("Bot joined meeting", { bot_id, meeting_id });
 }
 
-async function handleBotLeft(data: any) {
+async function handleBotLeft(data: BotLeftData): Promise<void> {
   const { bot_id, recording } = data;
   
   if (!bot_id) {
@@ -135,7 +136,7 @@ async function handleBotLeft(data: any) {
   log.info("Bot left meeting", { bot_id, duration });
 }
 
-async function handleTranscriptReady(data: any) {
+async function handleTranscriptReady(data: TranscriptReadyData): Promise<void> {
   const { bot_id, transcript } = data;
   
   if (!bot_id) {
@@ -175,7 +176,7 @@ async function handleTranscriptReady(data: any) {
   }
 }
 
-async function handleRecordingReady(data: any) {
+async function handleRecordingReady(data: RecordingReadyData): Promise<void> {
   const { bot_id, recording } = data;
   
   if (!bot_id) {

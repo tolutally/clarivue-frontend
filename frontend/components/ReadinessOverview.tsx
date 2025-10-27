@@ -2,6 +2,11 @@ import { TrendingUp, Target, ThumbsUp, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { LineChart } from './charts/LineChart';
 import { semantic, backgrounds, text } from '../utils/colors';
+import type { Student } from '../types';
+
+interface ReadinessOverviewProps {
+  students: Student[];
+}
 
 const trendData = [
   { week: 'Week 1', score: 54 },
@@ -10,7 +15,7 @@ const trendData = [
   { week: 'Week 4', score: 72 },
 ];
 
-export function ReadinessOverview() {
+export function ReadinessOverview({ students }: ReadinessOverviewProps) {
   return (
     <div>
       <Card className="p-6 rounded-xl shadow-sm border-0">

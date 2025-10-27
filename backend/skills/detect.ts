@@ -1,4 +1,5 @@
 import { api } from "encore.dev/api";
+import type { SkillConfidence } from "../types/skills";
 
 export interface DetectSkillsRequest {
   transcript: string;
@@ -7,7 +8,7 @@ export interface DetectSkillsRequest {
 
 export interface DetectedSkill {
   skill: string;
-  confidence: "high" | "mentioned" | "missing";
+  confidence: SkillConfidence | "missing";
   category: string;
   evidenceTimestamp?: string;
   context?: string;
@@ -65,7 +66,7 @@ const SKILL_PATTERNS = {
   }
 };
 
-function extractTimestamp(text: string, matchIndex: number): string | undefined {
+function extractTimestamp(text: string, matchIndex: number): string {
   const timestampPatterns = [
     /(\d{1,2}:\d{2}(?::\d{2})?)/g,
     /at\s+(\d{1,2}:\d{2})/gi,
@@ -84,7 +85,7 @@ function extractTimestamp(text: string, matchIndex: number): string | undefined 
     }
   }
 
-  return undefined;
+  return "";
 }
 
 function getContext(text: string, matchIndex: number, matchLength: number): string {
@@ -148,9 +149,11 @@ export const detect = api<DetectSkillsRequest, DetectSkillsResponse>(
     }
 
     detectedSkills.sort((a, b) => {
-      const confidenceOrder = { high: 0, mentioned: 1, missing: 2 };
-      if (confidenceOrder[a.confidence] !== confidenceOrder[b.confidence]) {
-        return confidenceOrder[a.confidence] - confidenceOrder[b.confidence];
+      const confidenceOrder: Record<string, number> = { high: 0, mentioned: 1, low: 2, missing: 3 };
+      const aOrder = confidenceOrder[a.confidence] ?? 4;
+      const bOrder = confidenceOrder[b.confidence] ?? 4;
+      if (aOrder !== bOrder) {
+        return aOrder - bOrder;
       }
       return a.skill.localeCompare(b.skill);
     });

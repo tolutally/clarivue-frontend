@@ -51,7 +51,7 @@ export function OverviewPage() {
         </div>
 
         <div className="mb-8">
-          <AnalyticsSummary />
+          <AnalyticsSummary students={students} />
         </div>
 
         <div className="mb-8">

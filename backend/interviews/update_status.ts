@@ -14,7 +14,7 @@ interface UpdateStatusRequest {
 
 export const updateStatus = api<UpdateStatusRequest, Interview>(
   { expose: true, method: "PATCH", path: "/interviews/:id/status" },
-  async (req) => {
+  async (req): Promise<Interview> => {
     const existing = await db.queryRow<{ id: bigint }>`
       SELECT id FROM interviews WHERE id = ${req.id}
     `;
@@ -24,7 +24,7 @@ export const updateStatus = api<UpdateStatusRequest, Interview>(
     }
 
     const updates: string[] = [];
-    const params: any[] = [];
+    const params: (string | number | null)[] = [];
     let paramIndex = 1;
 
     updates.push(`status = $${paramIndex}`);

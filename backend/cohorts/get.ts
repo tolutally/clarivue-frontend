@@ -1,6 +1,7 @@
 import { api, APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 import { db } from "../db";
+import type { CohortTags } from "../types/cohort";
 
 export interface GetCohortRequest {
   id: string;
@@ -10,7 +11,7 @@ export interface CohortDetails {
   id: string;
   name: string;
   description: string | null;
-  tags: any;
+  tags: CohortTags;
   objectives: string[] | null;
   ownerId: string;
   createdAt: Date;
@@ -19,14 +20,14 @@ export interface CohortDetails {
 
 export const get = api<GetCohortRequest, CohortDetails>(
   { auth: true, expose: true, method: "GET", path: "/cohorts/:id" },
-  async (req) => {
+  async (req): Promise<CohortDetails> => {
     const auth = getAuthData()!;
 
     const cohort = await db.queryRow<{
       id: bigint;
       name: string;
       description: string | null;
-      tags: any;
+      tags: CohortTags;
       objectives: string[] | null;
       owner_id: bigint;
       created_at: Date;

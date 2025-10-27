@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Users, TrendingUp, AlertTriangle, Settings as SettingsIcon } from 'lucide-react';
 import { Header } from '../components/Header';
+import type { CohortTags } from '../types/cohort';
 
 interface CohortDetails {
   id: string;
   name: string;
   description: string | null;
-  tags: any;
+  tags: CohortTags;
   objectives: string[] | null;
 }
 

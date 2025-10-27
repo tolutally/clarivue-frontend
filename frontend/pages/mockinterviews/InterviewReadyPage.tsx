@@ -106,7 +106,7 @@ export function InterviewReadyPage() {
         setAudioLevel(0);
       }, 5000);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error('Microphone access denied:', err);
       setMicStatus('denied');
       setError('Microphone access denied. Please enable it in your browser settings.');

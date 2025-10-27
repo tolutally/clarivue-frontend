@@ -6,7 +6,7 @@ interface SkillsMentionedProps {
   onTimestampClick?: (timestamp: string) => void;
 }
 
-const confidenceColors = {
+const confidenceColors: Record<'high' | 'mentioned' | 'low' | 'missing', { bg: string; border: string; text: string; label: string }> = {
   high: {
     bg: 'bg-emerald-500/10',
     border: 'border-emerald-500/30',
@@ -18,6 +18,12 @@ const confidenceColors = {
     border: 'border-amber-500/30',
     text: 'text-amber-600',
     label: 'Mentioned'
+  },
+  low: {
+    bg: 'bg-blue-500/10',
+    border: 'border-blue-500/30',
+    text: 'text-blue-600',
+    label: 'Low Confidence'
   },
   missing: {
     bg: 'bg-slate-500/10',

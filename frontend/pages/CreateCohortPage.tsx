@@ -54,20 +54,21 @@ export function CreateCohortPage() {
     try {
       const filteredObjectives = objectives.filter((obj) => obj.trim() !== '');
       
+      const tags: Record<string, string> = {};
+      if (term) tags.term = term;
+      if (program) tags.program = program;
+      if (customTags.length > 0) tags.custom = customTags.join(',');
+      
       const cohort = await backend.cohorts.create({
         name,
         description: description || undefined,
-        tags: {
-          term: term || undefined,
-          program: program || undefined,
-          custom: customTags.length > 0 ? customTags : undefined,
-        },
+        tags: Object.keys(tags).length > 0 ? tags : undefined,
         objectives: filteredObjectives.length > 0 ? filteredObjectives : undefined,
       });
 
       navigate(`/cohorts/${cohort.id}/add-students`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to create cohort');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create cohort');
     } finally {
       setLoading(false);
     }

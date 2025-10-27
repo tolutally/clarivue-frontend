@@ -1,11 +1,12 @@
 import { api } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 import { db } from "../db";
+import type { CohortTags } from "../types/cohort";
 
 export interface CreateCohortRequest {
   name: string;
   description?: string;
-  tags?: any;
+  tags?: CohortTags;
   objectives?: string[];
 }
 
@@ -13,7 +14,7 @@ export interface Cohort {
   id: string;
   name: string;
   description: string | null;
-  tags: any;
+  tags: CohortTags;
   objectives: string[] | null;
   ownerId: string;
   createdAt: Date;
@@ -22,14 +23,14 @@ export interface Cohort {
 
 export const create = api<CreateCohortRequest, Cohort>(
   { auth: true, expose: true, method: "POST", path: "/cohorts" },
-  async (req) => {
+  async (req): Promise<Cohort> => {
     const auth = getAuthData()!;
 
     const cohort = await db.queryRow<{
       id: bigint;
       name: string;
       description: string | null;
-      tags: any;
+      tags: CohortTags;
       objectives: string[] | null;
       owner_id: bigint;
       created_at: Date;

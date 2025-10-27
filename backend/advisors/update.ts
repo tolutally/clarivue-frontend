@@ -14,7 +14,7 @@ interface UpdateAdvisorRequest {
 
 export const update = api<UpdateAdvisorRequest, Advisor>(
   { expose: true, method: "PATCH", path: "/advisors/:id" },
-  async (req) => {
+  async (req): Promise<Advisor> => {
     const existing = await db.queryRow<{ id: bigint }>`
       SELECT id FROM advisors WHERE id = ${req.id}
     `;
@@ -33,7 +33,7 @@ export const update = api<UpdateAdvisorRequest, Advisor>(
     }
 
     const updates: string[] = [];
-    const params: any[] = [];
+    const params: (string | number | null)[] = [];
     let paramIndex = 1;
 
     if (req.name !== undefined) {

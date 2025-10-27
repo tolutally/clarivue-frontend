@@ -1,8 +1,13 @@
 import { StudentCard } from './StudentCard';
 import { students } from '../data/mock-data';
 import { Card } from '@/components/ui/card';
+import type { Student } from '../types';
 
-export function StudentGrid() {
+interface StudentGridProps {
+  students: Student[];
+}
+
+export function StudentGrid({ students }: StudentGridProps) {
   const sortedStudents = [...students].sort((a, b) => b.improvement - a.improvement);
 
   return (

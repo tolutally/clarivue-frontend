@@ -1,12 +1,13 @@
 import { api } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 import { db } from "../db";
+import type { CohortTags } from "../types/cohort";
 
 export interface CohortSummary {
   id: string;
   name: string;
   description: string | null;
-  tags: any;
+  tags: CohortTags;
   objectives: string[] | null;
   ownerId: string;
   createdAt: Date;
@@ -26,7 +27,7 @@ export interface ListCohortsResponse {
 
 export const list = api<void, ListCohortsResponse>(
   { auth: true, expose: true, method: "GET", path: "/cohorts" },
-  async () => {
+  async (): Promise<ListCohortsResponse> => {
     const auth = getAuthData()!;
 
     const rows = [];
@@ -34,7 +35,7 @@ export const list = api<void, ListCohortsResponse>(
       id: bigint;
       name: string;
       description: string | null;
-      tags: any;
+      tags: CohortTags;
       objectives: string[] | null;
       owner_id: bigint;
       created_at: Date;

@@ -31,12 +31,12 @@ interface ListInterviewsResponse {
 
 export const list = api<ListInterviewsRequest, ListInterviewsResponse>(
   { expose: true, method: "GET", path: "/interviews" },
-  async (req) => {
+  async (req): Promise<ListInterviewsResponse> => {
     const limit = req.limit || 50;
     const offset = req.offset || 0;
     
-    let whereConditions: string[] = [];
-    let params: any[] = [];
+    const whereConditions: string[] = [];
+    const params: (string | number)[] = [];
     let paramIndex = 1;
 
     if (req.studentId) {

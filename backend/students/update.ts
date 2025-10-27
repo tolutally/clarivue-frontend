@@ -16,7 +16,7 @@ interface UpdateStudentRequest {
 
 export const update = api<UpdateStudentRequest, Student>(
   { expose: true, method: "PATCH", path: "/students/:id" },
-  async (req) => {
+  async (req): Promise<Student> => {
     const existing = await db.queryRow<{ id: bigint }>`
       SELECT id FROM students WHERE id = ${req.id}
     `;
@@ -44,7 +44,7 @@ export const update = api<UpdateStudentRequest, Student>(
     }
 
     const updates: string[] = [];
-    const params: any[] = [];
+    const params: (string | number | Date | null)[] = [];
     let paramIndex = 1;
 
     if (req.name !== undefined) {

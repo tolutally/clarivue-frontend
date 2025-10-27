@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
 import { Plus, Search, Users, TrendingUp, Calendar, MoreVertical } from 'lucide-react';
 import { Header } from '../components/Header';
+import type { CohortTags } from '../types/cohort';
 
 interface CohortSummary {
   id: string;
   name: string;
   description: string | null;
-  tags: any;
+  tags: CohortTags;
   stats: {
     invited: number;
     joined: number;

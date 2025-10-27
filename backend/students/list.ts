@@ -30,12 +30,12 @@ interface ListStudentsResponse {
 
 export const list = api<ListStudentsRequest, ListStudentsResponse>(
   { expose: true, method: "GET", path: "/students" },
-  async (req) => {
+  async (req): Promise<ListStudentsResponse> => {
     const limit = req.limit || 50;
     const offset = req.offset || 0;
     
-    let whereConditions: string[] = [];
-    let params: any[] = [];
+    const whereConditions: string[] = [];
+    const params: (string | number)[] = [];
     let paramIndex = 1;
 
     if (req.cohort) {

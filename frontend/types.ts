@@ -79,7 +79,7 @@ export interface TechnicalDepthIndex {
 
 export interface DetectedSkill {
   skill: string;
-  confidence: 'high' | 'mentioned' | 'missing';
+  confidence: 'high' | 'mentioned' | 'low' | 'missing';
   category: string;
   evidenceTimestamp?: string;
   context?: string;

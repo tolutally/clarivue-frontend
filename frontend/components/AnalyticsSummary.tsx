@@ -1,5 +1,10 @@
 import { Activity, Users, TrendingUp, Clock } from 'lucide-react';
 import { semantic, shadows } from '../utils/colors';
+import type { Student } from '../types';
+
+interface AnalyticsSummaryProps {
+  students: Student[];
+}
 
 const metrics = [
   { icon: Activity, label: 'Total Mock Interviews', value: '248' },
@@ -8,7 +13,7 @@ const metrics = [
   { icon: Clock, label: 'Avg Interview Length', value: '22.5 min' },
 ];
 
-export function AnalyticsSummary() {
+export function AnalyticsSummary({ students }: AnalyticsSummaryProps) {
   return (
     <div className={`${semantic.surface} rounded-xl border ${semantic.borderMedium} ${shadows.sm}`}>
       <div className="px-6 py-6">

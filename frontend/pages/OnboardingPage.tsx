@@ -37,12 +37,13 @@ export function OnboardingPage() {
         const response = await backend.auth.verifyInvite({ token });
         setEmail(response.email);
         setStep('credentials');
-      } catch (err: any) {
-        if (err.message?.includes('expired')) {
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '';
+        if (message.includes('expired')) {
           setError('This invitation expired. Contact your administrator for a new link.');
-        } else if (err.message?.includes('already accepted')) {
+        } else if (message.includes('already accepted')) {
           setError('This account is already active.');
-        } else if (err.message?.includes('already exists')) {
+        } else if (message.includes('already exists')) {
           setError('An account with this email exists. Try logging in or reset your password.');
         } else {
           setError('Invalid invitation link');

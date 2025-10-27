@@ -102,8 +102,8 @@ export function JDIntakePage() {
       } else {
         setError(response.message || 'Failed to analyze job description');
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);

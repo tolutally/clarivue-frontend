@@ -1,8 +1,14 @@
 import { Card } from '@/components/ui/card';
 import { students, competencies } from '../data/mock-data';
 import { semantic } from '../utils/colors';
+import type { Student } from '../types';
 
-const getColorClass = (score: number) => {
+interface CompetencyHeatmapProps {
+  students: Student[];
+  competencies: string[];
+}
+
+const getColorClass = (score: number): string => {
   if (score >= 80) return 'bg-[#C8A0FE]';
   if (score >= 70) return 'bg-[#D4B5FF]';
   if (score >= 60) return 'bg-[#E0CBFF]';
@@ -10,7 +16,7 @@ const getColorClass = (score: number) => {
   return 'bg-[#F5F0FF]';
 };
 
-export function CompetencyHeatmap() {
+export function CompetencyHeatmap({ students, competencies }: CompetencyHeatmapProps) {
   return (
     <Card className="p-6 rounded-xl shadow-sm border-0">
       <h3 className="text-lg font-semibold text-[#001223] mb-4">Competency Heatmap</h3>

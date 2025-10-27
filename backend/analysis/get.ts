@@ -1,5 +1,6 @@
 import { api, APIError } from "encore.dev/api";
 import { db } from "../db";
+import type { SentimentScores } from "../types/analysis";
 
 export interface InterviewAnalysis {
   id: number;
@@ -11,7 +12,7 @@ export interface InterviewAnalysis {
   concerns: string[];
   aiSummary: string | null;
   aiRecommendations: string | null;
-  sentimentScores: any | null;
+  sentimentScores: SentimentScores | null;
   processedAt: Date;
 }
 
@@ -21,8 +22,20 @@ interface GetAnalysisRequest {
 
 export const get = api<GetAnalysisRequest, InterviewAnalysis>(
   { expose: true, method: "GET", path: "/analysis/:interviewId" },
-  async (req) => {
-    const row = await db.queryRow<any>`
+  async (req): Promise<InterviewAnalysis> => {
+    const row = await db.queryRow<{
+      id: bigint;
+      interview_id: bigint;
+      overall_readiness_score: number | null;
+      technical_depth_index: number | null;
+      authenticity_score: number | null;
+      strengths: string[] | null;
+      concerns: string[] | null;
+      ai_summary: string | null;
+      ai_recommendations: string | null;
+      sentiment_scores: SentimentScores | null;
+      processed_at: Date;
+    }>`
       SELECT 
         id, interview_id, overall_readiness_score, technical_depth_index,
         authenticity_score, strengths, concerns, ai_summary, ai_recommendations,
