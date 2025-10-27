@@ -1,11 +1,19 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Download, Users } from 'lucide-react';
+import { Header } from '../components/Header';
 
 export function AllStudentsPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <div className="min-h-screen bg-[var(--surface-hover)]">
+      <Header activeTab="students" onTabChange={(tab) => {
+        if (tab === 'overview') navigate('/cohorts');
+        if (tab === 'students') navigate('/students');
+        if (tab === 'reports') navigate('/reports');
+      }} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>

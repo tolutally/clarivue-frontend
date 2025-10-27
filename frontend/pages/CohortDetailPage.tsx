@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Users, TrendingUp, AlertTriangle, Settings as SettingsIcon } from 'lucide-react';
+import { Header } from '../components/Header';
 
 interface CohortDetails {
   id: string;
@@ -56,6 +57,11 @@ export function CohortDetailPage() {
 
   return (
     <div className="min-h-screen bg-[var(--surface-hover)]">
+      <Header activeTab="cohorts" onTabChange={(tab) => {
+        if (tab === 'overview') navigate('/cohorts');
+        if (tab === 'students') navigate('/students');
+        if (tab === 'reports') navigate('/reports');
+      }} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <button
           onClick={() => navigate('/cohorts')}
