@@ -184,8 +184,8 @@ export function ConsentPage() {
                   <Checkbox
                     id="recordingConsent"
                     checked={consents.recordingConsent}
-                    onChange={(e) => {
-                      setConsents({ ...consents, recordingConsent: e.target.checked });
+                    onCheckedChange={(checked) => {
+                      setConsents({ ...consents, recordingConsent: checked === true });
                       if (showError) setShowError(false);
                     }}
                     aria-required="true"
@@ -209,8 +209,8 @@ export function ConsentPage() {
                   <Checkbox
                     id="dataUsageConsent"
                     checked={consents.dataUsageConsent}
-                    onChange={(e) => {
-                      setConsents({ ...consents, dataUsageConsent: e.target.checked });
+                    onCheckedChange={(checked) => {
+                      setConsents({ ...consents, dataUsageConsent: checked === true });
                       if (showError) setShowError(false);
                     }}
                     aria-required="true"
@@ -234,7 +234,7 @@ export function ConsentPage() {
                   <Checkbox
                     id="researchConsent"
                     checked={consents.researchConsent}
-                    onChange={(e) => setConsents({ ...consents, researchConsent: e.target.checked })}
+                    onCheckedChange={(checked) => setConsents({ ...consents, researchConsent: checked === true })}
                     aria-describedby="researchConsent-description"
                   />
                   <div className="flex-1">
