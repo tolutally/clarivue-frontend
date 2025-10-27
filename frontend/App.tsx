@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { LoginPage } from './pages/LoginPage';
 import { OnboardingPage } from './pages/OnboardingPage';
+import { OverviewPage } from './pages/OverviewPage';
 import { CohortsPage } from './pages/CohortsPage';
 import { CreateCohortPage } from './pages/CreateCohortPage';
 import { CohortDetailPage } from './pages/CohortDetailPage';
@@ -33,6 +34,12 @@ export default function App() {
               <PublicRoute>
                 <OnboardingPage />
               </PublicRoute>
+            } />
+            
+            <Route path="/overview" element={
+              <ProtectedRoute>
+                <OverviewPage />
+              </ProtectedRoute>
             } />
             
             <Route path="/cohorts" element={
@@ -95,7 +102,7 @@ export default function App() {
               </PublicRoute>
             } />
             
-            <Route path="/" element={<Navigate to="/cohorts" replace />} />
+            <Route path="/" element={<Navigate to="/overview" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

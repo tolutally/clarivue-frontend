@@ -6,6 +6,7 @@ interface HeaderProps {
 }
 
 const tabs = [
+  { id: 'overview', label: 'Overview' },
   { id: 'cohorts', label: 'Cohorts' },
   { id: 'students', label: 'Students' },
   { id: 'advisors', label: 'Advisors', disabled: true },

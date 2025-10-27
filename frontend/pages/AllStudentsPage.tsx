@@ -10,6 +10,7 @@ export function AllStudentsPage() {
   return (
     <div className="min-h-screen bg-[var(--surface-hover)]">
       <Header activeTab="students" onTabChange={(tab) => {
+        if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
         if (tab === 'students') navigate('/students');
         if (tab === 'reports') navigate('/reports');

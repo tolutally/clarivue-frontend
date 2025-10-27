@@ -119,6 +119,7 @@ export function CreateCohortPage() {
   return (
     <div className="min-h-screen bg-[var(--surface-hover)]">
       <Header activeTab="cohorts" onTabChange={(tab) => {
+        if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
         if (tab === 'students') navigate('/students');
         if (tab === 'reports') navigate('/reports');
