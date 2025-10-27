@@ -217,7 +217,7 @@ export function InterviewReadyPage() {
               <Checkbox
                 id="quietEnvironment"
                 checked={checklist.quietEnvironment}
-                onChange={(e) => setChecklist({ ...checklist, quietEnvironment: e.target.checked })}
+                onCheckedChange={(checked) => setChecklist({ ...checklist, quietEnvironment: checked === true })}
               />
               <div className="flex-1">
                 <Label htmlFor="quietEnvironment" className="flex items-center gap-2 cursor-pointer">
@@ -234,7 +234,7 @@ export function InterviewReadyPage() {
               <Checkbox
                 id="goodLighting"
                 checked={checklist.goodLighting}
-                onChange={(e) => setChecklist({ ...checklist, goodLighting: e.target.checked })}
+                onCheckedChange={(checked) => setChecklist({ ...checklist, goodLighting: checked === true })}
               />
               <div className="flex-1">
                 <Label htmlFor="goodLighting" className="flex items-center gap-2 cursor-pointer">
@@ -251,7 +251,7 @@ export function InterviewReadyPage() {
               <Checkbox
                 id="stableInternet"
                 checked={checklist.stableInternet}
-                onChange={(e) => setChecklist({ ...checklist, stableInternet: e.target.checked })}
+                onCheckedChange={(checked) => setChecklist({ ...checklist, stableInternet: checked === true })}
               />
               <div className="flex-1">
                 <Label htmlFor="stableInternet" className="flex items-center gap-2 cursor-pointer">

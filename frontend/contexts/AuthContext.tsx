@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const authedBackend = backend.with({ auth: storedToken });
+        const authedBackend = backend.with({ auth: { authorization: `Bearer ${storedToken}` } });
         const adminInfo = await authedBackend.auth.me();
         setAdmin(adminInfo);
         setToken(storedToken);
@@ -107,5 +107,5 @@ export function useAuth() {
 export function useBackend() {
   const { token } = useAuth();
   if (!token) return backend;
-  return backend.with({ auth: token });
+  return backend.with({ auth: { authorization: `Bearer ${token}` } });
 }
