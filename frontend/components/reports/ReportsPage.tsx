@@ -1,4 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Header } from '../Header';
 import { semantic } from '../../utils/colors';
 import { GlobalControls } from './GlobalControls';
 import { GlobalMetricRibbon } from './GlobalMetricRibbon';
@@ -30,6 +32,7 @@ const tabs = [
 ];
 
 export function ReportsPage() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<ReportFilters>({});
   const [activeTab, setActiveTab] = useState('cohort');
   const [selectedCohortA, setSelectedCohortA] = useState('fall-2025-coop');
@@ -48,6 +51,12 @@ export function ReportsPage() {
 
   return (
     <div className={`min-h-screen ${semantic.bgSubtle}`}>
+      <Header activeTab="reports" onTabChange={(tab) => {
+        if (tab === 'overview') navigate('/overview');
+        if (tab === 'cohorts') navigate('/cohorts');
+        if (tab === 'students') navigate('/students');
+        if (tab === 'reports') navigate('/reports');
+      }} />
       <div className={`${semantic.surface} border-b ${semantic.borderMedium}`}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">
