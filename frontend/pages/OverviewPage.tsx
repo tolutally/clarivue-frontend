@@ -6,7 +6,6 @@ import { AnalyticsSummary } from '../components/AnalyticsSummary';
 import { ReadinessOverview } from '../components/ReadinessOverview';
 import { CompetencyHeatmap } from '../components/CompetencyHeatmap';
 import { AdvisorInsights } from '../components/AdvisorInsights';
-import { FeedbackSummary } from '../components/FeedbackSummary';
 import { students, competencies } from '../data/mock-data';
 import { semantic } from '../utils/colors';
 
@@ -56,9 +55,8 @@ export function OverviewPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="mb-8">
           <CompetencyHeatmap students={students} competencies={competencies} />
-          <FeedbackSummary />
         </div>
 
         <div className="mb-8">
