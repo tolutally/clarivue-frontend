@@ -111,7 +111,7 @@
   - Inline input for adding new skills
 - Keyboard shortcuts (Enter to add, Escape to cancel)
 
-#### 6. **InterviewReadyPage** (`/mockinterviews/ready/:token`)
+#### 6. **InterviewReadyPage** (`/mockinterviews/ready/demo-token`)
 - Pre-interview checklist:
   - Quiet environment
   - Good lighting
