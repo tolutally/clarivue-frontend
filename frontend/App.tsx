@@ -10,6 +10,8 @@ import { CohortsPage } from './pages/CohortsPage';
 import { CreateCohortPage } from './pages/CreateCohortPage';
 import { CohortDetailPage } from './pages/CohortDetailPage';
 import { AllStudentsPage } from './pages/AllStudentsPage';
+import { StudentsPage } from './components/students/StudentsPage';
+import { ReportsPage } from './components/reports/ReportsPage';
 import { WelcomePage } from './pages/mockinterviews/WelcomePage';
 import { CompleteProfilePage } from './pages/mockinterviews/CompleteProfilePage';
 import { ConsentPage } from './pages/mockinterviews/ConsentPage';
@@ -62,7 +64,13 @@ export default function App() {
             
             <Route path="/students" element={
               <ProtectedRoute>
-                <AllStudentsPage />
+                <StudentsPage />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <ReportsPage />
               </ProtectedRoute>
             } />
             
