@@ -6,11 +6,11 @@ interface HeaderProps {
 }
 
 const tabs = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'students', label: 'Interviews' },
+  { id: 'cohorts', label: 'Cohorts' },
+  { id: 'students', label: 'Students' },
   { id: 'advisors', label: 'Advisors', disabled: true },
   { id: 'reports', label: 'Analytics' },
-  { id: 'settings', label: 'Settings' },
+  { id: 'settings', label: 'Settings', disabled: true },
 ];
 
 export function Header({ activeTab, onTabChange }: HeaderProps) {
