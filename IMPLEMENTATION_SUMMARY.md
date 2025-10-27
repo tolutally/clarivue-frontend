@@ -60,7 +60,7 @@
 
 ### Frontend Pages (`/frontend/pages/mockinterviews/`)
 
-#### 1. **WelcomePage** (`/mockinterviews/welcome/:token`)
+#### 1. **WelcomePage** (`/mockinterviews/welcome/demo-token`)
 - Verifies invite token
 - Displays student info (name, email, institution, cohort)
 - Shows "What to Expect" overview
