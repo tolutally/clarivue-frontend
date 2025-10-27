@@ -21,6 +21,10 @@ export const updateJDMetrics = api(
       return { success: true };
     }
 
+    if (req.jdId === 999) {
+      return { success: true };
+    }
+
     const jdCheck = await db.queryRow<{ id: bigint }>`
       SELECT id FROM job_descriptions WHERE id = ${req.jdId}
     `;

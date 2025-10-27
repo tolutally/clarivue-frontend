@@ -28,6 +28,19 @@ export interface VerifyTokenResponse {
 export const verifyToken = api(
   { expose: true, method: "POST", path: "/mockinterviews/verify-token" },
   async (req: VerifyTokenRequest): Promise<VerifyTokenResponse> => {
+    if (req.token === "demo-token") {
+      return {
+        valid: true,
+        currentStep: "welcome",
+        student: {
+          id: 999,
+          name: "Demo User",
+          email: "demo@example.com",
+          cohortName: "Demo Cohort"
+        }
+      };
+    }
+
     const tokenData = await db.queryRow<{
       id: bigint;
       student_id: bigint;
@@ -47,7 +60,7 @@ export const verifyToken = api(
       };
     }
 
-    if (req.token !== "demo-token" && new Date() > new Date(tokenData.expires_at)) {
+    if (new Date() > new Date(tokenData.expires_at)) {
       return {
         valid: false,
         message: "This invite link has expired. Please request a new invite."

@@ -24,6 +24,19 @@ export interface GetJDMetricsResponse {
 export const getJDMetrics = api(
   { expose: true, method: "POST", path: "/mockinterviews/get-jd-metrics" },
   async (req: GetJDMetricsRequest): Promise<GetJDMetricsResponse> => {
+    if (req.jdId === 999) {
+      return {
+        success: true,
+        jobTitle: "Demo Software Engineer",
+        companyName: "Demo Company",
+        metrics: [
+          { id: 1, type: "technical_skill", value: "JavaScript", confidence: 0.85, isStudentAdded: false },
+          { id: 2, type: "technical_skill", value: "React", confidence: 0.85, isStudentAdded: false },
+          { id: 3, type: "soft_skill", value: "Communication", confidence: 0.80, isStudentAdded: false }
+        ]
+      };
+    }
+
     const jd = await db.queryRow<{
       id: bigint;
       job_title: string | null;

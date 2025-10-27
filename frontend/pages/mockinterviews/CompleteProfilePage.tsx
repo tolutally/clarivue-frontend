@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowRight, User } from 'lucide-react';
 import backend from '~backend/client';
 
@@ -179,19 +179,19 @@ export function CompleteProfilePage() {
                   <Label htmlFor="skillLevel">
                     Current Skill Level <span className="text-red-500" aria-label="required">*</span>
                   </Label>
-                  <Select.Root
+                  <Select
                     value={formData.skillLevel}
                     onValueChange={(value) => setFormData({ ...formData, skillLevel: value as any })}
                   >
-                    <Select.Trigger id="skillLevel" className="w-full" aria-required="true">
-                      <Select.Value />
-                    </Select.Trigger>
-                    <Select.Content>
-                      <Select.Item value="beginner">Beginner - Learning the fundamentals</Select.Item>
-                      <Select.Item value="intermediate">Intermediate - Building projects</Select.Item>
-                      <Select.Item value="advanced">Advanced - Professional experience</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
+                    <SelectTrigger id="skillLevel" className="w-full" aria-required="true">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner - Learning the fundamentals</SelectItem>
+                      <SelectItem value="intermediate">Intermediate - Building projects</SelectItem>
+                      <SelectItem value="advanced">Advanced - Professional experience</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

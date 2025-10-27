@@ -204,6 +204,19 @@ export const parseJD = api(
       };
     }
 
+    if (req.token === "demo-token") {
+      const metrics = extractMetrics(req.content);
+      const jobTitle = extractJobTitle(req.content);
+      const companyName = extractCompanyName(req.content);
+      return {
+        success: true,
+        jdId: 999,
+        jobTitle,
+        companyName,
+        metrics
+      };
+    }
+
     const tokenData = await db.queryRow<{ student_id: bigint }>`
       SELECT student_id 
       FROM onboarding_tokens 
