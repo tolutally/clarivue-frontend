@@ -12,8 +12,8 @@ const trendData = [
 
 export function ReadinessOverview() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <Card className="p-6 col-span-1 lg:col-span-2 rounded-xl shadow-sm border-0">
+    <div>
+      <Card className="p-6 rounded-xl shadow-sm border-0">
         <div className="flex items-start justify-between mb-6">
           <div>
             <p className={`text-sm ${semantic.textTertiary} mb-1`}>Average Readiness Score</p>
@@ -53,21 +53,6 @@ export function ReadinessOverview() {
             </div>
           </div>
         </div>
-      </Card>
-      
-      <Card className="p-6 rounded-xl shadow-sm border-0 flex flex-col justify-between">
-        <div>
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FF5C57] to-[#C8A0FE] flex items-center justify-center mb-4">
-            <Target className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-lg font-semibold text-[#001223] mb-2">Quick Insights</h3>
-          <p className={`text-sm ${semantic.textSecondary}`}>
-            Candidates who complete 2+ mock interviews show an average improvement of 18 points in overall readiness.
-          </p>
-        </div>
-        <button className={`mt-4 w-full py-2.5 ${backgrounds.primary} text-white rounded-lg text-sm font-medium hover:bg-[#102c64]/90 transition-colors`}>
-          View Full Report
-        </button>
       </Card>
     </div>
   );
