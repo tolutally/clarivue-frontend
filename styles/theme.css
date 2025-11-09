@@ -1,0 +1,195 @@
+:root {
+  --surface: #ffffff;
+  --surface-hover: #f9fafb;
+  --surface-active: #f3f4f6;
+  
+  --border: #f3f4f6;
+  --border-medium: #e5e7eb;
+  --border-strong: #d1d5db;
+  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  --success: #059669;
+  --success-light: #ecfdf5;
+  --success-dark: #065f46;
+  
+  --warning: #d97706;
+  --warning-light: #fffbeb;
+  --warning-dark: #92400e;
+  
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --danger-dark: #991b1b;
+}
+
+:root,
+:root[data-brand="default"] {
+  --primary: #102C64;
+  --primary-light: rgba(16, 44, 100, 0.1);
+  --primary-dark: #0a1e45;
+  
+  --accent: #FE686D;
+  --accent-light: rgba(254, 104, 109, 0.1);
+  --accent-dark: #e54a4f;
+  
+  --secondary: #C8A0FE;
+  --secondary-light: rgba(200, 160, 254, 0.1);
+  --secondary-dark: #a87de5;
+  
+  --tertiary: #B8CCF4;
+  --tertiary-light: rgba(184, 204, 244, 0.1);
+  --tertiary-dark: #8fa9db;
+}
+
+:root[data-brand="university"] {
+  --primary: #8B0000;
+  --primary-light: rgba(139, 0, 0, 0.1);
+  --primary-dark: #5c0000;
+  
+  --accent: #FFD700;
+  --accent-light: rgba(255, 215, 0, 0.1);
+  --accent-dark: #ccac00;
+  
+  --secondary: #4169E1;
+  --secondary-light: rgba(65, 105, 225, 0.1);
+  --secondary-dark: #2a4ab4;
+  
+  --tertiary: #87CEEB;
+  --tertiary-light: rgba(135, 206, 235, 0.1);
+  --tertiary-dark: #5aa5be;
+}
+
+:root[data-brand="corporate"] {
+  --primary: #1E3A8A;
+  --primary-light: rgba(30, 58, 138, 0.1);
+  --primary-dark: #14275d;
+  
+  --accent: #10B981;
+  --accent-light: rgba(16, 185, 129, 0.1);
+  --accent-dark: #0a8a5e;
+  
+  --secondary: #8B5CF6;
+  --secondary-light: rgba(139, 92, 246, 0.1);
+  --secondary-dark: #6b3dc3;
+  
+  --tertiary: #06B6D4;
+  --tertiary-light: rgba(6, 182, 212, 0.1);
+  --tertiary-dark: #0489a1;
+}
+
+.dark {
+  --surface: #1f2937;
+  --surface-hover: #374151;
+  --surface-active: #4b5563;
+  
+  --border: #374151;
+  --border-medium: #4b5563;
+  --border-strong: #6b7280;
+  
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.15);
+  --success-dark: #34d399;
+  
+  --warning: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.15);
+  --warning-dark: #fbbf24;
+  
+  --danger: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.15);
+  --danger-dark: #f87171;
+}
+
+.dark[data-brand="default"] {
+  --primary: #3b5998;
+  --primary-light: rgba(59, 89, 152, 0.2);
+  --primary-dark: #4c6ab8;
+  
+  --accent: #ff8a8f;
+  --accent-light: rgba(255, 138, 143, 0.2);
+  --accent-dark: #ff9ea3;
+  
+  --secondary: #d4b5ff;
+  --secondary-light: rgba(212, 181, 255, 0.2);
+  --secondary-dark: #e0c9ff;
+  
+  --tertiary: #c8dcf8;
+  --tertiary-light: rgba(200, 220, 248, 0.2);
+  --tertiary-dark: #d6e5fa;
+}
+
+.dark[data-brand="university"] {
+  --primary: #b91c1c;
+  --primary-light: rgba(185, 28, 28, 0.2);
+  --primary-dark: #dc2626;
+  
+  --accent: #ffd700;
+  --accent-light: rgba(255, 215, 0, 0.2);
+  --accent-dark: #ffe44d;
+  
+  --secondary: #6b8cff;
+  --secondary-light: rgba(107, 140, 255, 0.2);
+  --secondary-dark: #93b0ff;
+  
+  --tertiary: #a3d9f0;
+  --tertiary-light: rgba(163, 217, 240, 0.2);
+  --tertiary-dark: #b8e3f5;
+}
+
+.dark[data-brand="corporate"] {
+  --primary: #3b82f6;
+  --primary-light: rgba(59, 130, 246, 0.2);
+  --primary-dark: #60a5fa;
+  
+  --accent: #34d399;
+  --accent-light: rgba(52, 211, 153, 0.2);
+  --accent-dark: #6ee7b7;
+  
+  --secondary: #a78bfa;
+  --secondary-light: rgba(167, 139, 250, 0.2);
+  --secondary-dark: #c4b5fd;
+  
+  --tertiary: #22d3ee;
+  --tertiary-light: rgba(34, 211, 238, 0.2);
+  --tertiary-dark: #67e8f9;
+}
+
+/* Brand Color Utilities */
+.bg-brand-primary { background-color: var(--primary); }
+.bg-brand-primary-light { background-color: var(--primary-light); }
+.bg-brand-primary-dark { background-color: var(--primary-dark); }
+
+.bg-brand-accent { background-color: var(--accent); }
+.bg-brand-accent-light { background-color: var(--accent-light); }
+.bg-brand-accent-dark { background-color: var(--accent-dark); }
+
+.bg-brand-secondary { background-color: var(--secondary); }
+.bg-brand-secondary-light { background-color: var(--secondary-light); }
+.bg-brand-secondary-dark { background-color: var(--secondary-dark); }
+
+.text-brand-primary { color: var(--primary); }
+.text-brand-accent { color: var(--accent); }
+.text-brand-secondary { color: var(--secondary); }
+
+.border-brand-primary { border-color: var(--primary); }
+.border-brand-accent { border-color: var(--accent); }
+.border-brand-secondary { border-color: var(--secondary); }
+
+.hover\:bg-brand-primary:hover { background-color: var(--primary); }
+.hover\:bg-brand-primary-dark:hover { background-color: var(--primary-dark); }
+
+/* Brand Gradient Backgrounds */
+.bg-brand-gradient { 
+  background: linear-gradient(135deg, var(--secondary-light) 0%, var(--primary-light) 50%, var(--accent-light) 100%);
+}
+
+.bg-brand-gradient-subtle {
+  background: linear-gradient(135deg, #f8fafc 0%, var(--secondary-light) 50%, var(--primary-light) 100%);
+}
