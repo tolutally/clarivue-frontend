@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 import { CheckCircle, Lock, Mail, User, AlertCircle } from 'lucide-react';
 import backend from '@/lib/api-client';
 
@@ -138,12 +139,13 @@ export function OnboardingPage() {
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Invitation</h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <button
+          <Button
             onClick={() => navigate('/login')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            variant="primary"
+            className="px-6 py-3 rounded-lg font-medium"
           >
             Go to Login
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -337,12 +339,13 @@ export function OnboardingPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
+                variant="primary"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all"
               >
                 Continue
-              </button>
+              </Button>
             </form>
           )}
 
@@ -381,13 +384,15 @@ export function OnboardingPage() {
                 </label>
               </div>
 
-              <button
+              <Button
                 onClick={handleComplete}
-                disabled={!termsAccepted || !privacyAccepted || loading}
+                loading={loading}
+                disabled={!termsAccepted || !privacyAccepted}
+                variant="primary"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Creating Account...' : 'Complete Setup'}
-              </button>
+              </Button>
             </div>
           )}
 

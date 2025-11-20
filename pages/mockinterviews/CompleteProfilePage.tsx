@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { ArrowRight, User } from 'lucide-react';
 import backend from '@/lib/api-client';
 
@@ -179,19 +179,16 @@ export function CompleteProfilePage() {
                   <Label htmlFor="skillLevel">
                     Current Skill Level <span className="text-red-500" aria-label="required">*</span>
                   </Label>
-                  <Select
+                  <Dropdown
                     value={formData.skillLevel}
-                    onValueChange={(value) => setFormData({ ...formData, skillLevel: value as any })}
-                  >
-                    <SelectTrigger id="skillLevel" className="w-full" aria-required="true">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Beginner - Learning the fundamentals</SelectItem>
-                      <SelectItem value="intermediate">Intermediate - Building projects</SelectItem>
-                      <SelectItem value="advanced">Advanced - Professional experience</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={(value) => setFormData({ ...formData, skillLevel: value as any })}
+                    options={[
+                      { value: 'beginner', label: 'Beginner - Learning the fundamentals' },
+                      { value: 'intermediate', label: 'Intermediate - Building projects' },
+                      { value: 'advanced', label: 'Advanced - Professional experience' },
+                    ]}
+                    placeholder="Select skill level"
+                  />
                 </div>
               </div>
             </div>
@@ -204,9 +201,13 @@ export function CompleteProfilePage() {
               >
                 Back
               </Button>
-              <Button type="submit" disabled={loading} className="gap-2">
-                {loading ? 'Saving...' : 'Continue'}
-                <ArrowRight className="w-5 h-5" aria-hidden="true" />
+              <Button 
+                type="submit" 
+                loading={loading}
+                variant="primary"
+                endIcon={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+              >
+                Continue
               </Button>
             </div>
           </form>

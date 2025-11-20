@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBackend } from '../../contexts/AuthContext';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Clock, FileText, AlertCircle } from 'lucide-react';
 import { InterviewHeader } from '../../components/interview/InterviewHeader';
 
@@ -55,12 +56,12 @@ export function WelcomePage() {
             Oops! Something went wrong
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
-          <button
+          <Button
             onClick={() => navigate('/')}
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            variant="outline"
           >
             Go to Home
-          </button>
+          </Button>
         </Card>
       </div>
     );
@@ -148,13 +149,14 @@ export function WelcomePage() {
           </div>
 
           <div className="flex justify-center pt-4">
-            <button
+            <Button
               onClick={handleGetStarted}
-              className="flex items-center gap-2 px-8 py-3 bg-brand-primary text-white rounded-lg font-medium hover:bg-brand-primary-dark transition-colors"
+              variant="primary"
+              size="lg"
+              endIcon={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
             >
               Get Started
-              <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </button>
+            </Button>
           </div>
         </div>
         </div>

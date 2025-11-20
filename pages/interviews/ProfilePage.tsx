@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { ArrowRight, ArrowLeft, User, X, Plus, Sparkles, Target, Clock } from 'lucide-react';
 import { InterviewHeader } from '../../components/interview/InterviewHeader';
 
@@ -402,18 +402,20 @@ export function ProfilePage() {
                     <div className="space-y-3">
                       <div className="flex flex-wrap gap-2">
                         {industryOptions.map((industry) => (
-                          <button
+                          <Button
                             key={industry}
                             type="button"
                             onClick={() => toggleIndustry(industry)}
-                            className={`px-3 py-1 text-sm rounded-full border transition-all duration-200 transform hover:scale-105 ${
+                            variant="ghost"
+                            size="sm"
+                            className={`rounded-full border transition-all duration-200 transform hover:scale-105 ${
                               formData.industryFocus.includes(industry)
                                 ? 'bg-brand-primary text-white border-brand-primary shadow-md'
                                 : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:border-brand-secondary hover:shadow-sm'
                             }`}
                           >
                             {industry}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                       <div className="flex gap-2">
@@ -446,21 +448,18 @@ export function ProfilePage() {
                     <Label htmlFor="experienceLevel">
                       Experience Level <span className="text-red-500" aria-label="required">*</span>
                     </Label>
-                    <Select
+                    <Dropdown
                       value={formData.experienceLevel}
-                      onValueChange={(value) => setFormData({ ...formData, experienceLevel: value })}
-                    >
-                      <SelectTrigger id="experienceLevel" className="w-full" aria-required="true">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="student">Student - Currently learning</SelectItem>
-                        <SelectItem value="entry-level">Entry Level - 0-1 years experience</SelectItem>
-                        <SelectItem value="early-career">Early Career - 1-3 years experience</SelectItem>
-                        <SelectItem value="mid-level">Mid Level - 3-5 years experience</SelectItem>
-                        <SelectItem value="senior">Senior - 5+ years experience</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      onChange={(value) => setFormData({ ...formData, experienceLevel: value })}
+                      options={[
+                        { value: 'student', label: 'Student - Currently learning' },
+                        { value: 'entry-level', label: 'Entry Level - 0-1 years experience' },
+                        { value: 'early-career', label: 'Early Career - 1-3 years experience' },
+                        { value: 'mid-level', label: 'Mid Level - 3-5 years experience' },
+                        { value: 'senior', label: 'Senior - 5+ years experience' },
+                      ]}
+                      placeholder="Select experience level"
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -477,14 +476,16 @@ export function ProfilePage() {
                       />
                       <div className="flex flex-wrap gap-2">
                         {careerGoalSuggestions.map((suggestion) => (
-                          <button
+                          <Button
                             key={suggestion}
                             type="button"
                             onClick={() => addCareerGoalSuggestion(suggestion)}
+                            variant="ghost"
+                            size="sm"
                             className="px-2 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
                           >
                             + {suggestion}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </div>
@@ -506,22 +507,22 @@ export function ProfilePage() {
               </div>
 
               <div className="flex justify-between pt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => navigate(`/session/${sessionId}/welcome`)}
-                  className="flex items-center gap-2 px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                  variant="outline"
+                  startIcon={<ArrowLeft className="w-5 h-5" aria-hidden="true" />}
                 >
-                  <ArrowLeft className="w-5 h-5" aria-hidden="true" />
                   Back
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2 bg-brand-primary text-white rounded-lg font-medium hover:bg-brand-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  loading={loading}
+                  variant="primary"
+                  endIcon={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
-                  {loading ? 'Saving...' : 'Continue'}
-                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </button>
+                  Continue
+                </Button>
               </div>
             </form>
           </Card>

@@ -1,5 +1,6 @@
-import { ArrowUp, ArrowDown, Calendar } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
+import { ArrowUp, ArrowDown } from 'lucide-react';
+import { Dropdown } from '@/components/ui/Dropdown';
 import type { InterventionData } from '../../data/reports-data';
 
 interface InterventionImpactProps {
@@ -7,44 +8,68 @@ interface InterventionImpactProps {
 }
 
 export function InterventionImpact({ data }: InterventionImpactProps) {
-  const intervention = data.selectedIntervention;
+  const interventions = data.interventions ?? [];
+  const [selectedInterventionId, setSelectedInterventionId] = useState(
+    interventions[0]?.id ?? ''
+  );
+
+  const selectedIntervention =
+    interventions.find((int) => int.id === selectedInterventionId) ??
+    interventions[0];
+
+  if (!selectedIntervention) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6 text-sm text-gray-600">
+        Intervention data unavailable.
+      </div>
+    );
+  }
+
+  const comparisonText =
+    selectedIntervention.comparisonBlurb ||
+    'Compared to non-participants: +9 pts higher readiness gain';
+  const highlightText =
+    selectedIntervention.highlight ||
+    'Avg feedback time reduced by 32% per student';
+  const overallImpact =
+    selectedIntervention.overallImpact || 'Strong';
+  const overallSummary =
+    selectedIntervention.overallSummary || 'Positive';
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
+      <div className="bg-linear-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-bold text-gray-900">Intervention Impact</h3>
           <div className="text-sm text-gray-700 font-semibold bg-white px-4 py-2 rounded-lg border border-[#C8A0FE]/30 shadow-sm">
-            Compared to non-participants: <span className="text-[#C8A0FE] font-bold">+9 pts</span> higher readiness gain
+            {comparisonText}
           </div>
         </div>
-        <p className="text-xs text-gray-600 mb-5">Avg feedback time reduced by <span className="font-semibold text-[#C8A0FE]">32%</span> per student</p>
+        <p className="text-xs text-gray-600 mb-5">
+          {highlightText}
+        </p>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-5">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-sm font-semibold text-gray-900">Select Intervention</h3>
-          <Select defaultValue={data.interventions[0].id}>
-            <SelectTrigger className="w-[280px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {data.interventions.map((int) => (
-                <SelectItem key={int.id} value={int.id}>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span>{int.name} – {int.date}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Dropdown
+            value={selectedInterventionId}
+            onChange={setSelectedInterventionId}
+            options={interventions.map((int) => ({
+              value: int.id,
+              label: `${int.name} – ${int.date}`,
+            }))}
+            className="w-[280px]"
+          />
         </div>
 
-        {intervention && (
+        {selectedIntervention && (
           <>
             <div className="mb-4">
-              <h4 className="text-lg font-bold text-gray-900 mb-1">{intervention.name}</h4>
+              <h4 className="text-lg font-bold text-gray-900 mb-1">
+                {selectedIntervention.name}
+              </h4>
               <p className="text-sm text-gray-600 italic">
                 Improvements are correlational; verify with controlled attribution studies.
               </p>
@@ -53,33 +78,40 @@ export function InterventionImpact({ data }: InterventionImpactProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <ImpactCard
                 label="Communication"
-                value={intervention.beforeAfter.communication}
+                value={selectedIntervention.beforeAfter.communication}
                 positive={true}
               />
               <ImpactCard
                 label="Clarity"
-                value={intervention.beforeAfter.clarity}
+                value={selectedIntervention.beforeAfter.clarity}
                 positive={true}
               />
               <ImpactCard
                 label="Interview Confidence Flags"
-                value={intervention.beforeAfter.redFlagRateBefore - intervention.beforeAfter.redFlagRateAfter}
+                value={
+                  selectedIntervention.beforeAfter.redFlagRateBefore -
+                  selectedIntervention.beforeAfter.redFlagRateAfter
+                }
                 suffix="%"
-                beforeValue={intervention.beforeAfter.redFlagRateBefore}
-                afterValue={intervention.beforeAfter.redFlagRateAfter}
+                beforeValue={selectedIntervention.beforeAfter.redFlagRateBefore}
+                afterValue={selectedIntervention.beforeAfter.redFlagRateAfter}
                 positive={true}
                 isDecrease={true}
               />
               <ImpactCard
                 label="% Ready"
-                value={intervention.beforeAfter.percentReadyChange}
+                value={selectedIntervention.beforeAfter.percentReadyChange}
                 suffix="pp"
                 positive={true}
               />
-              <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-4 flex flex-col justify-center items-center">
+              <div className="bg-linear-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-4 flex flex-col justify-center items-center">
                 <div className="text-xs font-medium text-gray-600 mb-2">Overall Impact</div>
-                <div className="text-3xl font-bold text-[#C8A0FE]">Strong</div>
-                <div className="text-xs text-gray-500 mt-1">Positive</div>
+                <div className="text-3xl font-bold text-[#C8A0FE]">
+                  {overallImpact}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {overallSummary}
+                </div>
               </div>
             </div>
 
@@ -88,13 +120,18 @@ export function InterventionImpact({ data }: InterventionImpactProps) {
                 metric="Communication Score"
                 before={68}
                 after={80}
-                change={intervention.beforeAfter.communication}
+                change={selectedIntervention.beforeAfter.communication}
               />
               <BeforeAfterComparison
                 metric="Interview Confidence Flags"
-                before={intervention.beforeAfter.redFlagRateBefore}
-                after={intervention.beforeAfter.redFlagRateAfter}
-                change={-(intervention.beforeAfter.redFlagRateBefore - intervention.beforeAfter.redFlagRateAfter)}
+                before={selectedIntervention.beforeAfter.redFlagRateBefore}
+                after={selectedIntervention.beforeAfter.redFlagRateAfter}
+                change={
+                  -(
+                    selectedIntervention.beforeAfter.redFlagRateBefore -
+                    selectedIntervention.beforeAfter.redFlagRateAfter
+                  )
+                }
                 isDecrease={true}
               />
             </div>
@@ -102,7 +139,7 @@ export function InterventionImpact({ data }: InterventionImpactProps) {
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-lg border border-[#B8CCF4]/20 p-5">
+      <div className="bg-linear-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-lg border border-[#B8CCF4]/20 p-5">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">What Works: Key Findings</h3>
         <div className="space-y-2">
           <div className="bg-white rounded-lg px-4 py-3 text-sm text-gray-700 border border-[#B8CCF4]/20 shadow-sm">

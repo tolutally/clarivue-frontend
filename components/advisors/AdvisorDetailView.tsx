@@ -1,4 +1,5 @@
 import { ArrowLeft, Mail, Users, TrendingUp, FileText, Clock, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { Advisor, Student } from '../../types';
 import { students } from '../../data/mock-data';
 import { backgrounds, borders, gradients, text, semantic, shadows, hover } from '../../utils/colors';
@@ -20,13 +21,13 @@ export function AdvisorDetailView({ advisor, onBack, onAssignStudent }: AdvisorD
 
   return (
     <div className="space-y-6">
-      <button
+      <Button
         onClick={onBack}
-        className={`flex items-center gap-2 ${semantic.textSecondary} hover:${semantic.textPrimary} transition-colors`}
+        variant="ghost"
+        startIcon={<ArrowLeft size={20} />}
       >
-        <ArrowLeft size={20} />
-        <span className="font-medium">Back to Advisors</span>
-      </button>
+        Back to Advisors
+      </Button>
 
       <div className={`${semantic.surface} rounded-2xl ${shadows.sm} border ${semantic.border} p-8`}>
         <div className="flex items-start justify-between mb-6">
@@ -45,13 +46,13 @@ export function AdvisorDetailView({ advisor, onBack, onAssignStudent }: AdvisorD
               </div>
             </div>
           </div>
-          <button
+          <Button
             onClick={onAssignStudent}
-            className={`flex items-center gap-2 px-4 py-2 ${backgrounds.primary} text-white rounded-lg hover:bg-[#102C64]/90 transition-colors font-medium`}
+            variant="primary"
+            startIcon={<UserPlus size={18} />}
           >
-            <UserPlus size={18} />
             Assign Student
-          </button>
+          </Button>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">

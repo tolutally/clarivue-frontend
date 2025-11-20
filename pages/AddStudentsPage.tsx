@@ -5,6 +5,8 @@ import { ArrowLeft, Upload, UserPlus, Trash2, CheckCircle } from 'lucide-react';
 import { Header } from '../components/Header';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
+import { backgrounds } from '@/utils/colors';
+import { Button } from '@/components/ui/button';
 
 interface StudentEntry {
   id: string;
@@ -148,7 +150,7 @@ export function AddStudentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       <Header activeTab="cohorts" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
@@ -157,13 +159,14 @@ export function AddStudentsPage() {
         if (tab === 'reports') navigate('/reports');
       }} />
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <button
+      <Button
           onClick={() => navigate(`/cohorts/${id}`)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          variant="ghost"
+          startIcon={<ArrowLeft className="w-5 h-5" />}
+          className="text-gray-600 hover:text-gray-900 mb-6 w-fit"
         >
-          <ArrowLeft className="w-5 h-5" />
           Back to Cohort
-        </button>
+        </Button>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Add Students to Cohort</h1>
@@ -255,40 +258,38 @@ export function AddStudentsPage() {
               </div>
             ))}
 
-            <button
+            <Button
               type="button"
+              variant="link"
+              startIcon={<UserPlus className="w-4 h-4" />}
               onClick={handleAddStudent}
-              className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium flex items-center gap-2 mt-4"
             >
-              <UserPlus className="w-4 h-4" />
               Add Another Student
-            </button>
+            </Button>
 
             <div className="flex gap-4 pt-6 border-t border-gray-200 mt-8">
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 onClick={() => navigate(`/cohorts/${id}`)}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                size="lg"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                disabled={loading}
-                className="flex-1 bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                variant="primary"
+                loading={loading}
+                size="lg"
+                className="flex-1"
+                startIcon={<UserPlus className="w-5 h-5" />}
               >
                 {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Adding Students...
-                  </>
+                  'Adding Students...'
                 ) : (
-                  <>
-                    <UserPlus className="w-5 h-5" />
-                    Add Students
-                  </>
+                  'Add Students'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
 

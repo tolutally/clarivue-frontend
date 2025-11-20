@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBackend } from '../../contexts/AuthContext';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, ArrowLeft, Shield, Video, Users, Database, AlertCircle } from 'lucide-react';
@@ -258,22 +259,23 @@ export function ConsentPage() {
               </div>
 
               <div className="flex justify-between pt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => navigate(`/session/${sessionId}/profile`)}
-                  className="flex items-center gap-2 px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                  variant="outline"
+                  startIcon={<ArrowLeft className="w-5 h-5" aria-hidden="true" />}
                 >
-                  <ArrowLeft className="w-5 h-5" aria-hidden="true" />
                   Back
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit" 
-                  disabled={loading || !allRequiredConsentsGiven} 
-                  className="flex items-center gap-2 px-6 py-2 bg-brand-primary text-white rounded-lg font-medium hover:bg-brand-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  loading={loading}
+                  disabled={!allRequiredConsentsGiven} 
+                  variant="primary"
+                  endIcon={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
                   {loading ? 'Saving...' : 'I Agree & Continue'}
-                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </button>
+                </Button>
               </div>
             </form>
           </Card>

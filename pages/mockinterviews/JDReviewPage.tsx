@@ -208,8 +208,12 @@ export function JDReviewPage() {
                     autoFocus
                     aria-label="New technical skill"
                   />
-                  <Button onClick={handleAddSkill} size="sm" disabled={!newSkillValue.trim()}>
-                    <Plus className="w-4 h-4" aria-hidden="true" />
+                  <Button 
+                    onClick={handleAddSkill} 
+                    size="sm" 
+                    disabled={!newSkillValue.trim()}
+                    startIcon={<Plus className="w-4 h-4" aria-hidden="true" />}
+                  >
                     <span className="sr-only">Add skill</span>
                   </Button>
                   <Button 
@@ -254,8 +258,12 @@ export function JDReviewPage() {
                     autoFocus
                     aria-label="New soft skill"
                   />
-                  <Button onClick={handleAddSkill} size="sm" disabled={!newSkillValue.trim()}>
-                    <Plus className="w-4 h-4" aria-hidden="true" />
+                  <Button 
+                    onClick={handleAddSkill} 
+                    size="sm" 
+                    disabled={!newSkillValue.trim()}
+                    startIcon={<Plus className="w-4 h-4" aria-hidden="true" />}
+                  >
                     <span className="sr-only">Add skill</span>
                   </Button>
                   <Button 

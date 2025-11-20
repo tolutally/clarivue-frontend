@@ -3,9 +3,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Plus, X, Sparkles } from 'lucide-react';
 import { Header } from '../components/Header';
+import { Button } from '@/components/ui/button';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
 import { CreatableSelect } from '../components/ui/CreatableSelect';
+import { backgrounds, semanticTokens } from '@/utils/colors';
 
 export function CreateCohortPage() {
   const navigate = useNavigate();
@@ -114,7 +116,7 @@ export function CreateCohortPage() {
 
   if (showWelcome) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
           <Sparkles className="w-20 h-20 text-blue-600 mx-auto mb-6" />
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to Clarivue!</h1>
@@ -140,12 +142,14 @@ export function CreateCohortPage() {
             </ol>
           </div>
 
-          <button
+          <Button
             onClick={() => setShowWelcome(false)}
-            className="bg-[var(--primary)] text-white px-8 py-4 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all text-lg"
+            variant="primary"
+            size="lg"
+            className="px-8 py-4 text-lg"
           >
             Create Your First Cohort
-          </button>
+          </Button>
 
           <p className="text-sm text-gray-500 mt-4">
             You can always access help from the ? icon in the navigation
@@ -156,7 +160,7 @@ export function CreateCohortPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       <Header activeTab="cohorts" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
@@ -165,13 +169,14 @@ export function CreateCohortPage() {
         if (tab === 'reports') navigate('/reports');
       }} />
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <button
+        <Button
           onClick={() => navigate('/cohorts')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          variant="ghost"
+          startIcon={<ArrowLeft className="w-5 h-5" />}
+          className="text-gray-600 hover:text-gray-900 mb-6 w-fit"
         >
-          <ArrowLeft className="w-5 h-5" />
           Back to Cohorts
-        </button>
+        </Button>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Cohort</h1>
@@ -258,14 +263,16 @@ export function CreateCohortPage() {
                     {savedTags
                       .filter((tag) => !customTags.includes(tag))
                       .map((tag) => (
-                        <button
+                        <Button
                           key={tag}
                           type="button"
                           onClick={() => handleSelectSavedTag(tag)}
-                          className="px-3 py-1 bg-[var(--primary-light)] text-[var(--primary)] rounded-full text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
+                          variant="ghost"
+                          size="sm"
+                          className={`${backgrounds.primaryLight} text-[${semanticTokens.primary}] rounded-full text-sm hover:bg-[${semanticTokens.primary}] hover:text-white transition-colors`}
                         >
                           + {tag}
-                        </button>
+                        </Button>
                       ))}
                   </div>
                 </div>
@@ -284,15 +291,16 @@ export function CreateCohortPage() {
                   }}
                   placeholder="Add a tag..."
                   maxLength={20}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                  className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[${semanticTokens.primary}] focus:border-transparent`}
                 />
-                <button
+                <Button
                   type="button"
                   onClick={handleAddCustomTag}
+                  variant="ghost"
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Add
-                </button>
+                </Button>
               </div>
               
               {/* Selected tags */}
@@ -306,14 +314,16 @@ export function CreateCohortPage() {
                         className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm flex items-center gap-2"
                       >
                         {tag}
-                        <button
+                        <Button
                           type="button"
                           onClick={() => handleRemoveTag(tag)}
+                          variant="ghost"
+                          size="icon"
                           className="text-gray-500 hover:text-gray-700"
                           aria-label={`Remove ${tag} tag`}
                         >
                           <X className="w-3 h-3" />
-                        </button>
+                        </Button>
                       </span>
                     ))}
                   </div>
@@ -336,46 +346,54 @@ export function CreateCohortPage() {
                       value={objective}
                       onChange={(e) => handleObjectiveChange(index, e.target.value)}
                       placeholder="e.g., Improve STAR response quality"
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                      className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[${semanticTokens.primary}] focus:border-transparent`}
                     />
                     {objectives.length > 1 && (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleRemoveObjective(index)}
-                        className="px-3 py-2 text-gray-500 hover:text-red-600 transition-colors"
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-500 hover:text-red-600 transition-colors"
                         aria-label="Remove objective"
                       >
                         <X className="w-5 h-5" />
-                      </button>
+                      </Button>
                     )}
                   </div>
                 ))}
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={handleAddObjective}
-                className="mt-3 text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium flex items-center gap-1"
+                variant="ghost"
+                className={`mt-3 text-sm text-[${semanticTokens.primary}] hover:text-[${semanticTokens.primaryDark}] font-medium flex items-center gap-1 w-fit`}
+                startIcon={<Plus className="w-4 h-4" />}
               >
-                <Plus className="w-4 h-4" />
                 Add Another Objective
-              </button>
+              </Button>
             </div>
 
             <div className="flex gap-4 pt-6 border-t border-gray-200">
-              <button
+              <Button
                 type="button"
                 onClick={() => navigate('/cohorts')}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                variant="outline"
+                size="lg"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                disabled={loading || !name.trim()}
-                className="flex-1 bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={loading}
+                disabled={!name.trim()}
+                variant="primary"
+                className="flex-1"
+                size="lg"
               >
-                {loading ? 'Creating...' : 'Create Cohort'}
-              </button>
+                Create Cohort
+              </Button>
             </div>
           </form>
         </div>

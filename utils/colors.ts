@@ -80,6 +80,7 @@ export const backgrounds = {
   tertiaryLight: 'bg-[var(--tertiary-light)]',
   surface: 'bg-[var(--surface)]',
   surfaceHover: 'bg-[var(--surface-hover)]',
+  surfaceActive: 'bg-[var(--surface-active)]',
 } as const;
 
 export const borders = {
@@ -120,6 +121,7 @@ export const hover = {
   secondaryLight: 'hover:bg-[var(--secondary-light)]',
   tertiaryLight: 'hover:bg-[var(--tertiary-light)]',
   surface: 'hover:bg-[var(--surface-hover)]',
+  surfaceLight: 'hover:bg-[var(--surface-hover)]/30',
 } as const;
 
 export const gradients = {
@@ -144,6 +146,7 @@ export const cardStyles = {
 
 export const semantic = {
   surface: backgrounds.surface,
+  surfaceActive: backgrounds.surfaceActive,
   border: borders.default,
   borderMedium: borders.medium,
   borderStrong: borders.strong,

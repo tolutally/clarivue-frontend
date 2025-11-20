@@ -194,21 +194,14 @@ export function JDIntakePage() {
                 </div>
                 <Button 
                   onClick={handleAnalyze} 
-                  disabled={loading || pastedJD.length < 100}
-                  className="w-full gap-2"
+                  loading={loading}
+                  disabled={pastedJD.length < 100}
+                  className="w-full"
                   size="lg"
+                  variant="primary"
+                  startIcon={<Sparkles className="w-5 h-5" aria-hidden="true" />}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5" aria-hidden="true" />
-                      Analyze Job Description
-                    </>
-                  )}
+                  Analyze Job Description
                 </Button>
               </div>
             </TabsContent>
@@ -288,10 +281,11 @@ export function JDIntakePage() {
                           </h3>
                           <div className="space-y-2">
                             {jds.map(jd => (
-                              <button
+                              <Button
                                 key={jd.id}
                                 onClick={() => setSelectedSampleId(jd.id)}
-                                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                                variant={selectedSampleId === jd.id ? 'primary' : 'outline'}
+                                className={`w-full text-left p-4 border-2 transition-all ${
                                   selectedSampleId === jd.id
                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20'
                                     : 'border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700'
@@ -324,7 +318,7 @@ export function JDIntakePage() {
                                     </div>
                                   )}
                                 </div>
-                              </button>
+                              </Button>
                             ))}
                           </div>
                         </div>

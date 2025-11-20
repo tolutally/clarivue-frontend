@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
-import { Plus, Search, Users, TrendingUp, Calendar, MoreVertical } from 'lucide-react';
+import { Plus, Search, Users, Calendar, MoreVertical } from 'lucide-react';
 import { Header } from '../components/Header';
+import { Button } from '@/components/ui/button';
 import type { CohortTags } from '../types/cohort';
+import { backgrounds, borders, semantic, semanticTokens } from '@/utils/colors';
 
 interface CohortSummary {
   id: string;
@@ -76,9 +78,9 @@ export function CohortsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--surface-hover)] flex items-center justify-center">
+      <div className={`min-h-screen ${semantic.surfaceActive} flex items-center justify-center`}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className={`w-12 h-12 border-4 ${borders.primary} border-t-transparent rounded-full animate-spin mx-auto mb-4`}></div>
           <p className="text-gray-600">Loading cohorts...</p>
         </div>
       </div>
@@ -86,7 +88,7 @@ export function CohortsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${semantic.surfaceActive}`}>
       <Header activeTab="cohorts" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
@@ -94,18 +96,19 @@ export function CohortsPage() {
         if (tab === 'reports') navigate('/reports');
       }} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex gap-5 flex-wrap items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Cohorts</h1>
             <p className="text-gray-600">Manage and track your student cohorts</p>
           </div>
-          <button
+          <Button
             onClick={() => navigate('/cohorts/new')}
-            className="bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all flex items-center gap-2"
+            variant="primary"
+            size="lg"
+            startIcon={<Plus className="w-5 h-5" />}
           >
-            <Plus className="w-5 h-5" />
             New Cohort
-          </button>
+          </Button>
         </div>
 
         <div className="mb-6">
@@ -126,13 +129,14 @@ export function CohortsPage() {
             <Users className="w-20 h-20 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No cohorts yet</h3>
             <p className="text-gray-600 mb-6">Create your first cohort to get started</p>
-            <button
+            <Button
               onClick={() => navigate('/cohorts/new')}
-              className="bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all inline-flex items-center gap-2"
+              variant="primary"
+              size="lg"
+              startIcon={<Plus className="w-5 h-5" />}
             >
-              <Plus className="w-5 h-5" />
               Create Your First Cohort
-            </button>
+            </Button>
           </div>
         )}
 
@@ -170,15 +174,17 @@ export function CohortsPage() {
                     )}
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
+                  variant="ghost"
+                  size="icon"
                   className="text-gray-400 hover:text-gray-600 p-1"
                   aria-label="Cohort options"
                 >
                   <MoreVertical className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
               <div className="grid grid-cols-4 gap-3 mb-4">
@@ -207,8 +213,11 @@ export function CohortsPage() {
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[var(--primary)] transition-all cohort-progress-bar"
+                    className={`h-full transition-all rounded-full cohort-progress-bar ${calculateProgress(cohort.stats) === 0 ? 'bg-gray-300' : 'bg-primary'}`}
                     data-progress={calculateProgress(cohort.stats)}
+                    style={{
+                      width: `${calculateProgress(cohort.stats)}%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -218,9 +227,9 @@ export function CohortsPage() {
                   <Calendar className="w-4 h-4" />
                   <span>{formatLastActivity(cohort.lastActivity)}</span>
                 </div>
-                <button className="text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium">
+                <Button variant="link" className="text-primary hover:text-primary-dark font-medium px-0">
                   View
-                </button>
+                </Button>
               </div>
             </div>
           ))}

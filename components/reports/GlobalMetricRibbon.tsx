@@ -2,8 +2,8 @@ import { TrendingUp, Briefcase, Clock } from 'lucide-react';
 
 export function GlobalMetricRibbon() {
   return (
-    <div className="bg-gradient-to-r from-[#102C64] to-[#102C64]/95 border-b border-[#C8A0FE]/30 px-6 py-3">
-      <div className="flex items-center justify-center gap-4">
+    <div className="bg-linear-to-r from-[#102C64] to-[#102C64]/95 border-b border-[#C8A0FE]/30 px-6 py-3">
+      <div className="flex flex-wrap items-center justify-center gap-4">
         <MetricPill
           icon={<TrendingUp className="w-4 h-4" />}
           label="Avg Readiness"

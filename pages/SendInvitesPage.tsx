@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Send, CheckCircle, Clock, Users as UsersIcon } from 'lucide-react';
 import { Header } from '../components/Header';
+import { Button } from '@/components/ui/button';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
 import type { CohortStudent } from '../types/cohort';
@@ -130,12 +131,13 @@ export function SendInvitesPage() {
             <UsersIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">No Students Found</h2>
             <p className="text-gray-600 mb-6">Add students to this cohort before sending invites</p>
-            <button
+            <Button
               onClick={() => navigate(`/cohorts/${id}/add-students`)}
-              className="bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all"
+              variant="primary"
+              size="lg"
             >
               Add Students
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -152,13 +154,14 @@ export function SendInvitesPage() {
         if (tab === 'reports') navigate('/reports');
       }} />
       <div className="max-w-5xl mx-auto px-6 py-8">
-        <button
+        <Button
           onClick={() => navigate(`/cohorts/${id}`)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          variant="ghost"
+          startIcon={<ArrowLeft className="w-5 h-5" />}
+          className="text-gray-600 hover:text-gray-900 mb-6 w-fit"
         >
-          <ArrowLeft className="w-5 h-5" />
           Back to Cohort
-        </button>
+        </Button>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Send Interview Invites</h1>
@@ -230,12 +233,13 @@ export function SendInvitesPage() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Select Students ({selectedStudents.size} of {cohort.students.length})
                 </h3>
-                <button
+                <Button
                   onClick={handleSelectAll}
-                  className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"
+                  variant="ghost"
+                  className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium w-fit"
                 >
                   {selectedStudents.size === cohort.students.length ? 'Deselect All' : 'Select All'}
-                </button>
+                </Button>
               </div>
 
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
@@ -292,30 +296,26 @@ export function SendInvitesPage() {
 
             {/* Action Buttons */}
             <div className="flex gap-4 pt-6 border-t border-gray-200">
-              <button
+              <Button
                 type="button"
                 onClick={() => navigate(`/cohorts/${id}`)}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                variant="outline"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleSendInvites}
-                disabled={sending || selectedStudents.size === 0}
-                className="flex-1 bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                loading={sending}
+                disabled={selectedStudents.size === 0}
+                variant="primary"
+                className="flex-1 flex items-center justify-center gap-2"
+                startIcon={!sending ? <Send className="w-5 h-5" /> : undefined}
               >
-                {sending ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Sending Invites...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5" />
-                    Send {selectedStudents.size} Invitation{selectedStudents.size !== 1 ? 's' : ''}
-                  </>
-                )}
-              </button>
+                {sending
+                  ? 'Sending Invites...'
+                  : `Send ${selectedStudents.size} Invitation${selectedStudents.size !== 1 ? 's' : ''}`}
+              </Button>
             </div>
           </div>
         </div>

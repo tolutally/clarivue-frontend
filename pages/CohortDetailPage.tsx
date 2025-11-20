@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Users, AlertTriangle, Settings as SettingsIcon, CheckCircle, UserPlus, Send, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Header } from '../components/Header';
 import type { CohortTags, CohortStudent } from '../types/cohort';
+import { backgrounds } from '@/utils/colors';
 
 interface CohortDetails {
   id: string;
@@ -58,7 +60,7 @@ export function CohortDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <Header activeTab="cohorts" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
@@ -66,13 +68,14 @@ export function CohortDetailPage() {
         if (tab === 'reports') navigate('/reports');
       }} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
-        <button
+        <Button
           onClick={() => navigate('/cohorts')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          variant="ghost"
+          startIcon={<ArrowLeft className="w-5 h-5" />}
+          className="text-gray-600 hover:text-gray-900 mb-6 w-fit"
         >
-          <ArrowLeft className="w-5 h-5" />
           Back to Cohorts
-        </button>
+        </Button>
 
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
@@ -100,36 +103,20 @@ export function CohortDetailPage() {
 
         <div className="border-b border-gray-200 mb-8">
           <div className="flex gap-6">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`pb-3 px-1 border-b-2 font-medium transition-colors ${
-                activeTab === 'overview'
-                  ? 'border-[var(--primary)] text-[var(--primary)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('students')}
-              className={`pb-3 px-1 border-b-2 font-medium transition-colors ${
-                activeTab === 'students'
-                  ? 'border-[var(--primary)] text-[var(--primary)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Students
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`pb-3 px-1 border-b-2 font-medium transition-colors ${
-                activeTab === 'settings'
-                  ? 'border-[var(--primary)] text-[var(--primary)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Settings
-            </button>
+            {(['overview', 'students', 'settings'] as Tab[]).map((tab) => (
+              <Button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                variant="ghost"
+                className={`pb-3 px-1 border-b-2 font-medium transition-colors rounded-none ${
+                  activeTab === tab
+                    ? 'border-[var(--primary)] text-[var(--primary)]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -188,20 +175,22 @@ export function CohortDetailPage() {
                     Students ({cohort.students.length})
                   </h2>
                   <div className="flex gap-3">
-                    <button
+                    <Button
                       onClick={() => navigate(`/cohorts/${id}/add-students`)}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      variant="outline"
+                      className="font-medium flex items-center gap-2"
+                      startIcon={<UserPlus className="w-4 h-4" />}
                     >
-                      <UserPlus className="w-4 h-4" />
                       Add More
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => navigate(`/cohorts/${id}/send-invites`)}
-                      className="bg-[var(--primary)] text-white px-4 py-2 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all flex items-center gap-2"
+                      variant="primary"
+                      className="font-medium flex items-center gap-2"
+                      startIcon={<Send className="w-4 h-4" />}
                     >
-                      <Send className="w-4 h-4" />
                       Send Interview Invites
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -254,12 +243,13 @@ export function CohortDetailPage() {
                 <Users className="w-20 h-20 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No students yet</h3>
                 <p className="text-gray-600 mb-6">Add students to start tracking their progress</p>
-                <button
+                <Button
                   onClick={() => navigate(`/cohorts/${id}/add-students`)}
-                  className="bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary-dark)] transition-all"
+                  variant="primary"
+                  size="lg"
                 >
                   Add Students
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -288,9 +278,11 @@ export function CohortDetailPage() {
 
               <div className="pt-6 border-t border-gray-200">
                 <h3 className="font-semibold text-gray-900 mb-4 text-red-600">Danger Zone</h3>
-                <button className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                <Button
+                  variant="danger"
+                >
                   Archive Cohort
-                </button>
+                </Button>
               </div>
             </div>
           </div>

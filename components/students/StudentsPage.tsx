@@ -4,6 +4,7 @@ import type { Student } from '../../types';
 import { Header } from '../Header';
 import { StudentOverview } from './StudentOverview';
 import { students } from '../../data/mock-data';
+import { backgrounds } from '@/utils/colors';
 
 const StudentDetailView = lazy(() => import('./StudentDetailView').then(module => ({ default: module.StudentDetailView })));
 
@@ -22,7 +23,7 @@ export function StudentsPage() {
 
   if (selectedStudent) {
     return (
-      <div className="min-h-screen bg-[var(--surface-hover)]">
+      <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
         <Header activeTab="students" onTabChange={(tab) => {
           if (tab === 'overview') navigate('/overview');
           if (tab === 'cohorts') navigate('/cohorts');
@@ -42,7 +43,7 @@ export function StudentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <Header activeTab="students" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');

@@ -1,6 +1,8 @@
+import { backgrounds } from "@/utils/colors";
+
 export function ReportsPageSkeleton() {
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <div className="bg-white border-b border-gray-200">
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">

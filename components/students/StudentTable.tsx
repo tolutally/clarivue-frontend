@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { ChevronUp, ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ChevronUp, ChevronDown, TrendingUp, TrendingDown, Users } from 'lucide-react';
 import { CircularProgress } from '../charts/CircularProgress';
 import { semantic, shadows, backgrounds, hover } from '../../utils/colors';
 import type { Student } from '../../types';
+import { Button } from '../ui/button';
 
 interface StudentTableProps {
   students: Student[];
@@ -25,25 +26,28 @@ export function StudentTable({ students, onStudentClick }: StudentTableProps) {
     }
   };
 
-  const sortedStudents = [...students].sort((a, b) => {
-    let aValue = a[sortField];
-    let bValue = b[sortField];
+  const sortedStudents = useMemo(() => {
+    return [...students].sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
 
-    if (sortField === 'lastInterviewDate') {
-      aValue = new Date(aValue as string).getTime();
-      bValue = new Date(bValue as string).getTime();
-    }
+      if (sortField === 'lastInterviewDate') {
+        aValue = aValue ? new Date(aValue as string).getTime() : 0;
+        bValue = bValue ? new Date(bValue as string).getTime() : 0;
+      }
 
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortDirection === 'asc' 
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    }
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
 
-    return sortDirection === 'asc'
-      ? (aValue as number) - (bValue as number)
-      : (bValue as number) - (aValue as number);
-  });
+      const aNum = typeof aValue === 'number' ? aValue : 0;
+      const bNum = typeof bValue === 'number' ? bValue : 0;
+
+      return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+    });
+  }, [students, sortField, sortDirection]);
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
@@ -57,6 +61,18 @@ export function StudentTable({ students, onStudentClick }: StudentTableProps) {
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('');
   };
+
+  const renderEmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center space-y-3">
+      <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
+        <Users className="w-8 h-8 text-slate-400" />
+      </div>
+      <div className="text-lg font-semibold text-slate-900">No students match your filters</div>
+      <p className="text-sm text-slate-500 max-w-md">
+        Try adjusting the search terms or filters to find students. Once they match, they'll appear here.
+      </p>
+    </div>
+  );
 
   return (
     <div className={`${semantic.surface} rounded-2xl ${shadows.sm} border ${semantic.border} overflow-hidden`}>
@@ -110,15 +126,20 @@ export function StudentTable({ students, onStudentClick }: StudentTableProps) {
             </tr>
           </thead>
           <tbody className={`divide-y ${semantic.border}`}>
-            {sortedStudents.map((student) => (
-              <tr 
+            {sortedStudents.length === 0 ? (
+              <tr>
+                <td colSpan={6}>{renderEmptyState()}</td>
+              </tr>
+            ) : (
+              sortedStudents.map((student) => (
+                <tr 
                 key={student.id}
                 onClick={() => onStudentClick(student)}
-                className={`${hover.primaryLight} transition-colors cursor-pointer`}
+                className={`${hover.surfaceLight} transition-colors cursor-pointer`}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#102c64] to-[#B8CCF4] flex items-center justify-center text-white font-semibold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#102c64] to-[#B8CCF4] flex items-center justify-center text-white font-semibold text-sm">
                       {getInitials(student.name)}
                     </div>
                     <div className={`font-medium ${semantic.textPrimary}`}>{student.name}</div>
@@ -149,18 +170,20 @@ export function StudentTable({ students, onStudentClick }: StudentTableProps) {
                   <div className={`text-sm ${semantic.textSecondary}`}>{student.lastInterviewDate}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <button
+                  <Button
+                    variant="primary"
+                    size="md"
                     onClick={(e) => {
                       e.stopPropagation();
                       onStudentClick(student);
                     }}
-                    className={`px-4 py-2 ${backgrounds.primary} text-white text-sm font-medium rounded-lg ${hover.primary} transition-colors`}
                   >
                     View Report
-                  </button>
+                  </Button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

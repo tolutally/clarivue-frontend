@@ -12,6 +12,7 @@ import { TechnicalDepthIndex } from './TechnicalDepthIndex';
 import { SkillTagsPanel } from './SkillTagsPanel';
 import { SkillsMentioned } from './SkillsMentioned';
 import backend from '@/lib/api-client';
+import { Button } from '../ui/button';
 
 interface InterviewReportCardProps {
   report: InterviewReport;
@@ -49,14 +50,19 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
     transcriptViewerRef.current?.scrollToTimestamp(timestamp);
   };
 
+  const chevronClasses = `w-5 h-5 ${semantic.textMuted} transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`;
+
   return (
     <div className={`${semantic.surface} rounded-xl ${shadows.sm} border ${semantic.border} overflow-hidden`}>
       <button
+        type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full px-6 py-4 flex items-center justify-between ${hover.primaryLight} transition-colors`}
+        aria-expanded={isExpanded}
+        aria-controls={`report-panel-${report.id}`}
+        className={`w-full px-6 py-4 flex items-center justify-between ${hover.surfaceLight} transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary`}
       >
         <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${gradients.tertiary} flex items-center justify-center text-white font-bold`}>
+          <div className={`w-12 h-12 rounded-full bg-linear-to-br ${gradients.tertiary} flex items-center justify-center text-white font-bold`}>
             #{report.interviewNumber}
           </div>
           <div className="text-left">
@@ -80,25 +86,25 @@ export function InterviewReportCard({ report }: InterviewReportCardProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={(e) => {
               e.stopPropagation();
             }}
-            className={`flex items-center gap-2 px-4 py-2 ${backgrounds.primary} text-white rounded-lg ${hover.primary} transition-colors text-sm font-medium`}
+            startIcon={<ExternalLink className="w-4 h-4" />}
           >
-            <ExternalLink className="w-4 h-4" />
             Open Full Report
-          </button>
-          {isExpanded ? (
-            <ChevronUp className={`w-5 h-5 ${semantic.textMuted}`} />
-          ) : (
-            <ChevronDown className={`w-5 h-5 ${semantic.textMuted}`} />
-          )}
+          </Button>
+          <ChevronDown className={chevronClasses} />
         </div>
       </button>
 
       {isExpanded && (
-        <div className={`border-t ${semantic.border} p-6 space-y-6 ${semantic.bgSubtle}`}>
+        <div
+          id={`report-panel-${report.id}`}
+          className={`border-t ${semantic.border} p-6 space-y-6 ${backgrounds.tertiaryLight}`}
+        >
           {report.technicalDepthIndex && (
             <TechnicalDepthIndex tdi={report.technicalDepthIndex} />
           )}

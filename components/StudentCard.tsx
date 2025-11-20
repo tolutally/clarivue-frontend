@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { CircularProgress } from './charts/CircularProgress';
 import { Sparkline } from './charts/Sparkline';
 import type { Student } from '../types';
@@ -55,9 +56,13 @@ export function StudentCard({ student }: StudentCardProps) {
       </td>
       
       <td className="py-3 px-4 text-right">
-        <button className="px-3 py-1.5 border border-[#102c64] text-[#102c64] rounded text-xs font-medium hover:bg-[#102c64] hover:text-white transition-colors">
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="text-xs"
+        >
           View Details
-        </button>
+        </Button>
       </td>
     </tr>
   );

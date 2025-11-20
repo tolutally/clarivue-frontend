@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 import { Mail, Lock, ArrowRight, CheckCircle } from 'lucide-react';
 
 export function LoginPage() {
@@ -51,8 +52,9 @@ export function LoginPage() {
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
           <div className="flex gap-2 mb-6 p-1 bg-gray-100 rounded-lg">
-            <button
+            <Button
               onClick={() => setActiveMethod('magic')}
+              variant="ghost"
               className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
                 activeMethod === 'magic'
                   ? 'bg-white shadow-sm text-gray-900'
@@ -60,9 +62,10 @@ export function LoginPage() {
               }`}
             >
               Magic Link
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveMethod('password')}
+              variant="ghost"
               className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
                 activeMethod === 'password'
                   ? 'bg-white shadow-sm text-gray-900'
@@ -70,7 +73,7 @@ export function LoginPage() {
               }`}
             >
               Password
-            </button>
+            </Button>
           </div>
 
           {error && (
@@ -98,14 +101,15 @@ export function LoginPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                loading={loading}
+                variant="primary"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                endIcon={<ArrowRight className="w-5 h-5" />}
               >
                 {loading ? 'Sending...' : 'Send Magic Link'}
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              </Button>
             </form>
           )}
 
@@ -117,12 +121,13 @@ export function LoginPage() {
                 We sent a secure login link to <strong>{email}</strong>
               </p>
               <p className="text-sm text-gray-500 mb-4">The link expires in 15 minutes</p>
-              <button
+              <Button
                 onClick={() => setMagicLinkSent(false)}
+                variant="link"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Use a different email
-              </button>
+              </Button>
             </div>
           )}
 
@@ -162,14 +167,15 @@ export function LoginPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                loading={loading}
+                variant="primary"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                endIcon={<ArrowRight className="w-5 h-5" />}
               >
                 {loading ? 'Logging in...' : 'Log In'}
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              </Button>
             </form>
           )}
         </div>

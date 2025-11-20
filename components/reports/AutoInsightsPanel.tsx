@@ -75,17 +75,26 @@ export function AutoInsightsPanel({ insights }: AutoInsightsPanelProps) {
       <div className={`${semantic.surface} rounded-lg border ${semantic.borderMedium} p-5`}>
         <h3 className={`text-sm font-semibold ${semantic.textPrimary} mb-4`}>Share & Schedule</h3>
         <div className="space-y-2">
-          <Button variant="outline" className="w-full justify-start gap-3">
-            <FileText className="w-4 h-4 text-[#FE686D]" />
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            startIcon={<FileText className="w-4 h-4 text-[#FE686D]" />}
+          >
             Share as PDF
           </Button>
-          <Button variant="outline" className="w-full justify-start gap-3">
-            <FileSpreadsheet className="w-4 h-4 text-[#C8A0FE]" />
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            startIcon={<FileSpreadsheet className="w-4 h-4 text-[#C8A0FE]" />}
+          >
             Share as CSV
           </Button>
           <div className={`border-t ${semantic.borderMedium} my-3`} />
-          <Button variant="outline" className="w-full justify-start gap-3">
-            <Mail className={`w-4 h-4 ${text.primary}`} />
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            startIcon={<Mail className={`w-4 h-4 ${text.primary}`} />}
+          >
             Schedule Weekly Email
           </Button>
         </div>
@@ -130,9 +139,13 @@ function DefinitionsPanel() {
         {definitions.map((def, i) => (
           <Popover key={i}>
             <PopoverTrigger asChild>
-              <button className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-xs font-medium text-gray-700 transition-colors">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-xs font-medium text-gray-700 transition-colors"
+              >
                 {def.term}
-              </button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80" side="left">
               <div className="space-y-2">

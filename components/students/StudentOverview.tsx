@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { StudentTable } from './StudentTable';
-import { semantic, backgrounds, hover } from '../../utils/colors';
+import { semantic } from '../../utils/colors';
 import type { Student, StudentFilterType } from '../../types';
+import { Button } from '@/components/ui/button';
+import { Dropdown } from '../ui/Dropdown';
 
 interface StudentOverviewProps {
   students: Student[];
@@ -15,6 +17,16 @@ export function StudentOverview({ students, onStudentClick }: StudentOverviewPro
   const [roleFilter, setRoleFilter] = useState<string>('all');
 
   const roles = ['all', ...Array.from(new Set(students.map(s => s.role)))];
+  const roleOptions = roles.map((role) => ({
+    value: role,
+    label: role === 'all' ? 'By Role' : role,
+  }));
+  const filters: Array<{ id: StudentFilterType; label: string }> = [
+    { id: 'all', label: 'All' },
+    { id: 'high-readiness', label: 'High Readiness (80+)' },
+    { id: 'improving', label: 'Improving Fast' },
+    { id: 'needs-support', label: 'Needs Support (<60)' },
+  ];
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,58 +60,34 @@ export function StudentOverview({ students, onStudentClick }: StudentOverviewPro
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <button
-          onClick={() => setActiveFilter('all')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            activeFilter === 'all'
-              ? `${backgrounds.primary} text-white shadow-md`
-              : `${semantic.surface} ${semantic.textSecondary} ${hover.primaryLight} border ${semantic.borderMedium}`
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setActiveFilter('high-readiness')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            activeFilter === 'high-readiness'
-              ? `${backgrounds.primary} text-white shadow-md`
-              : `${semantic.surface} ${semantic.textSecondary} ${hover.primaryLight} border ${semantic.borderMedium}`
-          }`}
-        >
-          High Readiness (80+)
-        </button>
-        <button
-          onClick={() => setActiveFilter('improving')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            activeFilter === 'improving'
-              ? `${backgrounds.primary} text-white shadow-md`
-              : `${semantic.surface} ${semantic.textSecondary} ${hover.primaryLight} border ${semantic.borderMedium}`
-          }`}
-        >
-          Improving Fast
-        </button>
-        <button
-          onClick={() => setActiveFilter('needs-support')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            activeFilter === 'needs-support'
-              ? `${backgrounds.primary} text-white shadow-md`
-              : `${semantic.surface} ${semantic.textSecondary} ${hover.primaryLight} border ${semantic.borderMedium}`
-          }`}
-        >
-          Needs Support (&lt;60)
-        </button>
+        {filters.map((filter) => {
+          const isActive = activeFilter === filter.id;
+          return (
+            <Button
+              key={filter.id}
+              type="button"
+              onClick={() => setActiveFilter(filter.id)}
+              variant={isActive ? 'primary' : 'outline'}
+              size="md"
+              className={`
+                rounded-lg border ${semantic.borderMedium}
+                transition-all whitespace-nowrap
+                min-w-12
+                focus:outline-none focus:ring-primary focus:border-transparent
+              `}
+            >
+              {filter.label}
+            </Button>
+          );
+        })}
 
-        <select
+        <Dropdown
           value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${semantic.surface} ${semantic.textSecondary} border ${semantic.borderMedium} ${hover.primaryLight} focus:outline-none focus:ring-2 focus:ring-[#102c64]/20 transition-all`}
-        >
-          {roles.map(role => (
-            <option key={role} value={role}>
-              {role === 'all' ? 'By Role' : role}
-            </option>
-          ))}
-        </select>
+          onChange={setRoleFilter}
+          options={roleOptions}
+          className="min-w-[140px]"
+          placeholder="By Role"
+        />
       </div>
 
       <StudentTable students={filteredStudents} onStudentClick={onStudentClick} />

@@ -176,11 +176,11 @@ export function WelcomePage() {
         <div className="flex justify-center pt-4">
           <Button 
             onClick={handleGetStarted}
+            variant="primary"
             size="lg"
-            className="gap-2 px-8"
+            endIcon={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
           >
             Get Started
-            <ArrowRight className="w-5 h-5" aria-hidden="true" />
           </Button>
         </div>
       </div>
