@@ -28,7 +28,9 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
     throw new Error(error.message || `HTTP ${response.status}`);
   }
   
-  return response.json();
+  const json = await response.json();
+  // Extract data from wrapped API response: { status_code, message, data, error }
+  return json.data || json;
 }
 
 /**
@@ -40,46 +42,8 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
  * 3. Implement the actual API calls below
  */
 export const realBackend: BackendClient = {
-  auth: {
-    login: async ({ email, password }) => {
-      return apiFetch('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
-    },
-    
-    verifyMagicLink: async ({ token }) => {
-      return apiFetch('/auth/magic-link/verify', {
-        method: 'POST',
-        body: JSON.stringify({ token }),
-      });
-    },
-    
-    requestMagicLink: async ({ email }) => {
-      return apiFetch('/auth/magic-link', {
-        method: 'POST',
-        body: JSON.stringify({ email }),
-      });
-    },
-    
-    me: async () => {
-      return apiFetch('/auth/me');
-    },
-    
-    verifyInvite: async ({ token }) => {
-      return apiFetch('/auth/onboard/verify', {
-        method: 'POST',
-        body: JSON.stringify({ token }),
-      });
-    },
-    
-    completeOnboarding: async (data) => {
-      return apiFetch('/auth/onboard/complete', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-    },
-  },
+  // Auth methods removed - use authService from @/services instead
+  auth: {},
   
   cohorts: {
     list: async () => {

@@ -1,94 +1,76 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useGetMe } from '@/hooks/useAuth';
+import type { GetMeResponse } from '@/services';
 import backend from '@/lib/api-client';
 
-interface AdminInfo {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  role: string;
-}
-
 interface AuthContextType {
-  admin: AdminInfo | null;
+  admin: GetMeResponse | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  loginWithMagicLink: (token: string) => Promise<void>;
-  requestMagicLink: (email: string) => Promise<void>;
-  logout: () => void;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [admin, setAdmin] = useState<AdminInfo | null>(null);
+  const queryClient = useQueryClient();
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('auth_token');
   });
-  const [loading, setLoading] = useState(true);
+  
+  const { data: admin, isLoading, isError } = useGetMe();
 
+  // Sync token from localStorage on mount and when it changes
   useEffect(() => {
-    const loadUser = async () => {
-      const storedToken = localStorage.getItem('auth_token');
-      if (!storedToken) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const authedBackend = backend.with({ auth: { authorization: `Bearer ${storedToken}` } });
-        const adminInfo = await authedBackend.auth.me();
-        setAdmin(adminInfo);
-        setToken(storedToken);
-      } catch (err) {
-        localStorage.removeItem('auth_token');
-        setToken(null);
-        setAdmin(null);
-      } finally {
-        setLoading(false);
+    const checkToken = () => {
+      const currentToken = localStorage.getItem('auth_token');
+      if (currentToken !== token) {
+        setToken(currentToken);
+        if (currentToken) {
+          // Invalidate query to refetch user data
+          queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+        }
       }
     };
 
-    loadUser();
-  }, []);
+    // Check immediately
+    checkToken();
 
-  const login = async (email: string, password: string) => {
-    const response = await backend.auth.login({ email, password });
-    localStorage.setItem('auth_token', response.token);
-    setToken(response.token);
-    setAdmin(response.admin);
-  };
+    // Listen for storage events (cross-tab)
+    window.addEventListener('storage', checkToken);
+    
+    // Poll for changes (same-tab updates like after login)
+    const interval = setInterval(checkToken, 100);
 
-  const loginWithMagicLink = async (magicToken: string) => {
-    const response = await backend.auth.verifyMagicLink({ token: magicToken });
-    localStorage.setItem('auth_token', response.token);
-    setToken(response.token);
-    setAdmin(response.admin);
-  };
+    return () => {
+      window.removeEventListener('storage', checkToken);
+      clearInterval(interval);
+    };
+  }, [token, queryClient]);
 
-  const requestMagicLink = async (email: string) => {
-    await backend.auth.requestMagicLink({ email });
-  };
+  // Clear token if query fails (invalid/expired token)
+  useEffect(() => {
+    if (isError && token) {
+      localStorage.removeItem('auth_token');
+      setToken(null);
+      queryClient.clear();
+    }
+  }, [isError, token, queryClient]);
 
-  const logout = () => {
-    localStorage.removeItem('auth_token');
-    setToken(null);
-    setAdmin(null);
-  };
-
+  // Check localStorage directly for token to avoid delay from polling
+  // This prevents the flash of login page after successful login
+  // If we have a token in localStorage, consider authenticated (even if admin is loading)
+  const hasToken = token || (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null);
+  const isAuthenticated = !!hasToken;
+  
   return (
     <AuthContext.Provider
       value={{
-        admin,
+        admin: admin || null,
         token,
-        loading,
-        login,
-        loginWithMagicLink,
-        requestMagicLink,
-        logout,
-        isAuthenticated: !!admin,
+        loading: isLoading,
+        isAuthenticated,
       }}
     >
       {children}

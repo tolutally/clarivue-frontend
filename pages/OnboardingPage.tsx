@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Lock, Mail, User, AlertCircle } from 'lucide-react';
-import backend from '@/lib/api-client';
+import { useVerifyInvite, useCompleteOnboarding } from '@/hooks/useAuth';
 
 type OnboardingStep = 'verify' | 'credentials' | 'terms' | 'complete';
 
 export function OnboardingPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { loginWithMagicLink } = useAuth();
   
   const [step, setStep] = useState<OnboardingStep>('verify');
   const [email, setEmail] = useState('');
@@ -25,6 +23,11 @@ export function OnboardingPage() {
   const [passwordStrength, setPasswordStrength] = useState(0);
 
   const token = searchParams.get('token');
+  const verifyInviteMutation = useVerifyInvite();
+  const completeOnboardingMutation = useCompleteOnboarding();
+  
+  // Combine loading states
+  const isLoading = loading || verifyInviteMutation.isPending || completeOnboardingMutation.isPending;
 
   useEffect(() => {
     if (!token) {
@@ -35,11 +38,11 @@ export function OnboardingPage() {
     const verifyToken = async () => {
       setLoading(true);
       try {
-        const response = await backend.auth.verifyInvite({ token });
+        const response = await verifyInviteMutation.mutateAsync({ token: token! });
         setEmail(response.email);
         setStep('credentials');
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '';
+      } catch (err: any) {
+        const message = err?.message || '';
         if (message.includes('expired')) {
           setError('This invitation expired. Contact your administrator for a new link.');
         } else if (message.includes('already accepted')) {
@@ -55,7 +58,7 @@ export function OnboardingPage() {
     };
 
     verifyToken();
-  }, [token, navigate]);
+  }, [token, navigate, verifyInviteMutation]);
 
   const calculatePasswordStrength = (pwd: string) => {
     let strength = 0;
@@ -98,14 +101,13 @@ export function OnboardingPage() {
     setError('');
 
     try {
-      const response = await backend.auth.completeOnboarding({
+      await completeOnboardingMutation.mutateAsync({
         token: token!,
         password,
         firstName,
         lastName,
       });
 
-      localStorage.setItem('auth_token', response.token);
       setStep('complete');
       
       setTimeout(() => {
@@ -123,7 +125,7 @@ export function OnboardingPage() {
 
   if (loading && step === 'verify') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Verifying your invitation...</p>
@@ -134,7 +136,7 @@ export function OnboardingPage() {
 
   if (error && step === 'verify') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Invitation</h2>
@@ -152,7 +154,7 @@ export function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <img src="/clarivue-logo.png" alt="Clarivue" className="h-12 mx-auto mb-6" />
@@ -342,7 +344,7 @@ export function OnboardingPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+                className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all"
               >
                 Continue
               </Button>
@@ -389,7 +391,7 @@ export function OnboardingPage() {
                 loading={loading}
                 disabled={!termsAccepted || !privacyAccepted}
                 variant="primary"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Creating Account...' : 'Complete Setup'}
               </Button>

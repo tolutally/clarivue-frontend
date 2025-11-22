@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Menu, 
   X, 
@@ -7,10 +7,14 @@ import {
   GraduationCap, 
   UserCheck, 
   BarChart2, 
-  Settings 
+  Settings,
+  LogOut,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { semantic, backgrounds, gradients } from '../utils/colors';
+import { useAuth } from '../contexts/AuthContext';
+import { useLogout } from '@/hooks/useAuth';
 
 interface HeaderProps {
   activeTab: string;
@@ -38,11 +42,61 @@ const tabs = [
 
 export function Header({ activeTab, onTabChange }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const { admin } = useAuth();
+  const logoutMutation = useLogout();
 
   const handleTabChange = (tabId: string) => {
     onTabChange(tabId);
     setMobileMenuOpen(false); // Close mobile menu after selection
   };
+
+  const handleLogout = async () => {
+    setProfileDropdownOpen(false);
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      // Error toast is handled by axios interceptor
+    }
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (admin?.user?.name) {
+      const names = admin.user.name.split(' ');
+      if (names.length >= 2) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+      }
+      return admin.user.name.substring(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
+
+  const getUserName = () => {
+    return admin?.user?.name || admin?.user?.email || 'User';
+  };
+
+  const getUserEmail = () => {
+    return admin?.user?.email || '';
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    if (profileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [profileDropdownOpen]);
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
@@ -82,6 +136,48 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
               ))}
             </nav>
 
+            {/* Profile Avatar & Dropdown - Desktop */}
+            <div className="hidden lg:block relative" ref={profileDropdownRef}>
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className={`flex items-center gap-2 p-1.5 rounded-lg transition-colors focus:outline-none cursor-pointer ${
+                  profileDropdownOpen ? 'bg-gray-100' : 'hover:bg-gray-100'
+                }`}
+                aria-label="User menu"
+                aria-expanded={profileDropdownOpen}
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-linear-to-br from-blue-500 to-purple-600 text-white text-base font-semibold shrink-0"
+                  style={{ lineHeight: 1 }} // ensure line-height does not distort centering
+                >
+                  <span className="flex items-center justify-center w-full h-full">
+                    {getUserInitials()}
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 shrink-0 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {profileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{getUserName()}</p>
+                    {getUserEmail() && (
+                      <p className="text-xs text-gray-500 mt-1 truncate">{getUserEmail()}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span>{logoutMutation.isPending ? 'Logging out...' : 'Log out'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Mobile Menu Button */}
             <Button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -113,7 +209,19 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
       >
         <div className="flex flex-col h-full">
           {/* Drawer Header */}
-          <div className={`flex items-center justify-end p-3 border-b ${semantic.borderMedium}`}>
+          <div className={`flex items-center justify-between p-3 border-b ${semantic.borderMedium}`}>
+            {/* User Profile - Top */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shrink-0">
+                {getUserInitials()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 truncate">{getUserName()}</p>
+                {getUserEmail() && (
+                  <p className="text-xs text-gray-500 truncate mt-0.5">{getUserEmail()}</p>
+                )}
+              </div>
+            </div>
             <Button
               onClick={() => setMobileMenuOpen(false)}
               className={`p-2 rounded-lg ${semantic.textPrimary} ${semantic.bgHover} transition-colors`}
@@ -144,6 +252,20 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
               ))}
             </div>
           </nav>
+
+          {/* Logout Button - Bottom */}
+          <div className={`border-t ${semantic.borderMedium} p-4`}>
+            <Button
+              onClick={handleLogout}
+              disabled={logoutMutation.isPending}
+              variant="ghost"
+              size="lg"
+              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+              startIcon={<LogOut className="w-4 h-4" />}
+            >
+              {logoutMutation.isPending ? 'Logging out...' : 'Log out'}
+            </Button>
+          </div>
         </div>
       </div>
     </>

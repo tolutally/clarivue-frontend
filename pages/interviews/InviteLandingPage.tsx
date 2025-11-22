@@ -9,7 +9,7 @@ import { AlertCircle } from 'lucide-react';
  * 
  * Route: /invite/:token
  * 
- * Purpose: Validate the magic link token and redirect to welcome page.
+ * Purpose: Validate the invite token and redirect to welcome page.
  * 
  * Flow:
  * 1. Extract token from URL

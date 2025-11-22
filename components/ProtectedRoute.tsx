@@ -1,18 +1,9 @@
-import { useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ErrorBoundary } from './ErrorBoundary';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, loading, login } = useAuth();
-
-  useEffect(() => {
-    // Auto-login for development with mock backend
-    if (!loading && !isAuthenticated) {
-      login('dev@clarivue.com', 'password').catch((err) => {
-        console.error('Auto-login failed:', err);
-      });
-    }
-  }, [loading, isAuthenticated, login]);
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -23,6 +14,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
   return (

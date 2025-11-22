@@ -1,11 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { StudentRoute } from './components/StudentRoute';
 import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { VerifyPasswordResetPage } from './pages/VerifyPasswordResetPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { OverviewPage } from './pages/OverviewPage';
 import { CohortsPage } from './pages/CohortsPage';
@@ -32,16 +38,65 @@ import { InterviewRoomPage } from './pages/interviews/InterviewRoomPage';
 import { CompletionPage } from './pages/interviews/CompletionPage';
 import './styles/theme.css';
 
+// Root redirect component that checks authentication
+function RootRedirect() {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return <Navigate to={isAuthenticated ? "/overview" : "/login"} replace />;
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
+        <ToastProvider>
+          <AuthProvider>
+            <BrowserRouter>
           <Routes>
             <Route path="/login" element={
               <PublicRoute>
                 <LoginPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/register" element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/verify-email" element={
+              <PublicRoute>
+                <VerifyEmailPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/forgot-password" element={
+              <PublicRoute>
+                <ForgotPasswordPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/forgot-password/verify" element={
+              <PublicRoute>
+                <VerifyPasswordResetPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/forgot-password/reset" element={
+              <PublicRoute>
+                <ResetPasswordPage />
               </PublicRoute>
             } />
             
@@ -184,10 +239,11 @@ export default function App() {
               </StudentRoute>
             } />
             
-            <Route path="/" element={<Navigate to="/overview" replace />} />
+            <Route path="/" element={<RootRedirect />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
+        </ToastProvider>
     </ThemeProvider>
     </ErrorBoundary>
   );

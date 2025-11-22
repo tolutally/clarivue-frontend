@@ -4,6 +4,10 @@ import type { ToastProps } from '../components/ui/toast';
 export function useToast() {
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
   const addToast = useCallback(
     (toast: Omit<ToastProps, 'id' | 'onClose'>) => {
       const id = Math.random().toString(36).substring(7);
@@ -20,12 +24,8 @@ export function useToast() {
 
       return id;
     },
-    []
+    [removeToast]
   );
-
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  }, []);
 
   const success = useCallback(
     (title: string, description?: string) => {

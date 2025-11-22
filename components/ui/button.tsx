@@ -18,7 +18,7 @@ const buttonVariants = cva(
         success: "bg-[var(--success)] text-white hover:bg-[var(--success-dark)] focus-visible:ring-[var(--success)] shadow-sm hover:shadow-md",
         outline: "border-2 border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 focus-visible:ring-gray-300",
         ghost: "bg-transparent hover:bg-gray-100 focus-visible:ring-gray-300",
-        link: "text-[var(--primary)] underline-offset-4 hover:underline hover:scale-100",
+        link: "text-[var(--primary)] underline-offset-4 hover:underline hover:scale-100 !p-0 text-blue-600 hover:text-blue-700",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
