@@ -1,72 +1,96 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBackend } from '../contexts/AuthContext';
 import { Plus, Search, Users, Calendar, MoreVertical } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Button } from '@/components/ui/button';
-import type { CohortTags } from '../types/cohort';
+import { useCohorts } from '@/hooks/useCohorts';
+import { useAuth } from '@/contexts/AuthContext';
 import { backgrounds, borders, semantic, semanticTokens } from '@/utils/colors';
-
-interface CohortSummary {
-  id: string;
-  name: string;
-  description: string | null;
-  tags: CohortTags;
-  stats: {
-    invited: number;
-    joined: number;
-    started: number;
-    completed: number;
-  };
-  lastActivity: Date | null;
-}
 
 export function CohortsPage() {
   const navigate = useNavigate();
-  const backend = useBackend();
-  const [cohorts, setCohorts] = useState<CohortSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { admin, loading: adminLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const { data: cohortsData, isLoading: cohortsLoading } = useCohorts({
+    search: searchQuery || undefined,
+    sort_by: 'updated_at',
+    sort_order: 'desc',
+    page: 1,
+    page_size: 20,
+  });
 
-  useEffect(() => {
-    loadCohorts();
-  }, []);
-
-  const loadCohorts = async () => {
-    try {
-      const response = await backend.cohorts.list();
-      // Ensure all cohorts have stats object
-      const cohortsWithStats = response.map((cohort: any) => ({
-        ...cohort,
-        stats: cohort.stats || {
-          invited: 0,
-          joined: 0,
-          started: 0,
-          completed: 0,
-        },
-      }));
-      setCohorts(cohortsWithStats);
-    } catch (err) {
-      console.error('Failed to load cohorts:', err);
-    } finally {
-      setLoading(false);
+  // Filter cohorts based on user role and company membership
+  const cohorts = useMemo(() => {
+    const allCohorts = cohortsData?.items || [];
+    
+    // If admin data is still loading, return empty array (will show loading state)
+    if (adminLoading || !admin?.user) {
+      return [];
     }
+
+    const user = admin.user;
+    const userType = user.role?.user_type;
+    const userId = user._id;
+
+    // Platform Super Admin (user_type === "admin") can see all cohorts
+    if (userType === 'super_admin') {
+      return allCohorts;
+    }
+
+    // For Company Administrators and Regular Users, filter cohorts:
+    // 1. Cohorts in their primary company (if they have one)
+    // 2. Cohorts in companies they're staff/admins of (staff_companies)
+    // 3. Cohorts in companies they're members of (cohort_companies)
+    // 4. Cohorts they created (created_by matches their user ID)
+
+    const allowedCompanyIds = new Set<string>();
+    
+    // Add primary company if exists
+    if (user.company) {
+      allowedCompanyIds.add(user.company);
+    }
+
+    // Add companies from staff_companies
+    if (user.companies?.staff_companies) {
+      user.companies.staff_companies.forEach((company) => {
+        allowedCompanyIds.add(company._id);
+      });
+    }
+
+    // Add companies from cohort_companies
+    if (user.companies?.cohort_companies) {
+      user.companies.cohort_companies.forEach((company) => {
+        allowedCompanyIds.add(company._id);
+      });
+    }
+
+    // Filter cohorts based on company membership or creation
+    return allCohorts.filter((cohort) => {
+      // Show if cohort is in an allowed company
+      if (cohort.company && allowedCompanyIds.has(cohort.company)) {
+        return true;
+      }
+
+      // Show if user created the cohort
+      if (cohort.created_by === userId) {
+        return true;
+      }
+
+      return false;
+    });
+  }, [cohortsData?.items, admin?.user, adminLoading]);
+
+  const calculateProgress = (invited: number, joined: number) => {
+    if (invited === 0) return 0;
+    return Math.min((joined / invited) * 100, 100);
   };
 
-  const filteredCohorts = cohorts.filter((cohort) =>
-    cohort.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    JSON.stringify(cohort.tags).toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const calculateProgress = (stats: CohortSummary['stats']) => {
-    if (stats.invited === 0) return 0;
-    return (stats.joined / stats.invited) * 100;
-  };
-
-  const formatLastActivity = (date: Date | null) => {
-    if (!date) return 'No activity';
+  const formatLastActivity = (dateString: string) => {
+    if (!dateString) return 'No activity';
     const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
+    const date = new Date(dateString);
+    const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
     
@@ -75,6 +99,9 @@ export function CohortsPage() {
     if (days === 1) return 'Yesterday';
     return `${days}d ago`;
   };
+
+  // Show loading state if cohorts are loading or admin data is loading
+  const loading = cohortsLoading || adminLoading;
 
   if (loading) {
     return (
@@ -119,12 +146,12 @@ export function CohortsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or tag..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
 
-        {filteredCohorts.length === 0 && !searchQuery && (
+        {cohorts.length === 0 && !loading && !searchQuery && (
           <div className="text-center py-16">
             <Users className="w-20 h-20 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No cohorts yet</h3>
@@ -140,7 +167,7 @@ export function CohortsPage() {
           </div>
         )}
 
-        {filteredCohorts.length === 0 && searchQuery && (
+        {cohorts.length === 0 && !loading && searchQuery && (
           <div className="text-center py-16">
             <Search className="w-20 h-20 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No results found</h3>
@@ -149,90 +176,88 @@ export function CohortsPage() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCohorts.map((cohort) => (
-            <div
-              key={cohort.id}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all cursor-pointer"
-              onClick={() => navigate(`/cohorts/${cohort.id}`)}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{cohort.name}</h3>
-                  {cohort.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">{cohort.description}</p>
-                  )}
-                  <div className="flex flex-wrap gap-2">
-                    {cohort.tags?.term && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
-                        {cohort.tags.term}
-                      </span>
+          {cohorts.map((cohort) => {
+            const invited = cohort.session_invite_count;
+            const joined = cohort.member_count;
+            const progress = calculateProgress(invited, joined);
+            
+            return (
+              <div
+                key={cohort._id}
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all cursor-pointer"
+                onClick={() => navigate(`/cohorts/${cohort._id}`)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{cohort.name}</h3>
+                    {cohort.description && (
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">{cohort.description}</p>
                     )}
-                    {cohort.tags?.program && (
-                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">
-                        {cohort.tags.program}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {cohort.term?.name && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+                          {cohort.term.name}
+                        </span>
+                      )}
+                      {cohort.program?.name && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">
+                          {cohort.program.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-400 hover:text-gray-600 p-1"
+                    aria-label="Cohort options"
+                  >
+                    <MoreVertical className="w-5 h-5" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-400">{invited}</div>
+                    <div className="text-xs text-gray-500">Invited</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{joined}</div>
+                    <div className="text-xs text-gray-500">Members</div>
                   </div>
                 </div>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-400 hover:text-gray-600 p-1"
-                  aria-label="Cohort options"
-                >
-                  <MoreVertical className="w-5 h-5" />
-                </Button>
-              </div>
 
-              <div className="grid grid-cols-4 gap-3 mb-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-400">{cohort.stats.invited}</div>
-                  <div className="text-xs text-gray-500">Invited</div>
+                <div className="mb-3">
+                  <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                    <span>Progress</span>
+                    <span>{Math.round(progress)}%</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all rounded-full cohort-progress-bar ${progress === 0 ? 'bg-gray-300' : 'bg-primary'}`}
+                      data-progress={progress}
+                      style={{
+                        width: `${progress}%`,
+                      }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{cohort.stats.joined}</div>
-                  <div className="text-xs text-gray-500">Joined</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-amber-600">{cohort.stats.started}</div>
-                  <div className="text-xs text-gray-500">Started</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{cohort.stats.completed}</div>
-                  <div className="text-xs text-gray-500">Done</div>
-                </div>
-              </div>
 
-              <div className="mb-3">
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                  <span>Progress</span>
-                  <span>{Math.round(calculateProgress(cohort.stats))}%</span>
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all rounded-full cohort-progress-bar ${calculateProgress(cohort.stats) === 0 ? 'bg-gray-300' : 'bg-primary'}`}
-                    data-progress={calculateProgress(cohort.stats)}
-                    style={{
-                      width: `${calculateProgress(cohort.stats)}%`,
-                    }}
-                  ></div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <Calendar className="w-4 h-4" />
+                    <span>{formatLastActivity(cohort.updated_at)}</span>
+                  </div>
+                  <Button variant="link" className="text-primary hover:text-primary-dark font-medium px-0">
+                    View
+                  </Button>
                 </div>
               </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-1 text-gray-500">
-                  <Calendar className="w-4 h-4" />
-                  <span>{formatLastActivity(cohort.lastActivity)}</span>
-                </div>
-                <Button variant="link" className="text-primary hover:text-primary-dark font-medium px-0">
-                  View
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

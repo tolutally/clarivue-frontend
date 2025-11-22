@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Upload, UserPlus, Trash2, CheckCircle } from 'lucide-react';
 import { Header } from '../components/Header';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
 import { backgrounds } from '@/utils/colors';
 import { Button } from '@/components/ui/button';
+import { useBulkAddUsers } from '@/hooks/useCohorts';
 
 interface StudentEntry {
   id: string;
@@ -18,13 +18,12 @@ interface StudentEntry {
 export function AddStudentsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const backend = useBackend();
   const toast = useToast();
+  const bulkAddUsers = useBulkAddUsers();
   
   const [students, setStudents] = useState<StudentEntry[]>([
     { id: '1', email: '', name: '' }
   ]);
-  const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -47,6 +46,25 @@ export function AddStudentsPage() {
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  // Helper function to split name into first_name and last_name
+  const splitName = (name: string): { first_name: string; last_name: string } => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return { first_name: '', last_name: '' };
+    }
+    
+    const parts = trimmed.split(/\s+/);
+    if (parts.length === 1) {
+      return { first_name: parts[0], last_name: '' };
+    }
+    
+    // First part is first_name, rest is last_name
+    return {
+      first_name: parts[0],
+      last_name: parts.slice(1).join(' '),
+    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,30 +92,34 @@ export function AddStudentsPage() {
       return;
     }
 
-    setLoading(true);
     try {
-      // Call backend API to add students
-      const result = await backend.cohorts.addStudents({
+      // Transform students to match API format (split name into first_name and last_name)
+      const users = validStudents.map(s => {
+        const { first_name, last_name } = splitName(s.name);
+        return {
+          email: s.email.trim(),
+          first_name,
+          last_name,
+        };
+      });
+
+      // Call the API using the hook
+      await bulkAddUsers.mutateAsync({
         cohortId: id!,
-        students: validStudents.map(s => ({
-          email: s.email,
-          name: s.name,
-        })),
+        data: { users },
       });
       
-      setSuccessMessage(result.message || `Successfully added ${validStudents.length} student${validStudents.length > 1 ? 's' : ''}`);
+      setSuccessMessage(`Successfully added ${validStudents.length} student${validStudents.length > 1 ? 's' : ''}`);
       toast.success('Students added!', `${validStudents.length} student${validStudents.length > 1 ? 's' : ''} added to cohort`);
       
       // Navigate to cohort detail page after 2 seconds
       setTimeout(() => {
         navigate(`/cohorts/${id}`);
       }, 2000);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to add students';
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.error?.detail || err?.message || 'Failed to add students';
       setError(errorMessage);
       toast.error('Failed to add students', errorMessage);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -182,13 +204,13 @@ export function AddStudentsPage() {
 
           {successMessage && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
               <div className="text-green-800 text-sm">{successMessage}</div>
             </div>
           )}
 
           <div className="mb-8">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[var(--primary)] transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="font-semibold text-gray-900 mb-2">Upload CSV File</h3>
               <p className="text-sm text-gray-600 mb-4">
@@ -229,7 +251,7 @@ export function AddStudentsPage() {
                       value={student.email}
                       onChange={(e) => handleStudentChange(student.id, 'email', e.target.value)}
                       placeholder="student@example.com"
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${
                         student.error ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                     />
@@ -242,7 +264,7 @@ export function AddStudentsPage() {
                     value={student.name}
                     onChange={(e) => handleStudentChange(student.id, 'name', e.target.value)}
                     placeholder="Full Name"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
                 {students.length > 1 && (
@@ -279,12 +301,12 @@ export function AddStudentsPage() {
               <Button
                 type="submit"
                 variant="primary"
-                loading={loading}
+                loading={bulkAddUsers.isPending}
                 size="lg"
                 className="flex-1"
                 startIcon={<UserPlus className="w-5 h-5" />}
               >
-                {loading ? (
+                {bulkAddUsers.isPending ? (
                   'Adding Students...'
                 ) : (
                   'Add Students'

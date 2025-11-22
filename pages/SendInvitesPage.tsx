@@ -1,125 +1,120 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useBackend } from '../contexts/AuthContext';
 import { ArrowLeft, Send, CheckCircle, Clock, Users as UsersIcon } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Button } from '@/components/ui/button';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
-import type { CohortStudent } from '../types/cohort';
+import { useCohort, useCohortMembers } from '@/hooks/useCohorts';
+import { useCreateBatchInvite } from '@/hooks/useSessionInvites';
+import type { CohortMember } from '@/services';
+import { backgrounds } from '@/utils/colors';
 
 export function SendInvitesPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const backend = useBackend();
   const toast = useToast();
   
-  const [cohort, setCohort] = useState<{ name: string; students: CohortStudent[] } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
-  const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
+  const { data: cohort, isLoading: cohortLoading } = useCohort(id);
+  const { data: membersData, isLoading: membersLoading } = useCohortMembers(id, { page: 1, page_size: 100 });
+  const createBatchInvite = useCreateBatchInvite();
+  
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [timeLimit, setTimeLimit] = useState<number>(45);
   const [numberOfInterviews, setNumberOfInterviews] = useState<number>(1);
+  const [description, setDescription] = useState<string>('');
+  const [expiresInDays, setExpiresInDays] = useState<number>(30);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const members = membersData?.items || [];
+  const loading = cohortLoading || membersLoading;
+
+  // Auto-select all members on mount
   useEffect(() => {
-    loadCohort();
-  }, [id]);
-
-  const loadCohort = async () => {
-    if (!id) return;
-    
-    try {
-      const data = await backend.cohorts.get({ id });
-      setCohort(data);
-      
-      // Auto-select students who haven't been invited yet
-      if (data.students) {
-        const uninvitedStudents = data.students
-          .filter((s: CohortStudent) => s.status === 'added')
-          .map((s: CohortStudent) => s.id);
-        setSelectedStudents(new Set(uninvitedStudents));
-      }
-    } catch (err) {
-      console.error('Failed to load cohort:', err);
-      navigate(`/cohorts/${id}`);
-    } finally {
-      setLoading(false);
+    if (members.length > 0 && selectedMembers.size === 0) {
+      const allMemberIds = members.map(m => m.user._id);
+      setSelectedMembers(new Set(allMemberIds));
     }
-  };
+  }, [members]);
 
-  const handleToggleStudent = (studentId: string) => {
-    const newSelected = new Set(selectedStudents);
-    if (newSelected.has(studentId)) {
-      newSelected.delete(studentId);
+  const handleToggleMember = (userId: string) => {
+    const newSelected = new Set(selectedMembers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
     } else {
-      newSelected.add(studentId);
+      newSelected.add(userId);
     }
-    setSelectedStudents(newSelected);
+    setSelectedMembers(newSelected);
   };
 
   const handleSelectAll = () => {
-    if (!cohort?.students) return;
+    if (members.length === 0) return;
     
-    const allIds = cohort.students.map(s => s.id);
-    if (selectedStudents.size === allIds.length) {
-      setSelectedStudents(new Set());
+    const allIds = members.map(m => m.user._id);
+    if (selectedMembers.size === allIds.length) {
+      setSelectedMembers(new Set());
     } else {
-      setSelectedStudents(new Set(allIds));
+      setSelectedMembers(new Set(allIds));
     }
   };
 
   const handleSendInvites = async () => {
-    if (selectedStudents.size === 0) {
-      const errorMsg = 'Please select at least one student';
+    if (selectedMembers.size === 0) {
+      const errorMsg = 'Please select at least one member';
       setError(errorMsg);
-      toast.error('No students selected', errorMsg);
+      toast.error('No members selected', errorMsg);
       return;
     }
 
+    if (!id || !cohort) return;
+
     setError('');
-    setSending(true);
 
     try {
-      await backend.cohorts.sendInvites({
-        cohortId: id!,
-        studentIds: Array.from(selectedStudents),
-        timeLimit,
-        numberOfInterviews,
+      // Get user emails from selected members
+      const selectedMemberObjects = members.filter(m => selectedMembers.has(m.user._id));
+      const userEmails = selectedMemberObjects.map(m => m.user.email);
+
+      await createBatchInvite.mutateAsync({
+        cohort_id: id,
+        description: description || `Interview invites for ${cohort.name}`,
+        expires_in_days: expiresInDays,
+        session_type: 'interview',
+        time_limit_minutes: timeLimit,
+        total_sessions_allowed: numberOfInterviews,
+        user_emails: userEmails,
       });
 
-      const successMsg = `Successfully sent invites to ${selectedStudents.size} student${selectedStudents.size > 1 ? 's' : ''}`;
+      const successMsg = `Successfully sent invites to ${selectedMembers.size} member${selectedMembers.size > 1 ? 's' : ''}`;
       setSuccess(successMsg);
-      toast.success('Invites sent!', `${selectedStudents.size} invitation${selectedStudents.size > 1 ? 's' : ''} sent successfully`);
+      toast.success('Invites sent!', `${selectedMembers.size} invitation${selectedMembers.size > 1 ? 's' : ''} sent successfully`);
       
       // Navigate back after 2 seconds
       setTimeout(() => {
         navigate(`/cohorts/${id}`);
       }, 2000);
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to send invites';
+    } catch (err: any) {
+      const errorMsg = err?.response?.data?.error?.detail || err?.message || 'Failed to send invites';
       setError(errorMsg);
       toast.error('Failed to send invites', errorMsg);
-    } finally {
-      setSending(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--surface-hover)] flex items-center justify-center">
+      <div className={`min-h-screen ${backgrounds.surfaceActive} flex items-center justify-center`}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading students...</p>
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading members...</p>
         </div>
       </div>
     );
   }
 
-  if (!cohort || !cohort.students || cohort.students.length === 0) {
+  if (!cohort || !members || members.length === 0) {
     return (
-      <div className="min-h-screen bg-[var(--surface-hover)]">
+      <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
         <Header activeTab="cohorts" onTabChange={(tab) => {
           if (tab === 'overview') navigate('/overview');
           if (tab === 'cohorts') navigate('/cohorts');
@@ -129,14 +124,14 @@ export function SendInvitesPage() {
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
             <UsersIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Students Found</h2>
-            <p className="text-gray-600 mb-6">Add students to this cohort before sending invites</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Members Found</h2>
+            <p className="text-gray-600 mb-6">Add members to this cohort before sending invites</p>
             <Button
               onClick={() => navigate(`/cohorts/${id}/add-students`)}
               variant="primary"
               size="lg"
             >
-              Add Students
+              Add Members
             </Button>
           </div>
         </div>
@@ -145,7 +140,7 @@ export function SendInvitesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       <Header activeTab="cohorts" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
@@ -166,7 +161,7 @@ export function SendInvitesPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Send Interview Invites</h1>
           <p className="text-gray-600 mb-8">
-            Configure and send mock interview invitations to students in <strong>{cohort.name}</strong>
+            Configure and send mock interview invitations to members in <strong>{cohort.name}</strong>
           </p>
 
           {error && (
@@ -177,7 +172,7 @@ export function SendInvitesPage() {
 
           {success && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
               <p className="text-sm text-green-800">{success}</p>
             </div>
           )}
@@ -193,7 +188,7 @@ export function SendInvitesPage() {
                 <select
                   value={timeLimit}
                   onChange={(e) => setTimeLimit(Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value={30}>30 minutes</option>
                   <option value={45}>45 minutes</option>
@@ -201,7 +196,7 @@ export function SendInvitesPage() {
                   <option value={90}>90 minutes</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Students will have {timeLimit} minutes to complete each interview
+                  Members will have {timeLimit} minutes to complete each interview
                 </p>
               </div>
 
@@ -213,7 +208,7 @@ export function SendInvitesPage() {
                 <select
                   value={numberOfInterviews}
                   onChange={(e) => setNumberOfInterviews(Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value={1}>1 interview</option>
                   <option value={2}>2 interviews</option>
@@ -222,64 +217,90 @@ export function SendInvitesPage() {
                   <option value={5}>5 interviews</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Each student will complete {numberOfInterviews} mock interview{numberOfInterviews > 1 ? 's' : ''}
+                  Each member will complete {numberOfInterviews} mock interview{numberOfInterviews > 1 ? 's' : ''}
                 </p>
               </div>
             </div>
 
-            {/* Student Selection Section */}
+            {/* Additional Configuration */}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={`Interview invites for ${cohort.name}`}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Optional description for this batch of invites
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Expires In (Days)
+                </label>
+                <input
+                  type="number"
+                  value={expiresInDays}
+                  onChange={(e) => setExpiresInDays(Number(e.target.value))}
+                  min={1}
+                  max={365}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Invites will expire in {expiresInDays} day{expiresInDays !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+
+            {/* Member Selection Section */}
             <div className="border-t border-gray-200 pt-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Select Students ({selectedStudents.size} of {cohort.students.length})
+                  Select Members ({selectedMembers.size} of {members.length})
                 </h3>
                 <Button
                   onClick={handleSelectAll}
                   variant="ghost"
-                  className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium w-fit"
+                  className="text-sm text-primary hover:text-primary-dark font-medium w-fit"
                 >
-                  {selectedStudents.size === cohort.students.length ? 'Deselect All' : 'Select All'}
+                  {selectedMembers.size === members.length ? 'Deselect All' : 'Select All'}
                 </Button>
               </div>
 
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                {cohort.students.map((student) => (
-                  <div
-                    key={student.id}
-                    onClick={() => handleToggleStudent(student.id)}
-                    className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedStudents.has(student.id)
-                        ? 'border-[var(--primary)] bg-[var(--primary-light)]'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedStudents.has(student.id)}
-                      onChange={() => {}}
-                      className="w-5 h-5 text-[var(--primary)] border-gray-300 rounded focus:ring-[var(--primary)]"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium text-gray-900">{student.name}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          student.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          student.status === 'in-progress' ? 'bg-[var(--primary-light)] text-[var(--primary)]' :
-                          student.status === 'invited' ? 'bg-[var(--secondary-light)] text-[var(--secondary)]' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {student.status}
-                        </span>
+                {members.map((member) => {
+                  const isSelected = selectedMembers.has(member.user._id);
+                  return (
+                    <div
+                      key={member._id}
+                      onClick={() => handleToggleMember(member.user._id)}
+                      className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all ${
+                        isSelected
+                          ? 'border-primary bg-primary/10'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {}}
+                        className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium text-gray-900">{member.user.name}</span>
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">{member.user.email}</div>
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">{student.email}</div>
                     </div>
-                    {student.status === 'invited' && (
-                      <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                        Already invited
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -287,10 +308,11 @@ export function SendInvitesPage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h4 className="font-semibold text-blue-900 mb-3">Invitation Summary</h4>
               <ul className="space-y-2 text-sm text-blue-800">
-                <li>• {selectedStudents.size} student{selectedStudents.size !== 1 ? 's' : ''} will receive invitations</li>
-                <li>• Each student will complete {numberOfInterviews} interview{numberOfInterviews > 1 ? 's' : ''}</li>
+                <li>• {selectedMembers.size} member{selectedMembers.size !== 1 ? 's' : ''} will receive invitations</li>
+                <li>• Each member will complete {numberOfInterviews} interview{numberOfInterviews > 1 ? 's' : ''}</li>
                 <li>• Time limit: {timeLimit} minutes per interview</li>
-                <li>• Students will receive an email with a unique invitation link</li>
+                <li>• Invites will expire in {expiresInDays} day{expiresInDays !== 1 ? 's' : ''}</li>
+                <li>• Members will receive an email with a unique invitation link</li>
               </ul>
             </div>
 
@@ -306,15 +328,15 @@ export function SendInvitesPage() {
               </Button>
               <Button
                 onClick={handleSendInvites}
-                loading={sending}
-                disabled={selectedStudents.size === 0}
+                loading={createBatchInvite.isPending}
+                disabled={selectedMembers.size === 0}
                 variant="primary"
                 className="flex-1 flex items-center justify-center gap-2"
-                startIcon={!sending ? <Send className="w-5 h-5" /> : undefined}
+                startIcon={!createBatchInvite.isPending ? <Send className="w-5 h-5" /> : undefined}
               >
-                {sending
+                {createBatchInvite.isPending
                   ? 'Sending Invites...'
-                  : `Send ${selectedStudents.size} Invitation${selectedStudents.size !== 1 ? 's' : ''}`}
+                  : `Send ${selectedMembers.size} Invitation${selectedMembers.size !== 1 ? 's' : ''}`}
               </Button>
             </div>
           </div>

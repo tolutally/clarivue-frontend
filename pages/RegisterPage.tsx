@@ -84,7 +84,7 @@ export function RegisterPage() {
   const passwordsMatch = password === confirmPassword || confirmPassword === '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <img src="/clarivue-logo.png" alt="Clarivue" className="h-12 mx-auto mb-6" />
