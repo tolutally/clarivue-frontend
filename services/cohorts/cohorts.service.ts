@@ -95,6 +95,7 @@ export interface CreateCohortRequest {
   program_id?: string;
   custom_tag_ids?: string[];
   objective_ids?: string[];
+  company_id: string;
 }
 
 // Update cohort request

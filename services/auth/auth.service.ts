@@ -72,7 +72,6 @@ export interface RegisterRequest {
   email: string;
   company_name: string;
   password: string;
-  role: string;
 }
 
 export interface RegisterResponse {

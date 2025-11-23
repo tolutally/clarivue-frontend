@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Sparkles, ChevronDown, Building2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Plus, X, ChevronDown, Building2 } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Button } from '@/components/ui/button';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
 import { backgrounds } from '@/utils/colors';
-import { useCreateCohort } from '@/hooks/useCohorts';
+import { useCohort, useUpdateCohort } from '@/hooks/useCohorts';
 import { useTerms, useCreateTerm } from '@/hooks/useTerms';
 import { usePrograms, useCreateProgram } from '@/hooks/usePrograms';
 import { useObjectives, useCreateObjective } from '@/hooks/useObjectives';
@@ -24,46 +24,67 @@ interface CustomTagEntry {
   tagId?: string; // ID from API if created
 }
 
-export function CreateCohortPage() {
+export function UpdateCohortPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const isFirstTime = searchParams.get('firstTime') === 'true';
+  const { id } = useParams<{ id: string }>();
   const toast = useToast();
   const { admin } = useAuth();
+
+  // Fetch existing cohort
+  const { data: cohortData, isLoading: cohortLoading } = useCohort(id);
 
   // Form state
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [termId, setTermId] = useState<string>('');
   const [programId, setProgramId] = useState<string>('');
-  const [companyId, setCompanyId] = useState<string>('');
   const [customTags, setCustomTags] = useState<CustomTagEntry[]>([]);
   const [objectives, setObjectives] = useState<ObjectiveEntry[]>([{ id: '1', objectiveId: '' }]);
   const [error, setError] = useState('');
-  const [showWelcome, setShowWelcome] = useState(isFirstTime);
 
   // Dropdown states
   const [termDropdownOpen, setTermDropdownOpen] = useState(false);
   const [programDropdownOpen, setProgramDropdownOpen] = useState(false);
-  const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
   const [objectiveDropdownOpen, setObjectiveDropdownOpen] = useState<Record<string, boolean>>({});
   const [termSearch, setTermSearch] = useState('');
   const [programSearch, setProgramSearch] = useState('');
   const [objectiveSearch, setObjectiveSearch] = useState<Record<string, string>>({});
   const termDropdownRef = useRef<HTMLDivElement>(null);
   const programDropdownRef = useRef<HTMLDivElement>(null);
-  const companyDropdownRef = useRef<HTMLDivElement>(null);
   const objectiveDropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Get staff companies
-  const staffCompanies = admin?.user?.companies?.staff_companies || [];
-
-  // Auto-select first company if only one exists
+  // Prefill form when cohort data loads
   useEffect(() => {
-    if (staffCompanies.length === 1 && !companyId) {
-      setCompanyId(staffCompanies[0]._id);
+    if (cohortData) {
+      setName(cohortData.name || '');
+      setDescription(cohortData.description || '');
+      setTermId(cohortData.term?._id || '');
+      setProgramId(cohortData.program?._id || '');
+      
+      // Set custom tags
+      if (cohortData.custom_tags && cohortData.custom_tags.length > 0) {
+        setCustomTags(
+          cohortData.custom_tags.map((tag, index) => ({
+            id: `tag-${index}`,
+            name: tag.name,
+            tagId: tag._id,
+          }))
+        );
+      }
+      
+      // Set objectives
+      if (cohortData.objectives && cohortData.objectives.length > 0) {
+        setObjectives(
+          cohortData.objectives.map((obj, index) => ({
+            id: `obj-${index}`,
+            objectiveId: obj._id,
+          }))
+        );
+      } else {
+        setObjectives([{ id: '1', objectiveId: '' }]);
+      }
     }
-  }, [staffCompanies, companyId]);
+  }, [cohortData]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -73,9 +94,6 @@ export function CreateCohortPage() {
       }
       if (programDropdownRef.current && !programDropdownRef.current.contains(event.target as Node)) {
         setProgramDropdownOpen(false);
-      }
-      if (companyDropdownRef.current && !companyDropdownRef.current.contains(event.target as Node)) {
-        setCompanyDropdownOpen(false);
       }
       
       // Close objective dropdowns
@@ -97,7 +115,7 @@ export function CreateCohortPage() {
   const { data: customTagsData } = useCustomTags({ page_size: 100 });
 
   // Hooks for creating
-  const createCohort = useCreateCohort();
+  const updateCohort = useUpdateCohort();
   const createTerm = useCreateTerm();
   const createProgram = useCreateProgram();
   const createObjective = useCreateObjective();
@@ -257,14 +275,8 @@ export function CreateCohortPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!id) return;
     setError('');
-
-    // Validate company selection if user has multiple companies
-    if (staffCompanies.length > 1 && !companyId) {
-      setError('Please select a company');
-      toast.error('Validation Error', 'Please select a company');
-      return;
-    }
 
     // Get objective IDs (all should already have IDs from dropdown selection/creation)
     const objectiveIds = objectives
@@ -277,75 +289,56 @@ export function CreateCohortPage() {
       .map(t => t.tagId!);
 
     try {
-      const cohort = await createCohort.mutateAsync({
-        name: name.trim(),
-        description: description.trim() || undefined,
-        term_id: termId || undefined,
-        program_id: programId || undefined,
-        custom_tag_ids: customTagIds.length > 0 ? customTagIds : undefined,
-        objective_ids: objectiveIds.length > 0 ? objectiveIds : undefined,
-        company_id: companyId,
+      await updateCohort.mutateAsync({
+        id,
+        data: {
+          name: name.trim(),
+          description: description.trim() || undefined,
+          term_id: termId || undefined,
+          program_id: programId || undefined,
+          custom_tag_ids: customTagIds.length > 0 ? customTagIds : undefined,
+          objective_ids: objectiveIds.length > 0 ? objectiveIds : undefined,
+        },
       });
 
-      toast.success('Cohort created!', `${name} has been created successfully`);
+      toast.success('Cohort updated!', `${name} has been updated successfully`);
       
       setTimeout(() => {
-        navigate(`/cohorts/${cohort._id}/add-students`);
+        navigate(`/cohorts/${id}`);
       }, 1000);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.error?.detail || err?.message || 'Failed to create cohort';
+      const errorMessage = err?.response?.data?.error?.detail || err?.message || 'Failed to update cohort';
       setError(errorMessage);
-      toast.error('Failed to create cohort', errorMessage);
+      toast.error('Failed to update cohort', errorMessage);
     }
   };
 
-  if (showWelcome) {
+  const loading = cohortLoading || updateCohort.isPending || createTerm.isPending || createProgram.isPending || 
+                  createObjective.isPending || createCustomTag.isPending;
+
+  if (cohortLoading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
-          <Sparkles className="w-20 h-20 text-blue-600 mx-auto mb-6" />
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to Clarivue!</h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Let's get you started by creating your first cohort
-          </p>
-          
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-left">
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Guide:</h3>
-            <ol className="space-y-3 text-sm text-gray-700">
-              <li className="flex items-start gap-3">
-                <span className="shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <span>Create your first cohort with a name and description</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>Add students via CSV upload or manual entry</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Track interview progress and student readiness in real-time</span>
-              </li>
-            </ol>
-          </div>
-
-          <Button
-            onClick={() => setShowWelcome(false)}
-            variant="primary"
-            size="lg"
-            className="px-8 py-4 text-lg"
-          >
-            Create Your First Cohort
-          </Button>
-
-          <p className="text-sm text-gray-500 mt-4">
-            You can always access help from the ? icon in the navigation
-          </p>
+      <div className={`min-h-screen ${backgrounds.surfaceActive} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading cohort...</p>
         </div>
       </div>
     );
   }
 
-  const loading = createCohort.isPending || createTerm.isPending || createProgram.isPending || 
-                  createObjective.isPending || createCustomTag.isPending;
+  if (!cohortData) {
+    return (
+      <div className={`min-h-screen ${backgrounds.surfaceActive} flex items-center justify-center`}>
+        <div className="text-center">
+          <p className="text-gray-600">Cohort not found</p>
+          <Button onClick={() => navigate('/cohorts')} variant="primary" className="mt-4">
+            Back to Cohorts
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
@@ -358,18 +351,18 @@ export function CreateCohortPage() {
       }} />
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Button
-          onClick={() => navigate('/cohorts')}
+          onClick={() => navigate(`/cohorts/${id}`)}
           variant="ghost"
           startIcon={<ArrowLeft className="w-5 h-5" />}
           className="text-gray-600 hover:text-gray-900 mb-6 w-fit"
         >
-          Back to Cohorts
+          Back to Cohort
         </Button>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Cohort</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Update Cohort</h1>
           <p className="text-gray-600 mb-8">
-            Set up a new cohort to track and manage student interviews
+            Update the details of your cohort
           </p>
 
           {error && (
@@ -409,58 +402,6 @@ export function CreateCohortPage() {
               />
               <p className="text-xs text-gray-500 mt-1">{description.length}/500 characters</p>
             </div>
-
-            {/* Company Select - Show if user has more than one company */}
-            {staffCompanies.length > 1 && (
-              <div className="relative" ref={companyDropdownRef}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCompanyDropdownOpen(!companyDropdownOpen);
-                      setTermDropdownOpen(false);
-                      setProgramDropdownOpen(false);
-                    }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-left flex items-center justify-between bg-white"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-gray-400" />
-                      <span className={companyId ? 'text-gray-900' : 'text-gray-500'}>
-                        {companyId
-                          ? staffCompanies.find(c => c._id === companyId)?.name || 'Select company...'
-                          : 'Select company...'}
-                      </span>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${companyDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  
-                  {companyDropdownOpen && (
-                    <div className="absolute z-50 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-hidden">
-                      <div className="max-h-64 overflow-y-auto">
-                        {staffCompanies.map((company) => (
-                          <button
-                            key={company._id}
-                            type="button"
-                            onClick={() => {
-                              setCompanyId(company._id);
-                              setCompanyDropdownOpen(false);
-                            }}
-                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
-                              companyId === company._id ? 'bg-primary/10 text-primary' : ''
-                            }`}
-                          >
-                            {company.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             <div className="grid grid-cols-2 gap-4">
               {/* Term Select */}
@@ -715,7 +656,6 @@ export function CreateCohortPage() {
                             }));
                             setTermDropdownOpen(false);
                             setProgramDropdownOpen(false);
-                            setCompanyDropdownOpen(false);
                           }}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-left flex items-center justify-between"
                         >
@@ -799,7 +739,7 @@ export function CreateCohortPage() {
             <div className="flex gap-4 pt-6 border-t border-gray-200">
               <Button
                 type="button"
-                onClick={() => navigate('/cohorts')}
+                onClick={() => navigate(`/cohorts/${id}`)}
                 variant="outline"
                 size="lg"
                 className="flex-1"
@@ -809,12 +749,12 @@ export function CreateCohortPage() {
               <Button
                 type="submit"
                 loading={loading}
-                disabled={!name.trim() || (staffCompanies.length > 1 && !companyId)}
+                disabled={!name.trim()}
                 variant="primary"
                 className="flex-1"
                 size="lg"
               >
-                Create Cohort
+                Update Cohort
               </Button>
             </div>
           </form>
@@ -823,3 +763,4 @@ export function CreateCohortPage() {
     </div>
   );
 }
+

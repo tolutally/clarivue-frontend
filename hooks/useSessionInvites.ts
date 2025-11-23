@@ -86,3 +86,9 @@ export const useVerifySessionToken = () => {
   });
 };
 
+export const useStartSession = () => {
+  return useMutation({
+    mutationFn: () => sessionInvitesService.startSession(),
+  });
+};
+

@@ -73,7 +73,6 @@ export function RegisterPage() {
         email,
         company_name: companyName,
         password,
-        role: 'admin', // Default role for new registrations
       });
     } catch (error) {
       // Error toast is handled by axios interceptor

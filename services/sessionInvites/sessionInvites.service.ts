@@ -58,6 +58,30 @@ export interface VerifySessionTokenRequest {
   token: string;
 }
 
+// Verify session token response
+export interface VerifySessionTokenResponse {
+  access_token: string;
+  token_type: string;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  sessions_remaining: number;
+  time_limit_minutes: number;
+  session_type: string;
+  cohort_name: string;
+}
+
+// Start session response
+export interface StartSessionResponse {
+  session_access_token: string;
+  token_type: string;
+  session_log_id: string;
+  sessions_remaining: number;
+  time_limit_minutes: number;
+  session_type: string;
+  cohort_name: string;
+}
+
 class SessionInvitesService {
   async list(params?: ListInvitesParams): Promise<PaginatedInvitesResponse> {
     const response = await apiClient.get<ApiResponseWrapper<PaginatedInvitesResponse>>('/session-invites', {
@@ -104,8 +128,13 @@ class SessionInvitesService {
     return response.data.data;
   }
 
-  async verifyToken(data: VerifySessionTokenRequest): Promise<any> {
-    const response = await apiClient.post<ApiResponseWrapper<any>>('/session-invites/verify', data);
+  async verifyToken(data: VerifySessionTokenRequest): Promise<VerifySessionTokenResponse> {
+    const response = await apiClient.post<ApiResponseWrapper<VerifySessionTokenResponse>>('/session-invites/verify', data);
+    return response.data.data;
+  }
+
+  async startSession(): Promise<StartSessionResponse> {
+    const response = await apiClient.post<ApiResponseWrapper<StartSessionResponse>>('/session-invites/start-session');
     return response.data.data;
   }
 }

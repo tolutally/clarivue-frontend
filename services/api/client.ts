@@ -40,7 +40,11 @@ function extractErrorMessage(errorData: any): string {
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('auth_token');
+    // Check for session_access_token first (for interview flow), then fall back to auth_token (for dashboard)
+    const sessionToken = localStorage.getItem('session_access_token');
+    const authToken = localStorage.getItem('auth_token');
+    const token = sessionToken || authToken;
+    
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }

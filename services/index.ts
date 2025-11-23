@@ -92,6 +92,8 @@ export type {
   CreateBatchInviteRequest,
   ExtendUserSessionsRequest,
   VerifySessionTokenRequest,
+  VerifySessionTokenResponse,
+  StartSessionResponse,
 } from './sessionInvites/sessionInvites.service';
 
 export type {

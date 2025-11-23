@@ -1,90 +1,77 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Users, Calendar, MoreVertical } from 'lucide-react';
+import { Plus, Search, Users, Calendar, MoreVertical, ChevronDown, Building2, Edit, Trash2 } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Button } from '@/components/ui/button';
-import { useCohorts } from '@/hooks/useCohorts';
+import { useCohorts, useDeleteCohort } from '@/hooks/useCohorts';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/ui/toast';
 import { backgrounds, borders, semantic, semanticTokens } from '@/utils/colors';
 
 export function CohortsPage() {
   const navigate = useNavigate();
   const { admin, loading: adminLoading } = useAuth();
+  const toast = useToast();
+  const deleteCohort = useDeleteCohort();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+  const companyDropdownRef = useRef<HTMLDivElement>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const menuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Get staff companies
+  const staffCompanies = admin?.user?.companies?.staff_companies || [];
   
+  // Set first company as default when admin data loads
+  useEffect(() => {
+    if (staffCompanies.length > 0 && !selectedCompanyId) {
+      setSelectedCompanyId(staffCompanies[0]._id);
+    }
+  }, [staffCompanies, selectedCompanyId]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (companyDropdownRef.current && !companyDropdownRef.current.contains(event.target as Node)) {
+        setCompanyDropdownOpen(false);
+      }
+      
+      // Close menu dropdowns
+      Object.entries(menuRefs.current).forEach(([id, ref]) => {
+        if (ref && !ref.contains(event.target as Node)) {
+          setOpenMenuId(null);
+        }
+      });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleDeleteCohort = async (cohortId: string) => {
+    try {
+      await deleteCohort.mutateAsync(cohortId);
+      toast.success('Cohort deleted', 'The cohort has been successfully deleted');
+      setDeleteConfirmId(null);
+    } catch (err: any) {
+      const errorMsg = err?.response?.data?.error?.detail || err?.message || 'Failed to delete cohort';
+      toast.error('Failed to delete cohort', errorMsg);
+    }
+  };
+
   const { data: cohortsData, isLoading: cohortsLoading } = useCohorts({
     search: searchQuery || undefined,
+    company_id: selectedCompanyId || undefined,
     sort_by: 'updated_at',
     sort_order: 'desc',
     page: 1,
     page_size: 20,
   });
 
-  // Filter cohorts based on user role and company membership
-  const cohorts = useMemo(() => {
-    const allCohorts = cohortsData?.items || [];
-    
-    // If admin data is still loading, return empty array (will show loading state)
-    if (adminLoading || !admin?.user) {
-      return [];
-    }
-
-    const user = admin.user;
-    const userType = user.role?.user_type;
-    const userId = user._id;
-
-    // Platform Super Admin (user_type === "admin") can see all cohorts
-    if (userType === 'super_admin') {
-      return allCohorts;
-    }
-
-    // For Company Administrators and Regular Users, filter cohorts:
-    // 1. Cohorts in their primary company (if they have one)
-    // 2. Cohorts in companies they're staff/admins of (staff_companies)
-    // 3. Cohorts in companies they're members of (cohort_companies)
-    // 4. Cohorts they created (created_by matches their user ID)
-
-    const allowedCompanyIds = new Set<string>();
-    
-    // Add primary company if exists
-    if (user.company) {
-      allowedCompanyIds.add(user.company);
-    }
-
-    // Add companies from staff_companies
-    if (user.companies?.staff_companies) {
-      user.companies.staff_companies.forEach((company) => {
-        allowedCompanyIds.add(company._id);
-      });
-    }
-
-    // Add companies from cohort_companies
-    if (user.companies?.cohort_companies) {
-      user.companies.cohort_companies.forEach((company) => {
-        allowedCompanyIds.add(company._id);
-      });
-    }
-
-    // Filter cohorts based on company membership or creation
-    return allCohorts.filter((cohort) => {
-      // Show if cohort is in an allowed company
-      if (cohort.company && allowedCompanyIds.has(cohort.company)) {
-        return true;
-      }
-
-      // Show if user created the cohort
-      if (cohort.created_by === userId) {
-        return true;
-      }
-
-      return false;
-    });
-  }, [cohortsData?.items, admin?.user, adminLoading]);
-
-  const calculateProgress = (invited: number, joined: number) => {
-    if (invited === 0) return 0;
-    return Math.min((joined / invited) * 100, 100);
-  };
+  const cohorts = cohortsData?.items || [];
 
   const formatLastActivity = (dateString: string) => {
     if (!dateString) return 'No activity';
@@ -100,8 +87,8 @@ export function CohortsPage() {
     return `${days}d ago`;
   };
 
-  // Show loading state if cohorts are loading or admin data is loading
-  const loading = cohortsLoading || adminLoading;
+  // Show loading state if cohorts are loading or admin data is loading (for company dropdown)
+  const loading = cohortsLoading;
 
   if (loading) {
     return (
@@ -116,6 +103,7 @@ export function CohortsPage() {
 
   return (
     <div className={`min-h-screen ${semantic.surfaceActive}`}>
+      <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       <Header activeTab="cohorts" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
@@ -138,8 +126,9 @@ export function CohortsPage() {
           </Button>
         </div>
 
-        <div className="mb-6">
-          <div className="relative max-w-md">
+        <div className="mb-6 flex gap-4 items-end">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px] max-w-md bg-white">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -149,6 +138,66 @@ export function CohortsPage() {
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
+
+          {/* Company Filter */}
+          {staffCompanies.length > 0 && (
+            <div className="relative" ref={companyDropdownRef}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter by Company
+              </label>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
+                  className="w-full min-w-[200px] px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-left flex items-center justify-between bg-white"
+                >
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <span className={selectedCompanyId ? 'text-gray-900' : 'text-gray-500'}>
+                      {selectedCompanyId
+                        ? staffCompanies.find(c => c._id === selectedCompanyId)?.name || 'Select company...'
+                        : 'All Companies'}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${companyDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {companyDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-hidden">
+                    <div className="max-h-64 overflow-y-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCompanyId('');
+                          setCompanyDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
+                          !selectedCompanyId ? 'bg-primary/10 text-primary' : ''
+                        }`}
+                      >
+                        All Companies
+                      </button>
+                      {staffCompanies.map((company) => (
+                        <button
+                          key={company._id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCompanyId(company._id);
+                            setCompanyDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
+                            selectedCompanyId === company._id ? 'bg-primary/10 text-primary' : ''
+                          }`}
+                        >
+                          {company.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {cohorts.length === 0 && !loading && !searchQuery && (
@@ -178,9 +227,7 @@ export function CohortsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cohorts.map((cohort) => {
             const invited = cohort.session_invite_count;
-            const joined = cohort.member_count;
-            const progress = calculateProgress(invited, joined);
-            
+            const joined = cohort.member_count;            
             return (
               <div
                 key={cohort._id}
@@ -206,43 +253,62 @@ export function CohortsPage() {
                       )}
                     </div>
                   </div>
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                  <div 
+                    className="relative"
+                    ref={(el) => {
+                      if (el) menuRefs.current[cohort._id] = el;
                     }}
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-600 p-1"
-                    aria-label="Cohort options"
                   >
-                    <MoreVertical className="w-5 h-5" />
-                  </Button>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === cohort._id ? null : cohort._id);
+                      }}
+                      variant="ghost"
+                      size="icon"
+                      className="text-gray-400 hover:text-gray-600 p-1"
+                      aria-label="Cohort options"
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </Button>
+                    
+                    {openMenuId === cohort._id && (
+                      <div className="absolute right-0 top-8 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/cohorts/${cohort._id}/edit`);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Update
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirmId(cohort._id);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="text-center">
+                <div className="flex gap-7 mb-4">
+                  <div>
                     <div className="text-2xl font-bold text-gray-400">{invited}</div>
                     <div className="text-xs text-gray-500">Invited</div>
                   </div>
-                  <div className="text-center">
+                  <div>
                     <div className="text-2xl font-bold text-blue-600">{joined}</div>
                     <div className="text-xs text-gray-500">Members</div>
-                  </div>
-                </div>
-
-                <div className="mb-3">
-                  <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                    <span>Progress</span>
-                    <span>{Math.round(progress)}%</span>
-                  </div>
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all rounded-full cohort-progress-bar ${progress === 0 ? 'bg-gray-300' : 'bg-primary'}`}
-                      data-progress={progress}
-                      style={{
-                        width: `${progress}%`,
-                      }}
-                    ></div>
                   </div>
                 </div>
 
@@ -260,6 +326,35 @@ export function CohortsPage() {
           })}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-black/50 z-[9998] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Cohort</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete this cohort? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                onClick={() => setDeleteConfirmId(null)}
+                variant="outline"
+                disabled={deleteCohort.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleDeleteCohort(deleteConfirmId)}
+                variant="primary"
+                loading={deleteCohort.isPending}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
