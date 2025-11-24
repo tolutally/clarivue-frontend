@@ -16,6 +16,7 @@ import { SetupPage as SessionSetupPage } from './pages/session/SetupPage';
 import { PreflightPage as SessionPreflightPage } from './pages/session/PreflightPage';
 import { StartSessionPage } from './pages/session/StartSessionPage';
 import { InterviewRoomPage as SessionInterviewRoomPage } from './pages/session/InterviewRoomPage';
+import { SessionCompletePage } from './pages/session/SessionCompletePage';
 import { LoginPage } from './pages/LoginPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -169,6 +170,11 @@ export default function App() {
             <Route path="/session/interview" element={
               <SessionRoute>
                 <SessionInterviewRoomPage />
+              </SessionRoute>
+            } />
+            <Route path="/session/complete" element={
+              <SessionRoute>
+                <SessionCompletePage />
               </SessionRoute>
             } />
             

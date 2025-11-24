@@ -1,43 +1,19 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Briefcase, FileText, Upload, X, FileCheck, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Briefcase, FileText, ArrowLeft } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { InterviewHeader } from '@/components/interview/InterviewHeader';
+import { useSession } from '@/contexts/SessionContext';
 
 export function SetupPage() {
   const navigate = useNavigate();
+  const { sessionData, setSessionData } = useSession();
   
-  const [roleTitle, setRoleTitle] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [roleTitle, setRoleTitle] = useState(sessionData?.role_title || '');
+  const [jobDescription, setJobDescription] = useState(sessionData?.job_description || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.includes(file.type)) {
-      setError('Please upload a PDF or Word document');
-      return;
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Resume file must be less than 5MB');
-      return;
-    }
-
-    setResumeFile(file);
-    setError(null);
-  };
-
-  const removeResume = () => {
-    setResumeFile(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,8 +33,15 @@ export function SetupPage() {
       setLoading(true);
       setError(null);
       
-      // For now, just navigate - in the future, we might want to save setup data to API
-      // The resume can be uploaded later when starting the session
+      // Store setup data in session context
+      if (sessionData) {
+        setSessionData({
+          ...sessionData,
+          role_title: roleTitle.trim(),
+          job_description: jobDescription.trim(),
+        });
+      }
+      
       navigate('/session/preflight');
     } catch (err) {
       console.error('Failed to setup session:', err);
@@ -128,58 +111,6 @@ export function SetupPage() {
                   {jobDescription.length}/5000 characters
                 </p>
               </div>
-
-              {/* Resume Upload (Optional) */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Upload className="w-4 h-4 text-gray-500" />
-                  Upload Resume <span className="text-xs text-gray-500 font-normal">(Optional)</span>
-                </label>
-                <p className="text-xs text-gray-600 mb-3">
-                  Upload your resume to help our AI ask personalized questions based on your experience.
-                </p>
-
-                {!resumeFile ? (
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleResumeUpload}
-                      className="hidden"
-                      id="resume-upload"
-                    />
-                    <label
-                      htmlFor="resume-upload"
-                      className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-blue-50 transition-colors"
-                    >
-                      <Upload className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        Click to upload PDF or Word document (Max 5MB)
-                      </span>
-                    </label>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileCheck className="w-5 h-5 text-green-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{resumeFile.name}</p>
-                        <p className="text-xs text-gray-600">
-                          {(resumeFile.size / 1024).toFixed(1)} KB
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={removeResume}
-                      className="p-1 hover:bg-red-100 rounded-full transition-colors"
-                      title="Remove resume"
-                    >
-                      <X className="w-5 h-5 text-red-600" />
-                    </button>
-                  </div>
-                )}
-              </div>
             </Card>
 
             {/* Help text */}
@@ -190,7 +121,7 @@ export function SetupPage() {
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• The more detailed the job description, the better we can simulate a realistic interview</li>
                 <li>• Include technical skills, soft skills, and specific responsibilities</li>
-                <li>• Uploading your resume helps us ask questions relevant to your experience level</li>
+                {/* Removed resume upload tip */}
               </ul>
             </div>
 
@@ -219,4 +150,3 @@ export function SetupPage() {
     </div>
   );
 }
-

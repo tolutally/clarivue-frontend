@@ -5,6 +5,13 @@ export interface ApiResponse<T = any> {
   success?: boolean;
 }
 
+export interface ApiResponseWrapper<T> {
+  status_code: number;
+  message: string;
+  data: T;
+  error: null | any;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;

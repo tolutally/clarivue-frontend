@@ -9,6 +9,8 @@
     "start": "vite preview --port 3000"
   },
   "dependencies": {
+    "@pipecat-ai/client-js": "^1.4.1",
+    "@pipecat-ai/small-webrtc-transport": "^1.7.2",
     "@radix-ui/react-checkbox": "^1.1.5",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-popover": "^1.1.7",

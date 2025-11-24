@@ -1,33 +1,168 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
-import { LogOut, User, Sparkles, Video, VideoOff, Mic, MicOff, Monitor, MonitorOff, Clock } from 'lucide-react';
+import { LogOut, User, Sparkles, Video, VideoOff, Mic, MicOff, Monitor, MonitorOff, Clock, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SessionManager, type TranscriptMessage } from '@/lib/sessionManager';
+import { useToast } from '@/hooks/useToast';
 
 export function InterviewRoomPage() {
+  const navigate = useNavigate();
   const { sessionData, clearSession } = useSession();
-  const [startTime] = useState(Date.now());
+  const toast = useToast();
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<string>('Connecting...');
+  const [transcriptMessages, setTranscriptMessages] = useState<TranscriptMessage[]>([]);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [sessionStarted, setSessionStarted] = useState(false);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const screenShareRef = useRef<MediaStream | null>(null);
+  const sessionManagerRef = useRef<SessionManager | null>(null);
+  const sessionStartTimeRef = useRef<number | null>(null);
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Timer effect
+  // Initialize AI session
   useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [startTime]);
+    const initializeSession = async () => {
+      if (!sessionData?.session_access_token || !sessionData?.time_limit_minutes) {
+        setSessionError('Missing session data. Please start over.');
+        setIsInitializing(false);
+        return;
+      }
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
+      try {
+        setIsInitializing(true);
+        setSessionError(null);
+
+        // Create session manager (uses localhost:8000 by default for local Docker)
+        const sessionManager = new SessionManager();
+        sessionManagerRef.current = sessionManager;
+
+        // Set up callbacks
+        sessionManager.onStatusChange = (status) => {
+          setConnectionStatus(status);
+          if (status === 'Connected' || status === 'AI Ready') {
+            setIsInitializing(false);
+          }
+        };
+
+        sessionManager.onTranscriptUpdate = (message) => {
+          setTranscriptMessages((prev) => [...prev, message]);
+        };
+
+        sessionManager.onError = (errorMessage) => {
+          setSessionError(errorMessage);
+          toast.error('Session Error', errorMessage);
+          setIsInitializing(false);
+        };
+
+        sessionManager.onSessionAutoEnded = () => {
+          toast.error('Session Ended', 'Your interview session has ended automatically.');
+          handleLeaveInterview(true);
+        };
+
+        // Start the session
+        // Map session_type to valid API values: 'interview_prep', 'sales_practice', 'coaching', or 'presentation'
+        const mapSessionType = (type: string | null | undefined): string => {
+          if (!type) return 'interview_prep'; // Default to interview_prep
+          
+          // Map common variations to valid types
+          const normalized = type.toLowerCase().trim();
+          if (normalized === 'interview' || normalized === 'interview_prep') {
+            return 'interview_prep';
+          }
+          if (normalized === 'sales' || normalized === 'sales_practice') {
+            return 'sales_practice';
+          }
+          if (normalized === 'coaching') {
+            return 'coaching';
+          }
+          if (normalized === 'presentation') {
+            return 'presentation';
+          }
+          
+          // If it's already a valid type, return as-is
+          if (['interview_prep', 'sales_practice', 'coaching', 'presentation'].includes(normalized)) {
+            return normalized;
+          }
+          
+          // Default fallback
+          return 'interview_prep';
+        };
+        
+        const sessionType = mapSessionType(sessionData.session_type);
+        const durationMinutes = sessionData.time_limit_minutes || 30;
+        
+        // Record session start time
+        const startTime = Date.now();
+        sessionStartTimeRef.current = startTime;
+        
+        const sessionId = await sessionManager.startSession({
+          session_type: sessionType,
+          duration_minutes: durationMinutes,
+          role_title: sessionData.role_title || undefined,
+          job_description: sessionData.job_description || undefined,
+        });
+
+        // Store session ID for completion page
+        if (sessionId) {
+          localStorage.setItem('ai_session_id', sessionId);
+        }
+
+        // Mark session as started to trigger timer
+        setSessionStarted(true);
+      } catch (error: any) {
+        console.error('Failed to initialize session:', error);
+        const errorMsg = error?.message || 'Failed to start interview session';
+        setSessionError(errorMsg);
+        toast.error('Session Error', errorMsg);
+        setIsInitializing(false);
+      }
+    };
+
+    initializeSession();
+
+    // Cleanup on unmount
+    return () => {
+      if (sessionManagerRef.current) {
+        sessionManagerRef.current.cleanup();
+        sessionManagerRef.current = null;
+      }
+    };
+  }, []); // Only run once on mount
+
+  // Timer effect - runs when session starts
+  useEffect(() => {
+    if (!sessionStarted || !sessionStartTimeRef.current) {
+      return;
+    }
+
+    // Update immediately to show 00:00
+    setElapsedTime(0);
+
+    // Start the timer interval
+    timerIntervalRef.current = setInterval(() => {
+      if (sessionStartTimeRef.current) {
+        const elapsed = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+        setElapsedTime(elapsed);
+      }
+    }, 1000);
+
+    // Cleanup timer on unmount or when session ends
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+    };
+  }, [sessionStarted]); // Re-run when session starts
 
   // Initialize camera and microphone
   useEffect(() => {
@@ -47,7 +182,10 @@ export function InterviewRoomPage() {
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
-      } catch {}
+      } catch (error) {
+        console.error('Failed to initialize media:', error);
+        toast.error('Media Error', 'Failed to access camera or microphone. Please check your permissions.');
+      }
     };
 
     initMedia();
@@ -68,6 +206,12 @@ export function InterviewRoomPage() {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
 
   const toggleCamera = () => {
     if (stream) {
@@ -110,39 +254,50 @@ export function InterviewRoomPage() {
           setIsScreenSharing(false);
           screenShareRef.current = null;
         };
-      } catch {}
+      } catch (error) {
+        console.error('Failed to start screen share:', error);
+      }
     }
   };
 
-  const handleLeaveInterview = () => {
-    const originalToken = sessionData?.original_token;
-    const sessionsRemaining = sessionData?.sessions_remaining;
-
-    let targetUrl: string;
-    const shouldClearSession =
-      sessionsRemaining === 0 ||
-      !originalToken ||
-      sessionsRemaining === null ||
-      sessionsRemaining === undefined;
-
-    if (sessionsRemaining === 0) {
-      targetUrl = '/login';
-    } else if (!originalToken) {
-      targetUrl = '/login';
-    } else if (sessionsRemaining === null || sessionsRemaining === undefined) {
-      targetUrl = '/login';
-    } else if (sessionsRemaining > 0) {
-      targetUrl = `/session/join?token=${originalToken}`;
-    } else {
-      targetUrl = '/login';
+  const handleLeaveInterview = async (autoEnded: boolean = false) => {
+    // Store session ID before cleanup (needed for closing session)
+    const sessionId = sessionManagerRef.current?.getSessionId();
+    if (sessionId) {
+      localStorage.setItem('ai_session_id', sessionId);
     }
 
-    if (shouldClearSession) {
-      clearSession();
+    // Disconnect WebRTC but don't close via API yet
+    // The completion page will handle closing the session
+    if (sessionManagerRef.current) {
+      try {
+        await sessionManagerRef.current.disconnect();
+      } catch (error) {
+        console.error('Error disconnecting session:', error);
+      }
     }
 
-    window.location.href = targetUrl;
+    // Navigate to completion page which will handle closing the session
+    navigate('/session/complete', { replace: true });
   };
+
+  // Show error state
+  if (sessionError && !isInitializing) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Session Error</h2>
+          <p className="text-gray-600 mb-6">{sessionError}</p>
+          <Button onClick={() => handleLeaveInterview()} variant="destructive" className="w-full">
+            Return to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
@@ -155,6 +310,12 @@ export function InterviewRoomPage() {
               <Clock className="w-4 h-4" />
               <span className="font-mono">{formatTime(elapsedTime)}</span>
             </div>
+            {isInitializing && (
+              <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{connectionStatus}</span>
+              </div>
+            )}
           </div>
 
           <Button
@@ -162,6 +323,7 @@ export function InterviewRoomPage() {
             variant="destructive"
             size="sm"
             startIcon={<LogOut className="w-4 h-4" />}
+            disabled={isInitializing}
           >
             Leave Interview
           </Button>
@@ -250,20 +412,40 @@ export function InterviewRoomPage() {
               )}
             </div>
 
-            {/* AI Avatar Placeholder */}
-            <div className="relative bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 rounded-lg overflow-hidden flex items-center justify-center">
+            {/* AI Avatar Section */}
+            <div className="relative bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 rounded-lg overflow-hidden flex items-center justify-center">
               <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/50 px-3 py-1.5 rounded-full">
                 <Sparkles className="w-4 h-4 text-white" />
                 <span className="text-white text-sm font-medium">AI Interviewer</span>
               </div>
 
-              <div className="text-center p-8">
-                <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <Sparkles className="w-12 h-12 text-white" />
+              {isInitializing ? (
+                <div className="text-center p-8">
+                  <Loader2 className="w-16 h-16 text-white animate-spin mx-auto mb-4" />
+                  <p className="text-white text-lg font-medium mb-2">Connecting to AI...</p>
+                  <p className="text-white/60 text-sm">{connectionStatus}</p>
                 </div>
-                <p className="text-white text-lg font-medium mb-2">AI Avatar</p>
-                <p className="text-white/60 text-sm">WebRTC integration placeholder</p>
-              </div>
+              ) : (
+                <div className="text-center p-8">
+                  <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                    <Sparkles className="w-12 h-12 text-white" />
+                  </div>
+                  <p className="text-white text-lg font-medium mb-2">AI Interviewer</p>
+                  <p className="text-white/60 text-sm mb-4">{connectionStatus}</p>
+                  
+                  {/* Transcript Preview */}
+                  {transcriptMessages.length > 0 && (
+                    <div className="mt-4 max-h-32 overflow-y-auto text-left bg-black/20 rounded-lg p-3 text-xs text-white/80">
+                      {transcriptMessages.slice(-3).map((msg, idx) => (
+                        <div key={idx} className="mb-1">
+                          <span className="font-semibold">{msg.role === 'user' ? 'You' : 'AI'}:</span>{' '}
+                          <span>{msg.content}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -289,7 +471,10 @@ export function InterviewRoomPage() {
                 Stay
               </Button>
               <Button
-                onClick={handleLeaveInterview}
+                onClick={() => {
+                  setShowLeaveModal(false);
+                  handleLeaveInterview();
+                }}
                 variant="destructive"
                 className="flex-1"
               >
@@ -302,4 +487,3 @@ export function InterviewRoomPage() {
     </div>
   );
 }
-

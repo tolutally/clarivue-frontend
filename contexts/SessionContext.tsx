@@ -10,6 +10,9 @@ export interface SessionData {
   session_type: string | null;
   cohort_name: string | null;
   original_token: string | null; // Store the original verification token
+  // Setup data for AI session
+  role_title?: string | null;
+  job_description?: string | null;
 }
 
 interface SessionContextType {
