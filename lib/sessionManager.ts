@@ -120,6 +120,16 @@ export class SessionManager {
       this.updateStatus('Initializing devices...');
       await this.pcClient.initDevices();
 
+      // Reset audio element before connecting (in case of previous session)
+      const audioElement = document.getElementById('bot-audio') as HTMLAudioElement;
+      if (audioElement) {
+        const oldStream = audioElement.srcObject as MediaStream | null;
+        if (oldStream) {
+          oldStream.getTracks().forEach(track => track.stop());
+        }
+        audioElement.srcObject = null;
+      }
+
       // Connect to session
       this.updateStatus('Connecting to AI...');
       await this.pcClient.connect();
@@ -173,7 +183,12 @@ export class SessionManager {
       },
       onTrackStarted: (track: MediaStreamTrack, participant?: { local?: boolean }) => {
         if (!participant?.local && track.kind === 'audio') {
-          console.log('Audio track started');
+          console.log('Audio track started:', {
+            id: track.id,
+            enabled: track.enabled,
+            readyState: track.readyState,
+            label: track.label,
+          });
           // Set up audio playback
           this.setupAudioTrack(track);
         }
@@ -185,15 +200,120 @@ export class SessionManager {
    * Set up audio track for playback
    */
   private setupAudioTrack(track: MediaStreamTrack): void {
-    const audioElement = (document.getElementById('bot-audio') as HTMLAudioElement) || this.createAudioElement();
-    const stream = audioElement.srcObject as MediaStream | null;
+    try {
+      console.log('Setting up audio track:', track.id, track.enabled, track.readyState);
+      
+      // Ensure track is enabled
+      if (!track.enabled) {
+        track.enabled = true;
+      }
 
-    if (stream) {
-      const oldTrack = stream.getAudioTracks()[0];
-      if (oldTrack?.id === track.id) return;
+      const audioElement = (document.getElementById('bot-audio') as HTMLAudioElement) || this.createAudioElement();
+      const stream = audioElement.srcObject as MediaStream | null;
+
+      // Stop old tracks if they exist and are different
+      if (stream) {
+        const oldTrack = stream.getAudioTracks()[0];
+        if (oldTrack?.id === track.id) {
+          // Same track, but ensure it's still enabled and playing
+          console.log('Same track, ensuring playback');
+          if (audioElement.paused) {
+            audioElement.play().catch(err => {
+              console.warn('Audio play failed:', err);
+            });
+          }
+          return;
+        }
+        // Stop all old tracks before setting new stream
+        stream.getTracks().forEach(t => {
+          console.log('Stopping old track:', t.id);
+          t.stop();
+        });
+      }
+
+      // Create new stream with the new track
+      const newStream = new MediaStream([track]);
+      
+      // Set volume to max and ensure not muted BEFORE setting srcObject
+      audioElement.volume = 1.0;
+      audioElement.muted = false;
+      audioElement.autoplay = true;
+      
+      // Set the stream
+      audioElement.srcObject = newStream;
+      
+      // Log audio element state
+      console.log('Audio element state:', {
+        paused: audioElement.paused,
+        muted: audioElement.muted,
+        volume: audioElement.volume,
+        readyState: audioElement.readyState,
+        srcObject: audioElement.srcObject,
+        trackCount: newStream.getAudioTracks().length,
+        trackEnabled: track.enabled,
+        trackReadyState: track.readyState,
+      });
+      
+      // Wait for the stream to be ready, then play
+      const tryPlay = () => {
+        if (audioElement.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+          const playPromise = audioElement.play();
+          
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log('Audio playback started successfully');
+                // Verify it's actually playing
+                setTimeout(() => {
+                  console.log('Audio element after play:', {
+                    paused: audioElement.paused,
+                    currentTime: audioElement.currentTime,
+                    readyState: audioElement.readyState,
+                    muted: audioElement.muted,
+                    volume: audioElement.volume,
+                  });
+                }, 100);
+              })
+              .catch(err => {
+                console.error('Audio autoplay failed:', err);
+                // Try to play again after a short delay
+                setTimeout(() => {
+                  audioElement.play().catch(e => {
+                    console.error('Retry audio play failed:', e);
+                  });
+                }, 500);
+              });
+          }
+        } else {
+          // Wait for ready state
+          audioElement.addEventListener('canplay', tryPlay, { once: true });
+          // Also try after a short delay as fallback
+          setTimeout(() => {
+            if (audioElement.paused) {
+              tryPlay();
+            }
+          }, 100);
+        }
+      };
+      
+      // Try to play immediately or wait for canplay
+      tryPlay();
+
+      // Listen for track ended event
+      track.onended = () => {
+        console.log('Audio track ended');
+      };
+
+      track.onmute = () => {
+        console.warn('Audio track muted');
+      };
+
+      track.onunmute = () => {
+        console.log('Audio track unmuted');
+      };
+    } catch (error) {
+      console.error('Error setting up audio track:', error);
     }
-
-    audioElement.srcObject = new MediaStream([track]);
   }
 
   /**
@@ -206,7 +326,51 @@ export class SessionManager {
       audioElement = document.createElement('audio');
       audioElement.id = 'bot-audio';
       audioElement.autoplay = true;
+      audioElement.volume = 1.0;
+      audioElement.muted = false;
+      
+      // Add event listeners for debugging
+      audioElement.addEventListener('loadedmetadata', () => {
+        console.log('Audio metadata loaded:', {
+          duration: audioElement.duration,
+          readyState: audioElement.readyState,
+          paused: audioElement.paused,
+          muted: audioElement.muted,
+          volume: audioElement.volume,
+        });
+      });
+      
+      audioElement.addEventListener('play', () => {
+        console.log('Audio element play event fired');
+      });
+      
+      audioElement.addEventListener('pause', () => {
+        console.log('Audio element pause event fired');
+      });
+      
+      audioElement.addEventListener('volumechange', () => {
+        console.log('Audio volume changed:', {
+          volume: audioElement.volume,
+          muted: audioElement.muted,
+        });
+      });
+      
+      audioElement.addEventListener('canplay', () => {
+        console.log('Audio can play - attempting to play');
+        if (audioElement.paused) {
+          audioElement.play().catch(err => {
+            console.error('Auto-play on canplay failed:', err);
+          });
+        }
+      });
+      
       document.body.appendChild(audioElement);
+      console.log('Audio element created and appended to body');
+    } else {
+      // Ensure existing element is properly configured
+      audioElement.volume = 1.0;
+      audioElement.muted = false;
+      audioElement.autoplay = true;
     }
 
     return audioElement;
@@ -356,6 +520,18 @@ export class SessionManager {
     if (this.pcClient) {
       this.pcClient.disconnect();
       this.pcClient = null;
+    }
+
+    // Clean up audio element
+    const audioElement = document.getElementById('bot-audio') as HTMLAudioElement;
+    if (audioElement) {
+      const stream = audioElement.srcObject as MediaStream | null;
+      if (stream) {
+        // Stop all audio tracks
+        stream.getTracks().forEach(track => track.stop());
+      }
+      audioElement.srcObject = null;
+      // Don't remove the element, just clear it - it will be reused for next session
     }
 
     this.sessionId = null;

@@ -13,6 +13,7 @@ export function SessionCompletePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<any[]>([]);
+  const [sessionStatus, setSessionStatus] = useState<any>(null);
 
   useEffect(() => {
     // Get session ID from localStorage or session data
@@ -32,17 +33,33 @@ export function SessionCompletePage() {
       setIsClosing(true);
       setError(null);
 
-      // Fetch transcript BEFORE closing the session (session might be deleted after close)
+      // 1. Get session status BEFORE closing (to see elapsed time, remaining time, etc.)
+      try {
+        const statusData = await aiSessionsService.getSessionStatus(sessionIdToClose);
+        setSessionStatus(statusData);
+        console.log('Session status before close:', statusData);
+      } catch (err) {
+        console.error('Failed to fetch session status:', err);
+        // Don't fail the whole flow if status fetch fails
+      }
+
+      // 2. Close session FIRST (transcript is only available after session is closed)
+      await aiSessionsService.closeSession(sessionIdToClose);
+      console.log('Session closed successfully');
+
+      // 3. Wait a moment for backend to finalize transcript
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // 4. Fetch transcript AFTER closing the session
       try {
         const transcriptData = await aiSessionsService.getTranscript(sessionIdToClose);
         setTranscript(transcriptData.transcript || []);
+        console.log('Transcript fetched:', transcriptData.transcript?.length || 0, 'messages');
       } catch (err) {
         console.error('Failed to fetch transcript:', err);
         // Don't fail the whole flow if transcript fetch fails
+        setError('Session closed successfully, but transcript could not be retrieved.');
       }
-
-      // Call close session endpoint AFTER fetching transcript
-      await aiSessionsService.closeSession(sessionIdToClose);
 
       setIsClosing(false);
     } catch (err: any) {
@@ -133,6 +150,47 @@ export function SessionCompletePage() {
                 </div>
                 <span className="text-2xl font-bold text-slate-900">{sessionsRemaining}</span>
               </div>
+
+              {sessionStatus && (
+                <div className="pt-4 border-t border-slate-200">
+                  <div className="flex items-center gap-2 text-slate-600 mb-3">
+                    <Clock className="w-5 h-5" />
+                    <span className="font-medium">Session Details</span>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {sessionStatus.session_type && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Session Type:</span>
+                        <span className="font-medium text-slate-900 capitalize">
+                          {sessionStatus.session_type.replace('_', ' ')}
+                        </span>
+                      </div>
+                    )}
+                    {sessionStatus.status && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Status:</span>
+                        <span className="font-medium text-slate-900 capitalize">{sessionStatus.status}</span>
+                      </div>
+                    )}
+                    {sessionStatus.duration_seconds && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Duration:</span>
+                        <span className="font-medium text-slate-900">
+                          {Math.floor(sessionStatus.duration_seconds / 60)} minutes
+                        </span>
+                      </div>
+                    )}
+                    {sessionStatus.started_at && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Started At:</span>
+                        <span className="font-medium text-slate-900">
+                          {new Date(sessionStatus.started_at).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {transcript.length > 0 && (
                 <div className="pt-4 border-t border-slate-200">

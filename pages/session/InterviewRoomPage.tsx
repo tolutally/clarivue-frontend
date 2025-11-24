@@ -100,7 +100,7 @@ export function InterviewRoomPage() {
         const sessionType = mapSessionType(sessionData.session_type);
         const durationMinutes = sessionData.time_limit_minutes || 30;
         
-        // Record session start time
+        // Record session start time BEFORE starting session
         const startTime = Date.now();
         sessionStartTimeRef.current = startTime;
         
@@ -116,7 +116,8 @@ export function InterviewRoomPage() {
           localStorage.setItem('ai_session_id', sessionId);
         }
 
-        // Mark session as started to trigger timer
+        // Mark session as started (this will trigger the timer effect)
+        console.log('Setting sessionStarted to true, startTime:', sessionStartTimeRef.current);
         setSessionStarted(true);
       } catch (error: any) {
         console.error('Failed to initialize session:', error);
@@ -140,23 +141,45 @@ export function InterviewRoomPage() {
 
   // Timer effect - runs when session starts
   useEffect(() => {
-    if (!sessionStarted || !sessionStartTimeRef.current) {
+    console.log('Timer effect running, sessionStarted:', sessionStarted, 'startTimeRef:', sessionStartTimeRef.current);
+    
+    if (!sessionStarted) {
+      console.log('Timer effect: session not started yet, waiting...');
       return;
+    }
+    
+    if (!sessionStartTimeRef.current) {
+      console.warn('Timer effect: session started but no startTime ref');
+      return;
+    }
+
+    // Clear any existing timer
+    if (timerIntervalRef.current) {
+      console.log('Timer effect: clearing existing timer');
+      clearInterval(timerIntervalRef.current);
     }
 
     // Update immediately to show 00:00
     setElapsedTime(0);
 
     // Start the timer interval
+    console.log('Setting up timer interval, startTime:', sessionStartTimeRef.current);
+    
     timerIntervalRef.current = setInterval(() => {
       if (sessionStartTimeRef.current) {
         const elapsed = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+        console.log('Timer tick:', elapsed, 'seconds');
         setElapsedTime(elapsed);
+      } else {
+        console.warn('Timer tick but no startTime ref');
       }
     }, 1000);
 
+    console.log('Timer started, startTime:', sessionStartTimeRef.current, 'interval ID:', timerIntervalRef.current);
+
     // Cleanup timer on unmount or when session ends
     return () => {
+      console.log('Timer effect cleanup');
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
@@ -261,6 +284,12 @@ export function InterviewRoomPage() {
   };
 
   const handleLeaveInterview = async (autoEnded: boolean = false) => {
+    // Stop the timer
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+
     // Store session ID before cleanup (needed for closing session)
     const sessionId = sessionManagerRef.current?.getSessionId();
     if (sessionId) {
