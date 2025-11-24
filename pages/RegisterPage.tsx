@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useRegister } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Mail, Lock, User, Building, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { AuthLayout } from '@/components/auth/AuthLayout';
 
 export function RegisterPage() {
   const [name, setName] = useState('');
@@ -56,16 +57,29 @@ export function RegisterPage() {
     return 'Strong';
   };
 
+  const [formError, setFormError] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
+      setFormError('Passwords do not match.');
       return;
     }
 
-    if (passwordStrength < 3) {
+    const missingRequirements = [];
+    if (!passwordRequirements.length) missingRequirements.push('at least 8 characters');
+    if (!passwordRequirements.uppercase) missingRequirements.push('one uppercase letter');
+    if (!passwordRequirements.lowercase) missingRequirements.push('one lowercase letter');
+    if (!passwordRequirements.number) missingRequirements.push('one number');
+    if (!passwordRequirements.special) missingRequirements.push('one special character');
+
+    if (missingRequirements.length > 0) {
+      setFormError(`Please include ${missingRequirements.join(', ')} in your password.`);
       return;
     }
+
+    setFormError(null);
 
     try {
       await registerMutation.mutateAsync({
@@ -83,180 +97,130 @@ export function RegisterPage() {
   const passwordsMatch = password === confirmPassword || confirmPassword === '';
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <img src="/clarivue-logo.png" alt="Clarivue" className="h-12 mx-auto mb-6" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Your Account</h1>
-          <p className="text-gray-600">Get started with Clarivue today</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Full Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-              {/* Company */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name
-                </label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="Your Company"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a strong password"
-                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {/* Password strength + requirements, placed under in one col */}
-                {password && (
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-gray-600">Password Strength</span>
-                      <span className={`text-xs font-medium ${getStrengthColor().replace('bg-', 'text-')}`}>
-                        {getStrengthLabel()}
-                      </span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${getStrengthColor()}`}
-                        style={{ width: `${(passwordStrength / 5) * 100}%` }}
-                      />
-                    </div>
-                    <div className="mt-3 space-y-1">
-                      <div className={`text-xs flex items-center gap-2 ${passwordRequirements.length ? 'text-green-600' : 'text-gray-500'}`}>
-                        <CheckCircle className={`w-3 h-3 ${passwordRequirements.length ? '' : 'opacity-30'}`} />
-                        At least 8 characters
-                      </div>
-                      <div className={`text-xs flex items-center gap-2 ${passwordRequirements.uppercase ? 'text-green-600' : 'text-gray-500'}`}>
-                        <CheckCircle className={`w-3 h-3 ${passwordRequirements.uppercase ? '' : 'opacity-30'}`} />
-                        One uppercase letter
-                      </div>
-                      <div className={`text-xs flex items-center gap-2 ${passwordRequirements.lowercase ? 'text-green-600' : 'text-gray-500'}`}>
-                        <CheckCircle className={`w-3 h-3 ${passwordRequirements.lowercase ? '' : 'opacity-30'}`} />
-                        One lowercase letter
-                      </div>
-                      <div className={`text-xs flex items-center gap-2 ${passwordRequirements.number ? 'text-green-600' : 'text-gray-500'}`}>
-                        <CheckCircle className={`w-3 h-3 ${passwordRequirements.number ? '' : 'opacity-30'}`} />
-                        One number
-                      </div>
-                      <div className={`text-xs flex items-center gap-2 ${passwordRequirements.special ? 'text-green-600' : 'text-gray-500'}`}>
-                        <CheckCircle className={`w-3 h-3 ${passwordRequirements.special ? '' : 'opacity-30'}`} />
-                        One special character
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {/* Confirm Password field */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {confirmPassword && !passwordsMatch && (
-                  <p className="mt-1 text-xs text-red-600">Passwords do not match</p>
-                )}
-              </div>
+    <AuthLayout
+      title="Create your Clarivue workspace"
+      subtitle="Collaborate with hiring teams, automate interviews, and delight candidates."
+      contentWidthClass="max-w-2xl"
+      footer={
+        <p className="text-center text-sm text-slate-500">
+          Already onboard?{' '}
+          <Link to="/login" className="text-sky-600 hover:text-sky-500 font-medium">
+            Sign in
+          </Link>
+        </p>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">Full Name</label>
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Jordan Lee"
+                className="w-full bg-[#EDF4FF] border border-transparent rounded-2xl pl-12 pr-4 py-3 text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-sky-400 focus:border-sky-200"
+                required
+              />
             </div>
-            <Button
-              type="submit"
-              loading={registerMutation.isPending}
-              variant="primary"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all"
-              disabled={!allRequirementsMet || !passwordsMatch}
-            >
-              {registerMutation.isPending ? 'Creating Account...' : 'Create Account'}
-            </Button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-center text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-                Sign in
-              </Link>
-            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">Work Email</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                className="w-full bg-[#EDF4FF] border border-transparent rounded-2xl pl-12 pr-4 py-3 text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-sky-400 focus:border-sky-200"
+                required
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">Company Name</label>
+            <div className="relative">
+              <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Clarivue Labs"
+                className="w-full bg-[#EDF4FF] border border-transparent rounded-2xl pl-12 pr-4 py-3 text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-sky-400 focus:border-sky-200"
+                required
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-medium text-slate-700 flex items-center justify-between">
+              <span>Password</span>
+              <span className="text-xs font-normal text-slate-500">Must include A-Z, a-z, 0-9, symbol</span>
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a strong password"
+                className="w-full bg-[#EDF4FF] border border-transparent rounded-2xl pl-12 pr-12 py-3 text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-sky-400 focus:border-sky-200"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-500"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <label className="text-sm font-medium text-slate-700">Confirm Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter your password"
+                className="w-full bg-[#EDF4FF] border border-transparent rounded-2xl pl-12 pr-12 py-3 text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-sky-400 focus:border-sky-200"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-500"
+              >
+                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            {confirmPassword && !passwordsMatch && (
+              <p className="text-xs text-rose-500">Passwords do not match</p>
+            )}
           </div>
         </div>
-      </div>
-    </div>
+
+        {formError && (
+          <div className="rounded-2xl border border-rose-100 bg-rose-50 text-rose-700 text-sm px-4 py-3">
+            {formError}
+          </div>
+        )}
+
+        <Button
+          type="submit"
+          loading={registerMutation.isPending}
+          variant="primary"
+          size="lg"
+          className="w-full"
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending ? 'Creating your workspace...' : 'Launch Clarivue'}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }
