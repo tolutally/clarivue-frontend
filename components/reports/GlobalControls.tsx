@@ -38,7 +38,7 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="mb-4 flex items-center gap-4">
-        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/30">
+        <div className="flex items-center gap-3 px-4 py-3 bg-linear-to-r from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/30">
           <div className="flex items-center gap-2">
             <Label htmlFor="cohort-a" className={`text-sm font-semibold ${semantic.textPrimary}`}>
               Cohort A:
@@ -64,7 +64,7 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
         </div>
 
         {compareMode && (
-          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/30">
+          <div className="flex items-center gap-3 px-4 py-3 bg-linear-to-r from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/30">
             <div className="flex items-center gap-2">
               <Label htmlFor="cohort-b" className="text-sm font-semibold text-gray-900">
                 Cohort B:

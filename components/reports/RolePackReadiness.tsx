@@ -75,7 +75,7 @@ export function RolePackReadiness({ data }: RolePackReadinessProps) {
         ))}
       </div>
 
-      <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
+      <div className="bg-linear-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Role-Pack Insights</h3>
         <div className="space-y-2">
           <div className="bg-white rounded-lg px-4 py-3 text-sm text-gray-700 border border-[#C8A0FE]/20 shadow-sm">

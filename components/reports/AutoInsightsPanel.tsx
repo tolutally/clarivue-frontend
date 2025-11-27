@@ -45,7 +45,7 @@ export function AutoInsightsPanel({ insights }: AutoInsightsPanelProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
+      <div className="bg-linear-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
         <div className="flex items-center gap-2 mb-4">
           <Lightbulb className="w-5 h-5 text-[#C8A0FE]" />
           <h3 className={`text-sm font-semibold ${semantic.textPrimary}`}>Auto-Generated Insights</h3>

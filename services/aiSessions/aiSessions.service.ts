@@ -4,11 +4,12 @@ import type { ApiResponseWrapper } from '@/services/api/types';
 export interface CreateSessionRequest {
   session_type: string;
   duration_seconds: number;
-  context: {
-    job_description?: string;
-    company_name?: string;
-    role_title?: string;
-  };
+  session_log_id?: string;
+  // context: {
+  //   job_description: string;
+  //   company_name: string;
+  //   role_title: string;
+  // };
 }
 
 export interface CreateSessionResponse {
@@ -19,52 +20,95 @@ export interface CreateSessionResponse {
 
 export interface SessionStatusResponse {
   session_id: string;
+  session_type: string;
   status: string;
-  elapsed_time?: number;
-  remaining_time?: number;
+  duration_seconds: number;
+  created_at: string;
+  started_at: string;
+  has_transcript: boolean;
+}
+
+export interface TranscriptMessage {
+  timestamp: string;
+  role: 'user' | 'assistant';
+  content: string;
+  speaker: string;
+}
+
+export interface SessionContext {
+  job_title?: string;
+  job_description?: string;
+  company_name?: string;
+}
+
+export interface CloseSessionResponse {
+  session_id: string;
+  session_type: string;
+  status: string;
+  transcript: TranscriptMessage[];
+  duration_seconds: number;
+  actual_duration: number;
+  created_at: string;
+  started_at: string;
+  completed_at: string;
+  context: SessionContext;
 }
 
 export interface TranscriptResponse {
-  transcript: Array<{
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp: number;
-  }>;
+  session_id: string;
+  session_type: string;
+  status: string;
+  transcript: TranscriptMessage[];
+  duration_seconds: number;
+  actual_duration: number;
+  created_at: string;
+  started_at: string;
+  completed_at: string;
+  context: SessionContext;
 }
 
 class AISessionsService {
   async createSession(data: CreateSessionRequest): Promise<CreateSessionResponse> {
     const response = await aiSessionsClient.post<ApiResponseWrapper<CreateSessionResponse>>(
-      '/api/ai-sessions/',
+      '/v1/ai-sessions/',
       data
     );
     return response.data.data;
   }
 
-  async closeSession(sessionId: string): Promise<{ success: boolean }> {
-    const response = await aiSessionsClient.post<ApiResponseWrapper<{ success: boolean }>>(
-      `/api/ai-sessions/${sessionId}/close`
+  async closeSession(sessionId: string): Promise<CloseSessionResponse> {
+    console.log('Calling closeSession API with sessionId:', sessionId);
+    const response = await aiSessionsClient.post<ApiResponseWrapper<CloseSessionResponse>>(
+      `/v1/ai-sessions/${sessionId}/close`
     );
+    console.log('Close session response:', response.data);
     return response.data.data;
   }
 
   async getSessionStatus(sessionId: string): Promise<SessionStatusResponse> {
     const response = await aiSessionsClient.get<ApiResponseWrapper<SessionStatusResponse>>(
-      `/api/ai-sessions/${sessionId}/status`
+      `/v1/ai-sessions/${sessionId}/status`
+    );
+    return response.data.data;
+  }
+
+  async getAnalysis(sessionLogId: string): Promise<any> {
+    const response = await aiSessionsClient.get<ApiResponseWrapper<any>>(
+      `/v1/ai-sessions/analysis/${sessionLogId}`
     );
     return response.data.data;
   }
 
   async getTranscript(sessionId: string): Promise<TranscriptResponse> {
     const response = await aiSessionsClient.get<ApiResponseWrapper<TranscriptResponse>>(
-      `/api/ai-sessions/${sessionId}/transcript`
+      `/v1/ai-sessions/${sessionId}/transcript`
     );
     return response.data.data;
   }
 
   async cancelSession(sessionId: string): Promise<{ success: boolean }> {
     const response = await aiSessionsClient.delete<ApiResponseWrapper<{ success: boolean }>>(
-      `/api/ai-sessions/${sessionId}`
+      `/v1/ai-sessions/${sessionId}`
     );
     return response.data.data;
   }

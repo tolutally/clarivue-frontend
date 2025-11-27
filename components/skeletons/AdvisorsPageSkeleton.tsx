@@ -8,7 +8,7 @@ export function AdvisorsPageSkeleton() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl p-6 border border-gray-200">
+          <div key={i} className="bg-linear-to-br from-gray-100 to-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
               <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />

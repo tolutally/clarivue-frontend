@@ -26,13 +26,25 @@ export function InterviewRoomPage() {
   const screenShareRef = useRef<MediaStream | null>(null);
   const sessionManagerRef = useRef<SessionManager | null>(null);
   const sessionStartTimeRef = useRef<number | null>(null);
+  const timerInitializedRef = useRef(false);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitializedRef = useRef(false);
 
   // Initialize AI session
   useEffect(() => {
     const initializeSession = async () => {
+      if (hasInitializedRef.current) {
+        console.log('InterviewRoomPage already initialized - skipping duplicate run');
+        return;
+      }
       if (!sessionData?.session_access_token || !sessionData?.time_limit_minutes) {
         setSessionError('Missing session data. Please start over.');
+        setIsInitializing(false);
+        return;
+      }
+
+      if (!sessionData?.session_log_id) {
+        setSessionError('Session is not initialized. Please return to the previous step and start the interview again.');
         setIsInitializing(false);
         return;
       }
@@ -40,6 +52,7 @@ export function InterviewRoomPage() {
       try {
         setIsInitializing(true);
         setSessionError(null);
+        hasInitializedRef.current = true;
 
         // Create session manager (uses localhost:8000 by default for local Docker)
         const sessionManager = new SessionManager();
@@ -48,7 +61,13 @@ export function InterviewRoomPage() {
         // Set up callbacks
         sessionManager.onStatusChange = (status) => {
           setConnectionStatus(status);
-          if (status === 'Connected' || status === 'AI Ready') {
+          if ((status === 'Connected' || status === 'AI Ready') && !timerInitializedRef.current) {
+            sessionStartTimeRef.current = Date.now();
+            timerInitializedRef.current = true;
+            setSessionStarted(true);
+            setIsInitializing(false);
+            console.log('Timer initialized from status change at', sessionStartTimeRef.current);
+          } else if (status === 'Connected' || status === 'AI Ready') {
             setIsInitializing(false);
           }
         };
@@ -58,8 +77,17 @@ export function InterviewRoomPage() {
         };
 
         sessionManager.onError = (errorMessage) => {
-          setSessionError(errorMessage);
-          toast.error('Session Error', errorMessage);
+          let readableError: string;
+          if (typeof errorMessage === 'string') {
+            readableError = errorMessage;
+          } else if (errorMessage && typeof errorMessage === 'object' && 'message' in errorMessage) {
+            const msg = (errorMessage as { message?: string }).message;
+            readableError = msg && typeof msg === 'string' ? msg : JSON.stringify(errorMessage);
+          } else {
+            readableError = String(errorMessage ?? 'Unknown error');
+          }
+          setSessionError(readableError);
+          toast.error('Session Error', readableError);
           setIsInitializing(false);
         };
 
@@ -68,7 +96,10 @@ export function InterviewRoomPage() {
           handleLeaveInterview(true);
         };
 
-        // Start the session
+        console.log('Using session_log_id from context:', sessionData.session_log_id);
+        sessionManager.setSessionLogId(sessionData.session_log_id);
+
+        // STEP 2: Create WebRTC session
         // Map session_type to valid API values: 'interview_prep', 'sales_practice', 'coaching', or 'presentation'
         const mapSessionType = (type: string | null | undefined): string => {
           if (!type) return 'interview_prep'; // Default to interview_prep
@@ -100,9 +131,8 @@ export function InterviewRoomPage() {
         const sessionType = mapSessionType(sessionData.session_type);
         const durationMinutes = sessionData.time_limit_minutes || 30;
         
-        // Record session start time BEFORE starting session
-        const startTime = Date.now();
-        sessionStartTimeRef.current = startTime;
+        // Clear any old session ID first
+        localStorage.removeItem('ai_session_id');
         
         const sessionId = await sessionManager.startSession({
           session_type: sessionType,
@@ -111,15 +141,20 @@ export function InterviewRoomPage() {
           job_description: sessionData.job_description || undefined,
         });
 
-        // Store session ID for completion page
-        if (sessionId) {
+        console.log('WebRTC session started, session ID from API:', sessionId);
+
+        // Store session ID for completion page - ensure it's the actual session_id from API
+        if (sessionId && typeof sessionId === 'string' && sessionId.length > 0) {
           localStorage.setItem('ai_session_id', sessionId);
+          console.log('Stored actual session ID in localStorage:', sessionId);
+        } else {
+          console.error('Invalid session ID returned from startSession():', sessionId);
+          throw new Error('Failed to get valid session ID from API');
         }
 
-        // Mark session as started (this will trigger the timer effect)
-        console.log('Setting sessionStarted to true, startTime:', sessionStartTimeRef.current);
-        setSessionStarted(true);
+        console.log('Session creation complete, awaiting AI Ready to start timer');
       } catch (error: any) {
+        hasInitializedRef.current = false;
         console.error('Failed to initialize session:', error);
         const errorMsg = error?.message || 'Failed to start interview session';
         setSessionError(errorMsg);
@@ -132,8 +167,16 @@ export function InterviewRoomPage() {
 
     // Cleanup on unmount
     return () => {
+      timerInitializedRef.current = false;
+      sessionStartTimeRef.current = null;
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
       if (sessionManagerRef.current) {
-        sessionManagerRef.current.cleanup();
+        sessionManagerRef.current.destroy().catch(err => {
+          console.error('Error during session manager cleanup:', err);
+        });
         sessionManagerRef.current = null;
       }
     };
@@ -284,29 +327,37 @@ export function InterviewRoomPage() {
   };
 
   const handleLeaveInterview = async (autoEnded: boolean = false) => {
-    // Stop the timer
+    const manager = sessionManagerRef.current;
+    const sessionId = manager?.getSessionId();
+
+    // Tear down WebRTC as quickly as possible
+    if (manager) {
+      try {
+        await manager.destroy();
+      } catch (error) {
+        console.error('Error destroying session manager:', error);
+        await manager.cleanup();
+      }
+      sessionManagerRef.current = null;
+    }
+
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
       timerIntervalRef.current = null;
     }
+    timerInitializedRef.current = false;
+    sessionStartTimeRef.current = null;
+    setSessionStarted(false);
+    setElapsedTime(0);
 
-    // Store session ID before cleanup (needed for closing session)
-    const sessionId = sessionManagerRef.current?.getSessionId();
     if (sessionId) {
       localStorage.setItem('ai_session_id', sessionId);
+      localStorage.setItem(
+        'session_elapsed_seconds',
+        String(Math.max(elapsedTime, 0)),
+      );
     }
 
-    // Disconnect WebRTC but don't close via API yet
-    // The completion page will handle closing the session
-    if (sessionManagerRef.current) {
-      try {
-        await sessionManagerRef.current.disconnect();
-      } catch (error) {
-        console.error('Error disconnecting session:', error);
-      }
-    }
-
-    // Navigate to completion page which will handle closing the session
     navigate('/session/complete', { replace: true });
   };
 
@@ -442,7 +493,7 @@ export function InterviewRoomPage() {
             </div>
 
             {/* AI Avatar Section */}
-            <div className="relative bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="relative bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 rounded-lg overflow-hidden flex items-center justify-center">
               <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/50 px-3 py-1.5 rounded-full">
                 <Sparkles className="w-4 h-4 text-white" />
                 <span className="text-white text-sm font-medium">AI Interviewer</span>

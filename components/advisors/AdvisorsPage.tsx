@@ -87,7 +87,7 @@ export function AdvisorsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className={`bg-gradient-to-br from-[#102C64]/10 to-[#102C64]/5 rounded-xl p-6 border ${borders.primaryLight}`}>
+        <div className={`bg-linear-to-br from-[#102C64]/10 to-[#102C64]/5 rounded-xl p-6 border ${borders.primaryLight}`}>
           <div className="flex items-center gap-3 mb-3">
             <div className={`p-2 ${backgrounds.primary} rounded-lg`}>
               <Users size={24} className="text-white" />
@@ -100,7 +100,7 @@ export function AdvisorsPage() {
           </p>
         </div>
 
-        <div className={`bg-gradient-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-xl p-6 border ${borders.accentLight}`}>
+        <div className={`bg-linear-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-xl p-6 border ${borders.accentLight}`}>
           <div className="flex items-center gap-3 mb-3">
             <div className={`p-2 ${backgrounds.accent} rounded-lg`}>
               <TrendingUp size={24} className="text-white" />
@@ -111,7 +111,7 @@ export function AdvisorsPage() {
           <p className="text-sm text-gray-600 mt-1">Across all advisors</p>
         </div>
 
-        <div className={`bg-gradient-to-br from-[#C8A0FE]/10 to-[#C8A0FE]/5 rounded-xl p-6 border ${borders.secondaryLight}`}>
+        <div className={`bg-linear-to-br from-[#C8A0FE]/10 to-[#C8A0FE]/5 rounded-xl p-6 border ${borders.secondaryLight}`}>
           <div className="flex items-center gap-3 mb-3">
             <div className={`p-2 ${backgrounds.secondary} rounded-lg`}>
               <FileText size={24} className="text-white" />
@@ -122,7 +122,7 @@ export function AdvisorsPage() {
           <p className="text-sm text-gray-600 mt-1">{totalReviews} reviews completed</p>
         </div>
 
-        <div className={`bg-gradient-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-xl p-6 border ${borders.tertiaryLight}`}>
+        <div className={`bg-linear-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-xl p-6 border ${borders.tertiaryLight}`}>
           <div className="flex items-center gap-3 mb-3">
             <div className={`p-2 ${backgrounds.tertiary} rounded-lg`}>
               <Award size={24} className="text-white" />

@@ -44,7 +44,7 @@ export function ConsentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
       <InterviewHeader currentStep={2} totalSteps={6} stepLabel="Privacy & Consent" />
       <main className="pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-3xl">

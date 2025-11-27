@@ -344,7 +344,7 @@ import { semantic } from '@/utils/colors';
 import { gradients } from '@/utils/colors';
 
 <div className={`
-  bg-gradient-to-r 
+  bg-linear-to-r 
   ${gradients.accent} 
   p-8 
   rounded-2xl

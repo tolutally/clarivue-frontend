@@ -183,7 +183,7 @@ export function ReadinessTrends({ cohortName, showAtRiskOnly = false }: Readines
                     return (
                       <div key={idx} className="flex-1 flex flex-col justify-end">
                         <div
-                          className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t transition-all hover:from-blue-600 hover:to-blue-500"
+                          className="bg-linear-to-t from-blue-500 to-blue-400 rounded-t transition-all hover:from-blue-600 hover:to-blue-500"
                           style={{ height: `${heightPercent}%` }}
                         />
                       </div>

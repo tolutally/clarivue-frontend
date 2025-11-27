@@ -7,7 +7,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardRoute } from './components/DashboardRoute';
 import { PublicRoute } from './components/PublicRoute';
-import { StudentRoute } from './components/StudentRoute';
 import { SessionRoute } from './components/SessionRoute';
 import { SessionJoinPage } from './pages/session/SessionJoinPage';
 import { WelcomePage as SessionWelcomePage } from './pages/session/WelcomePage';
@@ -41,14 +40,6 @@ import { ConsentPage } from './pages/mockinterviews/ConsentPage';
 import { JDIntakePage } from './pages/mockinterviews/JDIntakePage';
 import { JDReviewPage } from './pages/mockinterviews/JDReviewPage';
 import { InterviewReadyPage } from './pages/mockinterviews/InterviewReadyPage';
-import { InviteLandingPage } from './pages/interviews/InviteLandingPage';
-import { WelcomePage as InterviewWelcomePage } from './pages/interviews/WelcomePage';
-import { ProfilePage as InterviewProfilePage } from './pages/interviews/ProfilePage';
-import { ConsentPage as InterviewConsentPage } from './pages/interviews/ConsentPage';
-import { SetupPage } from './pages/interviews/SetupPage';
-import { PreflightPage } from './pages/interviews/PreflightPage';
-import { InterviewRoomPage } from './pages/interviews/InterviewRoomPage';
-import { CompletionPage } from './pages/interviews/CompletionPage';
 import './styles/theme.css';
 
 // Root redirect component that checks authentication and user type
@@ -266,55 +257,6 @@ export default function App() {
               <PublicRoute>
                 <InterviewReadyPage />
               </PublicRoute>
-            } />
-            
-            {/* Student-Facing Mock Interview Flow (WebRTC) */}
-            <Route path="/invite/:token" element={
-              <StudentRoute>
-                <InviteLandingPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/welcome" element={
-              <StudentRoute>
-                <InterviewWelcomePage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/profile" element={
-              <StudentRoute>
-                <InterviewProfilePage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/consent" element={
-              <StudentRoute>
-                <InterviewConsentPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/setup" element={
-              <StudentRoute>
-                <SetupPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/preflight" element={
-              <StudentRoute>
-                <PreflightPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/interview" element={
-              <StudentRoute>
-                <InterviewRoomPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/complete" element={
-              <StudentRoute>
-                <CompletionPage />
-              </StudentRoute>
             } />
             
             <Route path="/" element={<RootRedirect />} />

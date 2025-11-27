@@ -9,7 +9,7 @@ interface StrengthsConcernsProps {
 export function StrengthsConcerns({ strengths, concerns }: StrengthsConcernsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className={`bg-gradient-to-br ${semantic.successGradient} rounded-xl p-5 border ${semantic.successBorder}`}>
+      <div className={`bg-linear-to-br ${semantic.successGradient} rounded-xl p-5 border ${semantic.successBorder}`}>
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
             <ThumbsUp className="w-4 h-4 text-white" />
@@ -26,7 +26,7 @@ export function StrengthsConcerns({ strengths, concerns }: StrengthsConcernsProp
         </ul>
       </div>
 
-      <div className={`bg-gradient-to-br from-amber-50 to-white rounded-xl p-5 border ${semantic.warningBorder}`}>
+      <div className={`bg-linear-to-br from-amber-50 to-white rounded-xl p-5 border ${semantic.warningBorder}`}>
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center">
             <AlertTriangle className="w-4 h-4 text-white" />

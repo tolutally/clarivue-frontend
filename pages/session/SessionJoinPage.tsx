@@ -109,7 +109,7 @@ export function SessionJoinPage() {
   // If there's an error, show it immediately even if isPending might be true briefly
   if (hasError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
         <Card className="p-8 text-center max-w-md w-full">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
@@ -138,7 +138,7 @@ export function SessionJoinPage() {
   // Show loading state only when actually pending and no error yet
   if (verifyMutation.isPending) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
         <Card className="p-8 text-center max-w-md w-full">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Verifying Your Session</h2>

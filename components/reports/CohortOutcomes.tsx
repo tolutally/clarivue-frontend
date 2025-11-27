@@ -259,7 +259,7 @@ function DistributionHistogram({ data, compareData, cohortAName, cohortBName }: 
               <div className="relative h-6">
                 <div className="absolute inset-0 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#C8A0FE] to-[#102C64] transition-all duration-500"
+                    className="h-full bg-linear-to-r from-[#C8A0FE] to-[#102C64] transition-all duration-500"
                     style={{ width: `${(item.count / maxCount) * 100}%` }}
                   />
                 </div>

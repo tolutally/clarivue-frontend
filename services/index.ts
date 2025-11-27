@@ -1,8 +1,6 @@
 // Central export point for all services
 export { authService } from './auth/auth.service';
 export { cohortsService } from './cohorts/cohorts.service';
-export { interviewsService } from './interviews/interviews.service';
-export { mockInterviewsService } from './mockinterviews/mockinterviews.service';
 export { analysisService } from './analysis/analysis.service';
 export { sessionInvitesService } from './sessionInvites/sessionInvites.service';
 
@@ -95,16 +93,6 @@ export type {
   VerifySessionTokenResponse,
   StartSessionResponse,
 } from './sessionInvites/sessionInvites.service';
-
-export type {
-  ValidateInviteResponse,
-  SubmitProfileRequest,
-  SubmitConsentRequest,
-  SetupSessionRequest,
-  SubmitPreflightRequest,
-  RTCTokenResponse,
-  InterviewReport,
-} from './interviews/interviews.service';
 
 export type {
   VerifyTokenRequest,

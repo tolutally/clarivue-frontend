@@ -24,7 +24,7 @@ export function ComingSoonPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
       {/* Simple Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6">
@@ -55,7 +55,7 @@ export function ComingSoonPage() {
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-6 py-12">
         <div className="text-center max-w-2xl">
           <div className="mb-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
                 className="w-12 h-12 text-white"
                 fill="none"

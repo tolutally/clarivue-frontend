@@ -6,7 +6,15 @@ import { useToast } from '@/hooks/useToast';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { InterviewHeader } from '@/components/interview/InterviewHeader';
-import { ArrowLeft, AlertTriangle, Clock, Users } from 'lucide-react';
+import {
+  ArrowLeft,
+  AlertTriangle,
+  Clock,
+  Users,
+  Briefcase,
+  Building,
+  Target,
+} from 'lucide-react';
 
 export function StartSessionPage() {
   const navigate = useNavigate();
@@ -14,6 +22,12 @@ export function StartSessionPage() {
   const startSessionMutation = useStartSession();
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
+
+  const truncateDescription = (text?: string | null, limit: number = 600) => {
+    if (!text) return null;
+    if (text.length <= limit) return text;
+    return `${text.slice(0, limit)}…`;
+  };
 
   const handleStartInterview = async () => {
     if (!sessionData?.session_access_token) {
@@ -26,9 +40,14 @@ export function StartSessionPage() {
       return;
     }
 
+    if (!sessionData.job_submission_id) {
+      setError('Missing job information. Please go back and select a job.');
+      return;
+    }
+
     try {
       setError(null);
-      const response = await startSessionMutation.mutateAsync();
+      const response = await startSessionMutation.mutateAsync(sessionData.job_submission_id);
 
       // Update session data with new token and updated session count
       // Ensure we preserve all existing fields, especially original_token
@@ -36,6 +55,7 @@ export function StartSessionPage() {
         ...sessionData,
         session_access_token: response.session_access_token,
         sessions_remaining: response.sessions_remaining,
+        session_log_id: response.session_log_id,
         original_token: sessionData?.original_token || null, // Explicitly preserve original_token
       });
 
@@ -49,7 +69,7 @@ export function StartSessionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
       <InterviewHeader currentStep={5} totalSteps={6} stepLabel="Ready to Start" />
       <main className="pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-3xl">
@@ -114,6 +134,56 @@ export function StartSessionPage() {
                 </div>
               )}
             </div>
+
+            {/* Job Summary */}
+            {sessionData?.job_submission_id && (
+              <div className="p-6 bg-white border border-slate-200 rounded-lg space-y-4">
+                <div className="flex items-center gap-3">
+                  <Briefcase className="w-5 h-5 text-slate-600" />
+                  <div>
+                    <p className="text-sm text-slate-500">Selected Job</p>
+                    <p className="text-xl font-semibold text-slate-900">
+                      {sessionData.role_title || 'Job'}
+                    </p>
+                  </div>
+                </div>
+
+                {sessionData.job_company && (
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Building className="w-4 h-4 text-slate-500" />
+                    <span className="font-medium text-slate-900">{sessionData.job_company}</span>
+                  </div>
+                )}
+
+                {sessionData.job_focus_areas?.length ? (
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
+                      <Target className="w-4 h-4 text-slate-500" />
+                      <span className="font-medium">Focus Areas</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {sessionData.job_focus_areas.map(area => (
+                        <span
+                          key={area}
+                          className="px-3 py-1 text-xs rounded-full border border-slate-200 bg-slate-50 text-slate-700"
+                        >
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {sessionData.job_description && (
+                  <div>
+                    <p className="text-sm text-slate-500 font-medium mb-2">Job Description Preview</p>
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-700 whitespace-pre-line max-h-64 overflow-y-auto">
+                      {truncateDescription(sessionData.job_description)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Navigation */}
             <div className="flex justify-between pt-4 border-t border-gray-200">

@@ -133,15 +133,15 @@ export const gradients = {
 } as const;
 
 export const cardStyles = {
-  primary: `bg-gradient-to-br ${gradients.primary} text-white`,
-  accent: `bg-gradient-to-br ${gradients.accent} text-white`,
-  secondary: `bg-gradient-to-br ${gradients.secondary} text-white`,
-  tertiary: `bg-gradient-to-br ${gradients.tertiary} text-white`,
+  primary: `bg-linear-to-br ${gradients.primary} text-white`,
+  accent: `bg-linear-to-br ${gradients.accent} text-white`,
+  secondary: `bg-linear-to-br ${gradients.secondary} text-white`,
+  tertiary: `bg-linear-to-br ${gradients.tertiary} text-white`,
   
-  primaryLight: `bg-gradient-to-br from-[var(--primary-light)] to-[var(--primary-light)]/50 ${borders.primaryLight}`,
-  accentLight: `bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-light)]/50 ${borders.accentLight}`,
-  secondaryLight: `bg-gradient-to-br from-[var(--secondary-light)] to-[var(--secondary-light)]/50 ${borders.secondaryLight}`,
-  tertiaryLight: `bg-gradient-to-br from-[var(--tertiary-light)] to-[var(--tertiary-light)]/50 ${borders.tertiaryLight}`,
+  primaryLight: `bg-linear-to-br from-[var(--primary-light)] to-[var(--primary-light)]/50 ${borders.primaryLight}`,
+  accentLight: `bg-linear-to-br from-[var(--accent-light)] to-[var(--accent-light)]/50 ${borders.accentLight}`,
+  secondaryLight: `bg-linear-to-br from-[var(--secondary-light)] to-[var(--secondary-light)]/50 ${borders.secondaryLight}`,
+  tertiaryLight: `bg-linear-to-br from-[var(--tertiary-light)] to-[var(--tertiary-light)]/50 ${borders.tertiaryLight}`,
 } as const;
 
 export const semantic = {

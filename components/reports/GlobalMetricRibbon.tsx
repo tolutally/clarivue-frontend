@@ -44,8 +44,8 @@ interface MetricPillProps {
 
 function MetricPill({ icon, label, value, change, gradient, bgGradient }: MetricPillProps) {
   return (
-    <div className={`relative flex items-center gap-3 px-5 py-3 rounded-full bg-gradient-to-r ${bgGradient} border border-white/20 backdrop-blur-sm hover:scale-105 transition-transform duration-200`}>
-      <div className={`flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br ${gradient} shadow-lg`}>
+    <div className={`relative flex items-center gap-3 px-5 py-3 rounded-full bg-linear-to-r ${bgGradient} border border-white/20 backdrop-blur-sm hover:scale-105 transition-transform duration-200`}>
+      <div className={`flex items-center justify-center w-9 h-9 rounded-full bg-linear-to-br ${gradient} shadow-lg`}>
         <div className="text-white">
           {icon}
         </div>
@@ -55,7 +55,7 @@ function MetricPill({ icon, label, value, change, gradient, bgGradient }: Metric
           <div className="text-xs font-medium text-white/60">{label}</div>
           <div className="text-lg font-bold text-white">{value}</div>
         </div>
-        <div className={`px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${gradient} text-white shadow-md`}>
+        <div className={`px-2.5 py-1 rounded-full text-xs font-semibold bg-linear-to-r ${gradient} text-white shadow-md`}>
           {change}
         </div>
       </div>

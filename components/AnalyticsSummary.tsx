@@ -20,7 +20,7 @@ export function AnalyticsSummary({ students }: AnalyticsSummaryProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {metrics.map((metric) => (
             <div key={metric.label} className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#fe686d] to-[#ff9a9d] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#fe686d] to-[#ff9a9d] flex items-center justify-center">
                 <metric.icon className="w-6 h-6 text-white" />
               </div>
               <div>

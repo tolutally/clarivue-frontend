@@ -13,6 +13,10 @@ export interface SessionData {
   // Setup data for AI session
   role_title?: string | null;
   job_description?: string | null;
+  job_submission_id?: string | null; // Job submission ID created on SetupPage
+  session_log_id?: string | null; // VirtualSessionLog ID from startSessionWithJob
+  job_company?: string | null;
+  job_focus_areas?: string[] | null;
 }
 
 interface SessionContextType {
@@ -20,12 +24,14 @@ interface SessionContextType {
   setSessionData: (data: SessionData | null) => void;
   clearSession: () => void;
   isSessionActive: boolean;
+  isSessionLoading: boolean;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [sessionData, setSessionDataState] = useState<SessionData | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   // Load session data from localStorage on mount
   useEffect(() => {
@@ -47,6 +53,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         }
       }
     }
+
+    setIsSessionLoading(false);
   }, []);
 
   const setSessionData = (data: SessionData | null) => {
@@ -81,6 +89,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setSessionData,
         clearSession,
         isSessionActive,
+        isSessionLoading,
       }}
     >
       {children}

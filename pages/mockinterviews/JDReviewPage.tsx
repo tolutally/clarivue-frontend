@@ -300,7 +300,7 @@ export function JDReviewPage() {
                     </div>
                     <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
+                        className="h-full bg-linear-to-r from-blue-500 to-indigo-500 transition-all"
                         role="progressbar"
                         aria-valuenow={comp.importance}
                         aria-valuemin={0}

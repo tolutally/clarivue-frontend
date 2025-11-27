@@ -73,7 +73,7 @@ export function VerifyPasswordResetPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img src="/clarivue-logo.png" alt="Clarivue" className="h-12 mx-auto mb-6" />
@@ -109,7 +109,7 @@ export function VerifyPasswordResetPage() {
               type="submit"
               loading={verifyOtp.isPending}
               variant="primary"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+              className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all"
               endIcon={<ArrowRight className="w-5 h-5" />}
               disabled={otp.join('').length !== 6}
             >

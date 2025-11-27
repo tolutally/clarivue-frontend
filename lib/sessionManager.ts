@@ -6,15 +6,18 @@
 import { PipecatClient } from '@pipecat-ai/client-js';
 import { SmallWebRTCTransport } from '@pipecat-ai/small-webrtc-transport';
 import { aiSessionsService, type CreateSessionRequest } from '@/services/aiSessions/aiSessions.service';
+import { sessionInvitesService } from '@/services/sessionInvites/sessionInvites.service';
 
 export interface TranscriptMessage {
   role: 'user' | 'assistant';
   content: string;
-  timestamp: number;
+  timestamp: string; // ISO 8601 string
+  speaker?: string; // Optional speaker name
 }
 
 export class SessionManager {
   private sessionId: string | null = null;
+  private sessionLogId: string | null = null; // VirtualSessionLog ID for analysis
   private pcClient: PipecatClient | null = null;
   private startTime: number | null = null;
   private transcriptMessages: TranscriptMessage[] = [];
@@ -32,7 +35,48 @@ export class SessionManager {
   }
 
   /**
-   * Start a new AI session
+   * Start session with job submission (Step 1: Token decrementation)
+   * @param jobSubmissionId - Job submission ID
+   * @returns Session start response with session_log_id and updated session_access_token
+   */
+  async startSessionWithJob(jobSubmissionId: string): Promise<{
+    session_access_token: string;
+    session_log_id: string;
+    sessions_remaining: number;
+  }> {
+    try {
+      const response = await sessionInvitesService.startSessionWithJob(jobSubmissionId);
+      
+      // Store session_log_id
+      this.sessionLogId = response.session_log_id;
+      
+      // Update session_access_token in localStorage
+      if (response.session_access_token) {
+        localStorage.setItem('session_access_token', response.session_access_token);
+      }
+      
+      return {
+        session_access_token: response.session_access_token,
+        session_log_id: response.session_log_id,
+        sessions_remaining: response.sessions_remaining,
+      };
+    } catch (error: any) {
+      console.error('Failed to start session with job:', error);
+      const errorMsg = error?.message || 'Failed to start session';
+      this.handleError(errorMsg);
+      throw error;
+    }
+  }
+
+  /**
+   * Hydrate manager with an existing session log ID (when session was started earlier)
+   */
+  setSessionLogId(sessionLogId: string) {
+    this.sessionLogId = sessionLogId;
+  }
+
+  /**
+   * Create AI session (Step 2: WebRTC session creation)
    * @param formData - Session configuration
    * @returns Session ID
    */
@@ -44,15 +88,34 @@ export class SessionManager {
     company_name?: string;
   }): Promise<string> {
     try {
+      if (!this.sessionLogId) {
+        throw new Error('Session log ID is required. Call startSessionWithJob first.');
+      }
+
       // Create session via authenticated API call
       const requestData: CreateSessionRequest = {
         session_type: formData.session_type,
         duration_seconds: formData.duration_minutes * 60,
-        context: this.buildContext(formData),
+        session_log_id: this.sessionLogId, 
+        // context: this.buildContext(formData),
       };
 
       const sessionData = await aiSessionsService.createSession(requestData);
+      
+      // Ensure we're using the session_id from the API response
+      if (!sessionData.session_id) {
+        throw new Error('Session ID not returned from API');
+      }
+      
       this.sessionId = sessionData.session_id;
+      console.log('Session ID from API:', this.sessionId);
+
+      // Persist session ID immediately so the completion page can close it
+      if (this.sessionId) {
+        localStorage.setItem('ai_session_id', this.sessionId);
+        console.log('Persisted session ID to localStorage:', this.sessionId);
+      }
+
       this.startTime = Date.now();
 
       this.updateStatus('Session created, connecting...');
@@ -69,30 +132,30 @@ export class SessionManager {
     }
   }
 
-  /**
-   * Build context object based on session type
-   */
-  private buildContext(formData: {
-    role_title?: string;
-    job_description?: string;
-    company_name?: string;
-  }): CreateSessionRequest['context'] {
-    const context: CreateSessionRequest['context'] = {};
+  // /**
+  //  * Build context object based on session type
+  //  */
+  // private buildContext(formData: {
+  //   role_title?: string;
+  //   job_description?: string;
+  //   company_name?: string;
+  // }): CreateSessionRequest['context'] {
+  //   const context: CreateSessionRequest['context'] = {};
 
-    if (formData.role_title) {
-      context.role_title = formData.role_title;
-    }
+  //   if (formData.role_title) {
+  //     context.role_title = formData.role_title;
+  //   }
 
-    if (formData.job_description) {
-      context.job_description = formData.job_description;
-    }
+  //   if (formData.job_description) {
+  //     context.job_description = formData.job_description;
+  //   }
 
-    if (formData.company_name) {
-      context.company_name = formData.company_name;
-    }
+  //   if (formData.company_name) {
+  //     context.company_name = formData.company_name;
+  //   }
 
-    return context;
-  }
+  //   return context;
+  // }
 
   /**
    * Initialize WebRTC connection with PipecatClient
@@ -109,7 +172,7 @@ export class SessionManager {
       // The session_id in the URL query parameter authenticates the WebRTC connection
       this.pcClient = new PipecatClient({
         transport: new SmallWebRTCTransport({
-          webrtcUrl: `${this.serverUrl}/api/ai-sessions/${this.sessionId}/offer`,
+          webrtcUrl: `${this.serverUrl}/v1/ai-sessions/${this.sessionId}/offer`,
         }),
         enableMic: true,
         enableCam: false,
@@ -383,7 +446,8 @@ export class SessionManager {
     const message: TranscriptMessage = {
       role,
       content: text,
-      timestamp: Date.now(),
+      timestamp: new Date().toISOString(),
+      speaker: role === 'user' ? 'User' : undefined,
     };
 
     this.transcriptMessages.push(message);
@@ -516,9 +580,16 @@ export class SessionManager {
   /**
    * Clean up session resources
    */
-  cleanup(): void {
+  async cleanup(): Promise<void> {
     if (this.pcClient) {
-      this.pcClient.disconnect();
+      try {
+        await this.pcClient.disconnect();
+        if (typeof (this.pcClient as any).close === 'function') {
+          await (this.pcClient as any).close();
+        }
+      } catch (error) {
+        console.error('Failed to disconnect Pipecat client during cleanup:', error);
+      }
       this.pcClient = null;
     }
 
@@ -527,16 +598,23 @@ export class SessionManager {
     if (audioElement) {
       const stream = audioElement.srcObject as MediaStream | null;
       if (stream) {
-        // Stop all audio tracks
         stream.getTracks().forEach(track => track.stop());
       }
       audioElement.srcObject = null;
-      // Don't remove the element, just clear it - it will be reused for next session
     }
 
     this.sessionId = null;
+    this.sessionLogId = null;
     this.startTime = null;
     this.transcriptMessages = [];
+  }
+
+  /**
+   * Get session log ID
+   * @returns {string|null} Session log ID
+   */
+  getSessionLogId(): string | null {
+    return this.sessionLogId;
   }
 
   /**
@@ -544,6 +622,33 @@ export class SessionManager {
    */
   getSessionId(): string | null {
     return this.sessionId;
+  }
+
+  /**
+   * Completely destroy the WebRTC session (used when closing)
+   */
+  async destroy(): Promise<void> {
+    try {
+      if (this.pcClient) {
+        try {
+          await this.pcClient.disconnect();
+        } catch (disconnectError) {
+          console.warn('Error disconnecting Pipecat client during destroy:', disconnectError);
+        }
+
+        if (typeof (this.pcClient as any).close === 'function') {
+          try {
+            await (this.pcClient as any).close();
+          } catch (closeError) {
+            console.warn('Error closing Pipecat client during destroy:', closeError);
+          }
+        }
+
+        this.pcClient = null;
+      }
+    } catch (error) {
+      console.error('Failed to completely destroy session:', error);
+    }
   }
 }
 
