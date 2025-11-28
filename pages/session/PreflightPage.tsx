@@ -90,12 +90,12 @@ export function PreflightPage() {
   };
 
   const handleContinue = () => {
-    if (isCameraOn && isMicOn) {
-      navigate('/session/start');
-    }
+    // Allow proceeding even if camera/mic are muted
+    navigate('/session/start');
   };
 
-  const canContinue = isCameraOn && isMicOn && !cameraError && !micError;
+  // Allow continuing as long as there's no critical error (permission denied or device not found)
+  const canContinue = !cameraError;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -107,7 +107,7 @@ export function PreflightPage() {
               Camera & Microphone Check
             </h1>
             <p className="text-slate-600">
-              Let's make sure your camera and microphone are working properly before we start.
+              Test your camera and microphone. You can proceed even if they're muted.
             </p>
           </div>
 

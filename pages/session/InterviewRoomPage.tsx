@@ -257,11 +257,23 @@ export function InterviewRoomPage() {
     initMedia();
 
     return () => {
+      // Clean up media tracks on unmount
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach(track => {
+          track.stop();
+          console.log('Stopped media track on unmount:', track.kind, track.id);
+        });
+        setStream(null);
       }
       if (screenShareRef.current) {
-        screenShareRef.current.getTracks().forEach(track => track.stop());
+        screenShareRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log('Stopped screen share track on unmount:', track.kind, track.id);
+        });
+        screenShareRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -330,13 +342,41 @@ export function InterviewRoomPage() {
     const manager = sessionManagerRef.current;
     const sessionId = manager?.getSessionId();
 
-    // Tear down WebRTC as quickly as possible
+    // Stop all media tracks immediately
+    if (stream) {
+      stream.getTracks().forEach(track => {
+        track.stop();
+        console.log('Stopped media track:', track.kind, track.id);
+      });
+      setStream(null);
+    }
+
+    if (screenShareRef.current) {
+      screenShareRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('Stopped screen share track:', track.kind, track.id);
+      });
+      screenShareRef.current = null;
+      setIsScreenSharing(false);
+    }
+
+    // Clear video element
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    // Tear down WebRTC as quickly as possible to stop offer calls
     if (manager) {
       try {
         await manager.destroy();
+        console.log('Session manager destroyed, WebRTC connections closed');
       } catch (error) {
         console.error('Error destroying session manager:', error);
-        await manager.cleanup();
+        try {
+          await manager.cleanup();
+        } catch (cleanupError) {
+          console.error('Error during cleanup fallback:', cleanupError);
+        }
       }
       sessionManagerRef.current = null;
     }
@@ -352,10 +392,6 @@ export function InterviewRoomPage() {
 
     if (sessionId) {
       localStorage.setItem('ai_session_id', sessionId);
-      localStorage.setItem(
-        'session_elapsed_seconds',
-        String(Math.max(elapsedTime, 0)),
-      );
     }
 
     navigate('/session/complete', { replace: true });

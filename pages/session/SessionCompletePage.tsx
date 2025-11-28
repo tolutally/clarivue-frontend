@@ -51,19 +51,9 @@ export function SessionCompletePage() {
       setError(null);
 
       console.log('Closing session with ID:', sessionIdToClose);
-      
-      const storedElapsedRaw = localStorage.getItem('session_elapsed_seconds');
-      const storedElapsed = storedElapsedRaw ? parseInt(storedElapsedRaw, 10) : null;
 
       // Close session - this returns transcript, duration, context
-      const serverCloseResponse = await aiSessionsService.closeSession(sessionIdToClose);
-      const closeResponse = {
-        ...serverCloseResponse,
-        actual_duration:
-          typeof storedElapsed === 'number' && !Number.isNaN(storedElapsed)
-            ? storedElapsed
-            : serverCloseResponse.actual_duration,
-      };
+      const closeResponse = await aiSessionsService.closeSession(sessionIdToClose);
       setCloseData(closeResponse);
       console.log('Session closed with data:', closeResponse);
 

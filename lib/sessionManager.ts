@@ -626,28 +626,63 @@ export class SessionManager {
 
   /**
    * Completely destroy the WebRTC session (used when closing)
+   * This stops all WebRTC connections and prevents further offer calls
    */
   async destroy(): Promise<void> {
     try {
+      console.log('Destroying session manager, stopping all WebRTC activity...');
+      
       if (this.pcClient) {
         try {
+          // Disconnect the client first
           await this.pcClient.disconnect();
+          console.log('Pipecat client disconnected');
         } catch (disconnectError) {
           console.warn('Error disconnecting Pipecat client during destroy:', disconnectError);
         }
 
+        // Close the client if it has a close method
         if (typeof (this.pcClient as any).close === 'function') {
           try {
             await (this.pcClient as any).close();
+            console.log('Pipecat client closed');
           } catch (closeError) {
             console.warn('Error closing Pipecat client during destroy:', closeError);
           }
         }
 
+        // Nullify the client to prevent any further operations
         this.pcClient = null;
+        console.log('Pipecat client nullified');
       }
+
+      // Clean up audio element and stop all tracks
+      const audioElement = document.getElementById('bot-audio') as HTMLAudioElement;
+      if (audioElement) {
+        const stream = audioElement.srcObject as MediaStream | null;
+        if (stream) {
+          stream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Stopped audio track:', track.id);
+          });
+        }
+        audioElement.srcObject = null;
+        audioElement.pause();
+        console.log('Audio element cleaned up');
+      }
+
+      // Clear session ID to prevent any further API calls
+      this.sessionId = null;
+      this.sessionLogId = null;
+      this.startTime = null;
+      this.transcriptMessages = [];
+      
+      console.log('Session manager fully destroyed, all WebRTC activity stopped');
     } catch (error) {
       console.error('Failed to completely destroy session:', error);
+      // Ensure pcClient is nullified even if there's an error
+      this.pcClient = null;
+      this.sessionId = null;
     }
   }
 }
