@@ -30,7 +30,7 @@ export function TechnicalDepthIndex({ tdi }: TechnicalDepthIndexProps) {
   return (
     <div className={`${semantic.surface} rounded-xl p-6 border ${semantic.border}`}>
       <div className="flex items-start gap-4">
-        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${gradients.secondary} flex items-center justify-center flex-shrink-0`}>
+        <div className={`w-16 h-16 rounded-xl bg-linear-to-br ${gradients.secondary} flex items-center justify-center flex-shrink-0`}>
           <Code2 className="w-8 h-8 text-white" />
         </div>
         

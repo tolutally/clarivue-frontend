@@ -1,15 +1,33 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
+import { SessionProvider } from './contexts/SessionContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { DashboardRoute } from './components/DashboardRoute';
 import { PublicRoute } from './components/PublicRoute';
-import { StudentRoute } from './components/StudentRoute';
+import { SessionRoute } from './components/SessionRoute';
+import { SessionJoinPage } from './pages/session/SessionJoinPage';
+import { WelcomePage as SessionWelcomePage } from './pages/session/WelcomePage';
+import { ConsentPage as SessionConsentPage } from './pages/session/ConsentPage';
+import { SetupPage as SessionSetupPage } from './pages/session/SetupPage';
+import { PreflightPage as SessionPreflightPage } from './pages/session/PreflightPage';
+import { StartSessionPage } from './pages/session/StartSessionPage';
+import { InterviewRoomPage as SessionInterviewRoomPage } from './pages/session/InterviewRoomPage';
+import { SessionCompletePage } from './pages/session/SessionCompletePage';
 import { LoginPage } from './pages/LoginPage';
+import { ComingSoonPage } from './pages/ComingSoonPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { VerifyPasswordResetPage } from './pages/VerifyPasswordResetPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { OverviewPage } from './pages/OverviewPage';
 import { CohortsPage } from './pages/CohortsPage';
 import { CreateCohortPage } from './pages/CreateCohortPage';
+import { UpdateCohortPage } from './pages/UpdateCohortPage';
 import { CohortDetailPage } from './pages/CohortDetailPage';
 import { AddStudentsPage } from './pages/AddStudentsPage';
 import { SendInvitesPage } from './pages/SendInvitesPage';
@@ -22,26 +40,78 @@ import { ConsentPage } from './pages/mockinterviews/ConsentPage';
 import { JDIntakePage } from './pages/mockinterviews/JDIntakePage';
 import { JDReviewPage } from './pages/mockinterviews/JDReviewPage';
 import { InterviewReadyPage } from './pages/mockinterviews/InterviewReadyPage';
-import { InviteLandingPage } from './pages/interviews/InviteLandingPage';
-import { WelcomePage as InterviewWelcomePage } from './pages/interviews/WelcomePage';
-import { ProfilePage as InterviewProfilePage } from './pages/interviews/ProfilePage';
-import { ConsentPage as InterviewConsentPage } from './pages/interviews/ConsentPage';
-import { SetupPage } from './pages/interviews/SetupPage';
-import { PreflightPage } from './pages/interviews/PreflightPage';
-import { InterviewRoomPage } from './pages/interviews/InterviewRoomPage';
-import { CompletionPage } from './pages/interviews/CompletionPage';
 import './styles/theme.css';
+
+// Root redirect component that checks authentication and user type
+function RootRedirect() {
+  const { isAuthenticated, loading, admin } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Check user type and redirect accordingly
+  const userType = admin?.user?.role?.user_type;
+  if (userType === 'user') {
+    return <Navigate to="/overview" replace />;
+  } else {
+    return <Navigate to="/coming-soon" replace />;
+  }
+}
 
 export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
+        <ToastProvider>
+          <AuthProvider>
+            <SessionProvider>
+              <BrowserRouter>
           <Routes>
             <Route path="/login" element={
               <PublicRoute>
                 <LoginPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/register" element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/verify-email" element={
+              <PublicRoute>
+                <VerifyEmailPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/forgot-password" element={
+              <PublicRoute>
+                <ForgotPasswordPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/forgot-password/verify" element={
+              <PublicRoute>
+                <VerifyPasswordResetPage />
+              </PublicRoute>
+            } />
+            
+            <Route path="/forgot-password/reset" element={
+              <PublicRoute>
+                <ResetPasswordPage />
               </PublicRoute>
             } />
             
@@ -51,52 +121,106 @@ export default function App() {
               </PublicRoute>
             } />
             
-            <Route path="/overview" element={
+            <Route path="/coming-soon" element={
               <ProtectedRoute>
-                <OverviewPage />
+                <ComingSoonPage />
               </ProtectedRoute>
+            } />
+            
+            {/* Interview Session Flow */}
+            <Route path="/session/join" element={
+              <PublicRoute>
+                <SessionJoinPage />
+              </PublicRoute>
+            } />
+            <Route path="/session/welcome" element={
+              <SessionRoute>
+                <SessionWelcomePage />
+              </SessionRoute>
+            } />
+            <Route path="/session/consent" element={
+              <SessionRoute>
+                <SessionConsentPage />
+              </SessionRoute>
+            } />
+            <Route path="/session/setup" element={
+              <SessionRoute>
+                <SessionSetupPage />
+              </SessionRoute>
+            } />
+            <Route path="/session/preflight" element={
+              <SessionRoute>
+                <SessionPreflightPage />
+              </SessionRoute>
+            } />
+            <Route path="/session/start" element={
+              <SessionRoute>
+                <StartSessionPage />
+              </SessionRoute>
+            } />
+            <Route path="/session/interview" element={
+              <SessionRoute>
+                <SessionInterviewRoomPage />
+              </SessionRoute>
+            } />
+            <Route path="/session/complete" element={
+              <SessionRoute>
+                <SessionCompletePage />
+              </SessionRoute>
+            } />
+            
+            <Route path="/overview" element={
+              <DashboardRoute>
+                <OverviewPage />
+              </DashboardRoute>
             } />
             
             <Route path="/cohorts" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <CohortsPage />
-              </ProtectedRoute>
+              </DashboardRoute>
             } />
             
             <Route path="/cohorts/new" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <CreateCohortPage />
-              </ProtectedRoute>
+              </DashboardRoute>
+            } />
+            
+            <Route path="/cohorts/:id/edit" element={
+              <DashboardRoute>
+                <UpdateCohortPage />
+              </DashboardRoute>
             } />
             
             <Route path="/cohorts/:id" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <CohortDetailPage />
-              </ProtectedRoute>
+              </DashboardRoute>
             } />
             
             <Route path="/cohorts/:id/add-students" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <AddStudentsPage />
-              </ProtectedRoute>
+              </DashboardRoute>
             } />
             
             <Route path="/cohorts/:id/send-invites" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <SendInvitesPage />
-              </ProtectedRoute>
+              </DashboardRoute>
             } />
             
             <Route path="/students" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <StudentsPage />
-              </ProtectedRoute>
+              </DashboardRoute>
             } />
             
             <Route path="/reports" element={
-              <ProtectedRoute>
+              <DashboardRoute>
                 <ReportsPage />
-              </ProtectedRoute>
+              </DashboardRoute>
             } />
             
             <Route path="/mockinterviews/welcome/:token" element={
@@ -135,59 +259,12 @@ export default function App() {
               </PublicRoute>
             } />
             
-            {/* Student-Facing Mock Interview Flow (WebRTC) */}
-            <Route path="/invite/:token" element={
-              <StudentRoute>
-                <InviteLandingPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/welcome" element={
-              <StudentRoute>
-                <InterviewWelcomePage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/profile" element={
-              <StudentRoute>
-                <InterviewProfilePage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/consent" element={
-              <StudentRoute>
-                <InterviewConsentPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/setup" element={
-              <StudentRoute>
-                <SetupPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/preflight" element={
-              <StudentRoute>
-                <PreflightPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/interview" element={
-              <StudentRoute>
-                <InterviewRoomPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/session/:sessionId/complete" element={
-              <StudentRoute>
-                <CompletionPage />
-              </StudentRoute>
-            } />
-            
-            <Route path="/" element={<Navigate to="/overview" replace />} />
+            <Route path="/" element={<RootRedirect />} />
           </Routes>
         </BrowserRouter>
+            </SessionProvider>
       </AuthProvider>
+        </ToastProvider>
     </ThemeProvider>
     </ErrorBoundary>
   );

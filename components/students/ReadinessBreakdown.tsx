@@ -32,7 +32,7 @@ export function ReadinessBreakdown({ competencies }: ReadinessBreakdownProps) {
             </div>
             <div className={`h-3 ${semantic.bgSubtle} rounded-full overflow-hidden`}>
               <div
-                className={`h-full bg-gradient-to-r ${getColor(value)} transition-all duration-500 rounded-full`}
+                className={`h-full bg-linear-to-r ${getColor(value)} transition-all duration-500 rounded-full`}
                 style={{ width: `${value}%` }}
               />
             </div>

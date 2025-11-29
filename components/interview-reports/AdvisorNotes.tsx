@@ -97,7 +97,7 @@ export function AdvisorNotes({ notes = [] }: AdvisorNotesProps) {
           allNotes.map((note) => (
             <div 
               key={note.id}
-              className="p-4 bg-gradient-to-r from-[#102c64]/5 to-[#B8CCF4]/10 rounded-lg border border-gray-100"
+              className="p-4 bg-linear-to-r from-[#102c64]/5 to-[#B8CCF4]/10 rounded-lg border border-gray-100"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">

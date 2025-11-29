@@ -39,28 +39,11 @@ export interface JDMetric {
 }
 
 export interface BackendClient {
+  // Auth methods removed - use authService from @/services instead
+  // Keeping empty object to maintain interface compatibility
   auth: {
-    login: (params: { email: string; password: string }) => Promise<{
-      token: string;
-      admin: AdminInfo;
-    }>;
-    verifyMagicLink: (params: { token: string }) => Promise<{
-      token: string;
-      admin: AdminInfo;
-    }>;
-    requestMagicLink: (params: { email: string }) => Promise<{ success: boolean; message?: string }>;
-    me: () => Promise<AdminInfo>;
-    verifyInvite: (params: { token: string }) => Promise<{
-      valid: boolean;
-      email: string;
-      firstName: string;
-      lastName: string;
-      message?: string;
-    }>;
-    completeOnboarding: (data: any) => Promise<{
-      token: string;
-      admin: AdminInfo;
-    }>;
+    // Deprecated: Use authService from @/services instead
+    [key: string]: never;
   };
   cohorts: {
     list(): Promise<any[]>;

@@ -208,8 +208,12 @@ export function JDReviewPage() {
                     autoFocus
                     aria-label="New technical skill"
                   />
-                  <Button onClick={handleAddSkill} size="sm" disabled={!newSkillValue.trim()}>
-                    <Plus className="w-4 h-4" aria-hidden="true" />
+                  <Button 
+                    onClick={handleAddSkill} 
+                    size="sm" 
+                    disabled={!newSkillValue.trim()}
+                    startIcon={<Plus className="w-4 h-4" aria-hidden="true" />}
+                  >
                     <span className="sr-only">Add skill</span>
                   </Button>
                   <Button 
@@ -254,8 +258,12 @@ export function JDReviewPage() {
                     autoFocus
                     aria-label="New soft skill"
                   />
-                  <Button onClick={handleAddSkill} size="sm" disabled={!newSkillValue.trim()}>
-                    <Plus className="w-4 h-4" aria-hidden="true" />
+                  <Button 
+                    onClick={handleAddSkill} 
+                    size="sm" 
+                    disabled={!newSkillValue.trim()}
+                    startIcon={<Plus className="w-4 h-4" aria-hidden="true" />}
+                  >
                     <span className="sr-only">Add skill</span>
                   </Button>
                   <Button 
@@ -292,7 +300,7 @@ export function JDReviewPage() {
                     </div>
                     <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
+                        className="h-full bg-linear-to-r from-blue-500 to-indigo-500 transition-all"
                         role="progressbar"
                         aria-valuenow={comp.importance}
                         aria-valuemin={0}

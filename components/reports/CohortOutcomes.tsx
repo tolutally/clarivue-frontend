@@ -15,7 +15,7 @@ export function CohortOutcomes({ data, compareData, cohortAName, cohortBName }: 
   return (
     <div className="space-y-6">
       {isComparing && (
-        <div className="bg-gradient-to-r from-[#C8A0FE]/10 to-[#FE686D]/10 rounded-lg border border-[#C8A0FE]/30 p-4 mb-6">
+        <div className="bg-linear-to-r from-[#C8A0FE]/10 to-[#FE686D]/10 rounded-lg border border-[#C8A0FE]/30 p-4 mb-6">
           <div className="flex items-center justify-center gap-8">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-[#C8A0FE]" />
@@ -259,7 +259,7 @@ function DistributionHistogram({ data, compareData, cohortAName, cohortBName }: 
               <div className="relative h-6">
                 <div className="absolute inset-0 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#C8A0FE] to-[#102C64] transition-all duration-500"
+                    className="h-full bg-linear-to-r from-[#C8A0FE] to-[#102C64] transition-all duration-500"
                     style={{ width: `${(item.count / maxCount) * 100}%` }}
                   />
                 </div>
@@ -282,7 +282,7 @@ function DistributionHistogram({ data, compareData, cohortAName, cohortBName }: 
 
 function InsightChips({ insights }: { insights: string[] }) {
   return (
-    <div className="bg-gradient-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
+    <div className="bg-linear-to-br from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/20 p-5">
       <h3 className="text-sm font-semibold text-gray-900 mb-3">Key Insights</h3>
       <div className="space-y-2">
         {insights.map((insight, i) => (

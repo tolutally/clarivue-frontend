@@ -49,68 +49,8 @@ function saveStudentsToStorage() {
 }
 
 export const mockBackend: BackendClient = {
-  auth: {
-    login: async ({ email, password }: { email: string; password: string }) => {
-      // Mock login - in a real app, this would connect to your backend
-      return {
-        token: 'mock-token',
-        admin: {
-          id: '1',
-          email,
-          firstName: 'Demo',
-          lastName: 'User',
-          role: 'admin',
-        },
-      };
-    },
-    verifyMagicLink: async ({ token }: { token: string }) => {
-      return {
-        token: 'mock-token',
-        admin: {
-          id: '1',
-          email: 'demo@example.com',
-          firstName: 'Demo',
-          lastName: 'User',
-          role: 'admin',
-        },
-      };
-    },
-    requestMagicLink: async ({ email }: { email: string }) => {
-      console.log('Mock: Magic link requested for', email);
-      return { success: true };
-    },
-    me: async () => {
-      return {
-        id: '1',
-        email: 'demo@example.com',
-        firstName: 'Demo',
-        lastName: 'User',
-        role: 'admin',
-      };
-    },
-    verifyInvite: async ({ token }: { token: string }) => {
-      console.log('Mock: Invite verified for token', token);
-      return {
-        valid: true,
-        email: 'demo@example.com',
-        firstName: '',
-        lastName: '',
-      };
-    },
-    completeOnboarding: async (data: any) => {
-      console.log('Mock: Onboarding completed', data);
-      return {
-        token: 'mock-token',
-        admin: {
-          id: '1',
-          email: data.email || 'demo@example.com',
-          firstName: data.firstName,
-          lastName: data.lastName,
-          role: 'admin',
-        },
-      };
-    },
-  },
+  // Auth methods removed - use authService from @/services instead
+  auth: {},
   cohorts: {
     list: async () => {
       // Return mock cohorts list from localStorage with computed stats

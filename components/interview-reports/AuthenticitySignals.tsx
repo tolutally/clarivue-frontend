@@ -30,7 +30,7 @@ export function AuthenticitySignals({ signals }: AuthenticitySignalsProps) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#C8A0FE]/5 via-white to-[#B8CCF4]/5 rounded-xl p-5 border border-[#C8A0FE]/20">
+    <div className="bg-linear-to-br from-[#C8A0FE]/5 via-white to-[#B8CCF4]/5 rounded-xl p-5 border border-[#C8A0FE]/20">
       <div className="flex items-center justify-between mb-4">
         <h4 className={`text-sm font-semibold ${semantic.textPrimary}`}>Authenticity & Behavioral Signals</h4>
         <div className="group relative">

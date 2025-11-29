@@ -1,4 +1,5 @@
 import { ArrowLeft, Mail, Users, TrendingUp, FileText, Clock, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { Advisor, Student } from '../../types';
 import { students } from '../../data/mock-data';
 import { backgrounds, borders, gradients, text, semantic, shadows, hover } from '../../utils/colors';
@@ -20,18 +21,18 @@ export function AdvisorDetailView({ advisor, onBack, onAssignStudent }: AdvisorD
 
   return (
     <div className="space-y-6">
-      <button
+      <Button
         onClick={onBack}
-        className={`flex items-center gap-2 ${semantic.textSecondary} hover:${semantic.textPrimary} transition-colors`}
+        variant="ghost"
+        startIcon={<ArrowLeft size={20} />}
       >
-        <ArrowLeft size={20} />
-        <span className="font-medium">Back to Advisors</span>
-      </button>
+        Back to Advisors
+      </Button>
 
       <div className={`${semantic.surface} rounded-2xl ${shadows.sm} border ${semantic.border} p-8`}>
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-6">
-            <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradients.primary} flex items-center justify-center text-white text-3xl font-semibold`}>
+            <div className={`w-20 h-20 rounded-full bg-linear-to-br ${gradients.primary} flex items-center justify-center text-white text-3xl font-semibold`}>
               {advisor.name.split(' ').map(n => n[0]).join('')}
             </div>
             <div>
@@ -45,13 +46,13 @@ export function AdvisorDetailView({ advisor, onBack, onAssignStudent }: AdvisorD
               </div>
             </div>
           </div>
-          <button
+          <Button
             onClick={onAssignStudent}
-            className={`flex items-center gap-2 px-4 py-2 ${backgrounds.primary} text-white rounded-lg hover:bg-[#102C64]/90 transition-colors font-medium`}
+            variant="primary"
+            startIcon={<UserPlus size={18} />}
           >
-            <UserPlus size={18} />
             Assign Student
-          </button>
+          </Button>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
@@ -77,28 +78,28 @@ export function AdvisorDetailView({ advisor, onBack, onAssignStudent }: AdvisorD
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className={`bg-gradient-to-br from-[#102C64]/10 to-[#102C64]/5 rounded-xl p-4`}>
+          <div className={`bg-linear-to-br from-[#102C64]/10 to-[#102C64]/5 rounded-xl p-4`}>
             <div className={`flex items-center gap-2 ${text.primary} mb-2`}>
               <Users size={18} />
               <span className="text-sm font-medium">Active Students</span>
             </div>
             <div className={`text-3xl font-bold ${semantic.textPrimary}`}>{advisor.activityMetrics.activeStudents}</div>
           </div>
-          <div className={`bg-gradient-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-xl p-4`}>
+          <div className={`bg-linear-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-xl p-4`}>
             <div className={`flex items-center gap-2 ${text.accent} mb-2`}>
               <FileText size={18} />
               <span className="text-sm font-medium">Total Notes</span>
             </div>
             <div className="text-3xl font-bold text-gray-900">{advisor.activityMetrics.totalNotes}</div>
           </div>
-          <div className={`bg-gradient-to-br from-[#C8A0FE]/10 to-[#C8A0FE]/5 rounded-xl p-4`}>
+          <div className={`bg-linear-to-br from-[#C8A0FE]/10 to-[#C8A0FE]/5 rounded-xl p-4`}>
             <div className={`flex items-center gap-2 ${text.secondary} mb-2`}>
               <TrendingUp size={18} />
               <span className="text-sm font-medium">Reviews Done</span>
             </div>
             <div className="text-3xl font-bold text-gray-900">{advisor.activityMetrics.reviewsCompleted}</div>
           </div>
-          <div className={`bg-gradient-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-xl p-4`}>
+          <div className={`bg-linear-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-xl p-4`}>
             <div className={`flex items-center gap-2 ${text.tertiary} mb-2`}>
               <Clock size={18} />
               <span className="text-sm font-medium">Avg Response</span>

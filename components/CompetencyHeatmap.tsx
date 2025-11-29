@@ -33,7 +33,7 @@ export function CompetencyHeatmap({ students, competencies }: CompetencyHeatmapP
           </div>
           
           {students.map((student) => (
-            <div key={student.id} className="grid grid-cols-6 gap-2 mb-2">
+            <div key={student.id} className="grid grid-cols-6 gap-2 mb-2 p-2">
               <div className="text-sm font-medium text-gray-700 flex items-center">
                 {student.name}
               </div>
@@ -45,7 +45,7 @@ export function CompetencyHeatmap({ students, competencies }: CompetencyHeatmapP
                     className="group relative"
                   >
                     <div
-                      className={`h-10 rounded-lg ${getColorClass(score)} transition-all duration-200 hover:scale-110 hover:shadow-md flex items-center justify-center`}
+                      className={`h-10 rounded-lg ${getColorClass(score)} transition-all duration-200 hover:scale-101 hover:shadow-md flex items-center justify-center`}
                     >
                       <span className="text-xs font-semibold text-[#001223]">{score}</span>
                     </div>

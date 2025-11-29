@@ -16,7 +16,7 @@ export function PublicRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/cohorts" replace />;
+    return <Navigate to="/overview" replace />;
   }
 
   return <>{children}</>;

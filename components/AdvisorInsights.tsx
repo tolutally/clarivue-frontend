@@ -29,13 +29,21 @@ export function AdvisorInsights() {
         <BarChart data={programData} />
       </div>
       
-      <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-        <p className="text-sm font-medium text-[#001223] mb-2">Common Weaknesses</p>
-        <div className="flex flex-wrap gap-2">
-          {weaknesses.map((weakness) => (
+      <div className="mb-6 p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-lg">
+        <p className="text-xs font-medium text-[#001223] mb-2">Common Weaknesses</p>
+        <div className="flex flex-wrap gap-3">
+          {weaknesses.map((weakness, idx) => (
             <span
               key={weakness.label}
-              className={`px-3 py-1 bg-white rounded-full ${weakness.size} font-medium text-gray-700 shadow-sm`}
+              className={`px-4 py-1 bg-white rounded-full text-base font-medium text-[#273252] shadow-sm border border-gray-200`}
+              style={{
+                fontWeight: idx === 0 ? 600 : 500,
+                color: idx === 0 ? "#001223" : "#273252",
+                fontSize: "1rem",
+                boxShadow:
+                  "0 1px 2px 0 rgba(0,0,0,0.03),0 0.5px 1.5px 0 rgba(114,119,255,0.03)",
+                background: "#fff",
+              }}
             >
               {weakness.label}
             </span>

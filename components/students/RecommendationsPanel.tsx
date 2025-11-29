@@ -24,10 +24,10 @@ export function RecommendationsPanel({ recommendations }: RecommendationsPanelPr
           return (
             <div 
               key={rec.id}
-              className={`p-4 bg-gradient-to-r from-[#102c64]/5 to-[#B8CCF4]/10 rounded-xl border ${semantic.border} hover:border-[#102c64]/30 transition-all cursor-pointer group`}
+              className={`p-4 bg-linear-to-r from-[#102c64]/5 to-[#B8CCF4]/10 rounded-xl border ${semantic.border} hover:border-[#102c64]/30 transition-all cursor-pointer group`}
             >
               <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gradients.tertiary} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                <div className={`w-10 h-10 rounded-lg bg-linear-to-br ${gradients.tertiary} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">

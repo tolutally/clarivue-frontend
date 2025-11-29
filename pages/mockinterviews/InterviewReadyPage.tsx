@@ -321,22 +321,12 @@ export function InterviewReadyPage() {
               </div>
               <Button
                 onClick={testMicrophone}
-                disabled={testingMic}
+                loading={testingMic}
                 variant={micStatus === 'granted' ? 'outline' : 'default'}
                 size="sm"
-                className="gap-2"
+                startIcon={<Play className="w-4 h-4" aria-hidden="true" />}
               >
-                {testingMic ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                    Testing...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4" aria-hidden="true" />
-                    Test
-                  </>
-                )}
+                Test
               </Button>
             </div>
 

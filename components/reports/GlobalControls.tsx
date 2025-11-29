@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { Share2, Mail, FileText, FileSpreadsheet, X } from 'lucide-react';
 import { semantic, text } from '../../utils/colors';
 import type { ReportFilters } from '../../data/reports-data';
@@ -38,26 +38,17 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="mb-4 flex items-center gap-4">
-        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/30">
+        <div className="flex items-center gap-3 px-4 py-3 bg-linear-to-r from-[#C8A0FE]/10 to-[#B8CCF4]/10 rounded-lg border border-[#C8A0FE]/30">
           <div className="flex items-center gap-2">
             <Label htmlFor="cohort-a" className={`text-sm font-semibold ${semantic.textPrimary}`}>
               Cohort A:
             </Label>
-            <Select
+            <Dropdown
               value={selectedCohortA || 'fall-2025-coop'}
-              onValueChange={onCohortAChange}
-            >
-              <SelectTrigger className="w-[240px] bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {cohorts.map((cohort) => (
-                  <SelectItem key={cohort.value} value={cohort.value}>
-                    {cohort.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={onCohortAChange}
+              options={cohorts}
+              className="w-[240px]"
+            />
           </div>
         </div>
 
@@ -73,105 +64,89 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
         </div>
 
         {compareMode && (
-          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/30">
+          <div className="flex items-center gap-3 px-4 py-3 bg-linear-to-r from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/30">
             <div className="flex items-center gap-2">
               <Label htmlFor="cohort-b" className="text-sm font-semibold text-gray-900">
                 Cohort B:
               </Label>
-              <Select
+              <Dropdown
                 value={selectedCohortB || ''}
-                onValueChange={onCohortBChange}
-              >
-                <SelectTrigger className="w-[240px] bg-white">
-                  <SelectValue placeholder="Select cohort to compare" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cohorts.filter(c => c.value !== selectedCohortA).map((cohort) => (
-                    <SelectItem key={cohort.value} value={cohort.value}>
-                      {cohort.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={onCohortBChange}
+                options={cohorts.filter(c => c.value !== selectedCohortA)}
+                placeholder="Select cohort to compare"
+                className="w-[240px]"
+              />
             </div>
-            <button
+            <Button
               onClick={() => handleCompareModeToggle(false)}
+              variant="ghost"
+              size="icon"
               className="p-1 hover:bg-white rounded transition-colors"
             >
               <X className="w-4 h-4 text-gray-500" />
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex-1 flex flex-wrap items-center gap-3">
-          <Select
+          <Dropdown
             value={filters.term || 'all'}
-            onValueChange={(value) => onFiltersChange({ ...filters, term: value === 'all' ? undefined : value })}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Term/Semester" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Terms</SelectItem>
-              <SelectItem value="fall-2025">Fall 2025</SelectItem>
-              <SelectItem value="winter-2025">Winter 2025</SelectItem>
-              <SelectItem value="spring-2025">Spring 2025</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(value) => onFiltersChange({ ...filters, term: value === 'all' ? undefined : value })}
+            options={[
+              { value: 'all', label: 'All Terms' },
+              { value: 'fall-2025', label: 'Fall 2025' },
+              { value: 'winter-2025', label: 'Winter 2025' },
+              { value: 'spring-2025', label: 'Spring 2025' },
+            ]}
+            placeholder="Term/Semester"
+            className="w-[160px]"
+          />
 
-          <Select
+          <Dropdown
             value={filters.program || 'all'}
-            onValueChange={(value) => onFiltersChange({ ...filters, program: value === 'all' ? undefined : value })}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Program/Major" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Programs</SelectItem>
-              <SelectItem value="business">Business</SelectItem>
-              <SelectItem value="engineering">Engineering</SelectItem>
-              <SelectItem value="arts">Arts</SelectItem>
-              <SelectItem value="sciences">Sciences</SelectItem>
-              <SelectItem value="nursing">Nursing</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(value) => onFiltersChange({ ...filters, program: value === 'all' ? undefined : value })}
+            options={[
+              { value: 'all', label: 'All Programs' },
+              { value: 'business', label: 'Business' },
+              { value: 'engineering', label: 'Engineering' },
+              { value: 'arts', label: 'Arts' },
+              { value: 'sciences', label: 'Sciences' },
+              { value: 'nursing', label: 'Nursing' },
+            ]}
+            placeholder="Program/Major"
+            className="w-[160px]"
+          />
 
-          <Select
+          <Dropdown
             value={filters.rolePack || 'all'}
-            onValueChange={(value) => onFiltersChange({ ...filters, rolePack: value === 'all' ? undefined : value })}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Role Pack" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="software-engineer">Software Engineer</SelectItem>
-              <SelectItem value="data-analyst">Data Analyst</SelectItem>
-              <SelectItem value="bdr">BDR</SelectItem>
-              <SelectItem value="project-coordinator">Project Coordinator</SelectItem>
-              <SelectItem value="rn">RN</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(value) => onFiltersChange({ ...filters, rolePack: value === 'all' ? undefined : value })}
+            options={[
+              { value: 'all', label: 'All Roles' },
+              { value: 'software-engineer', label: 'Software Engineer' },
+              { value: 'data-analyst', label: 'Data Analyst' },
+              { value: 'bdr', label: 'BDR' },
+              { value: 'project-coordinator', label: 'Project Coordinator' },
+              { value: 'rn', label: 'RN' },
+            ]}
+            placeholder="Role Pack"
+            className="w-[180px]"
+          />
 
-
-
-          <Select
+          <Dropdown
             value={filters.classYear || 'all'}
-            onValueChange={(value) => onFiltersChange({ ...filters, classYear: value === 'all' ? undefined : value })}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Class Year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Years</SelectItem>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2026">2026</SelectItem>
-              <SelectItem value="2027">2027</SelectItem>
-              <SelectItem value="2028">2028</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(value) => onFiltersChange({ ...filters, classYear: value === 'all' ? undefined : value })}
+            options={[
+              { value: 'all', label: 'All Years' },
+              { value: '2025', label: '2025' },
+              { value: '2026', label: '2026' },
+              { value: '2027', label: '2027' },
+              { value: '2028', label: '2028' },
+            ]}
+            placeholder="Class Year"
+            className="w-[140px]"
+          />
 
           <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
             <Switch
@@ -199,27 +174,35 @@ export function GlobalControls({ filters, onFiltersChange, selectedCohortA, sele
         <div className="relative">
           <Button
             variant="outline"
-            className="gap-2"
             onClick={() => setShowExportMenu(!showExportMenu)}
+            startIcon={<Share2 className="w-4 h-4" />}
           >
-            <Share2 className="w-4 h-4" />
             Share Results
           </Button>
           {showExportMenu && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-              <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
-                <FileText className="w-4 h-4 text-red-600" />
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-sm"
+                startIcon={<FileText className="w-4 h-4 text-red-600" />}
+              >
                 Share as PDF
-              </button>
-              <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
-                <FileSpreadsheet className="w-4 h-4 text-green-600" />
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-sm"
+                startIcon={<FileSpreadsheet className="w-4 h-4 text-green-600" />}
+              >
                 Share as CSV
-              </button>
+              </Button>
               <div className="border-t border-gray-200 my-2" />
-              <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
-                <Mail className="w-4 h-4 text-blue-600" />
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-sm"
+                startIcon={<Mail className="w-4 h-4 text-blue-600" />}
+              >
                 Schedule Weekly Email
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { CircularProgress } from './charts/CircularProgress';
 import { Sparkline } from './charts/Sparkline';
 import type { Student } from '../types';
@@ -15,7 +16,7 @@ export function StudentCard({ student }: StudentCardProps) {
     <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#102c64] to-[#C8A0FE] flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#102c64] to-[#C8A0FE] flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
             {student.name.split(' ').map(n => n[0]).join('')}
           </div>
           <div>
@@ -55,9 +56,13 @@ export function StudentCard({ student }: StudentCardProps) {
       </td>
       
       <td className="py-3 px-4 text-right">
-        <button className="px-3 py-1.5 border border-[#102c64] text-[#102c64] rounded text-xs font-medium hover:bg-[#102c64] hover:text-white transition-colors">
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="text-xs"
+        >
           View Details
-        </button>
+        </Button>
       </td>
     </tr>
   );

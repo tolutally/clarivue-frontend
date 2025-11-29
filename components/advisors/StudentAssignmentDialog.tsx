@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Search, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { Student, Advisor } from '../../types';
 import { backgrounds, borders, semantic, shadows } from '../../utils/colors';
 
@@ -44,12 +45,14 @@ export function StudentAssignmentDialog({ advisor, allStudents, onAssign, onClos
             <h2 className={`text-2xl font-bold ${semantic.textPrimary}`}>Assign Students</h2>
             <p className={`${semantic.textSecondary} mt-1`}>Manage student assignments for {advisor.name}</p>
           </div>
-          <button
+          <Button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            variant="ghost"
+            size="icon"
+            className="hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X size={24} className={semantic.textTertiary} />
-          </button>
+          </Button>
         </div>
 
         <div className={`p-6 border-b ${semantic.borderMedium}`}>
@@ -114,18 +117,18 @@ export function StudentAssignmentDialog({ advisor, allStudents, onAssign, onClos
             {selectedStudents.size} student{selectedStudents.size !== 1 ? 's' : ''} selected
           </div>
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+              variant="outline"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSave}
-              className={`px-4 py-2 ${backgrounds.primary} text-white rounded-lg hover:bg-[#102C64]/90 transition-colors font-medium`}
+              variant="primary"
             >
               Save Assignments
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Camera, CameraOff, Mic, MicOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface VideoPreviewProps {
   onStreamReady?: (stream: MediaStream) => void;
@@ -137,29 +138,33 @@ export function VideoPreview({ onStreamReady, onError }: VideoPreviewProps) {
 
       {/* Controls overlay */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
-        <button
+        <Button
           onClick={toggleVideo}
-          className={`p-3 rounded-full transition-all ${
+          variant={videoEnabled ? "ghost" : "danger"}
+          size="icon"
+          className={`p-3 rounded-full ${
             videoEnabled
               ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-red-600 hover:bg-red-500 text-white'
+              : ''
           }`}
           aria-label={videoEnabled ? 'Turn off camera' : 'Turn on camera'}
         >
           {videoEnabled ? <Camera className="w-5 h-5" /> : <CameraOff className="w-5 h-5" />}
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={toggleAudio}
-          className={`p-3 rounded-full transition-all ${
+          variant={audioEnabled ? "ghost" : "danger"}
+          size="icon"
+          className={`p-3 rounded-full ${
             audioEnabled
               ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-red-600 hover:bg-red-500 text-white'
+              : ''
           }`}
           aria-label={audioEnabled ? 'Mute microphone' : 'Unmute microphone'}
         >
           {audioEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
-        </button>
+        </Button>
       </div>
 
       <style>{`

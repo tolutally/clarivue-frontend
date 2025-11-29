@@ -43,7 +43,7 @@ export function CapacityCoverage({ data }: CapacityCoverageProps) {
         <StudentFunnel data={data.funnel} />
       </div>
 
-      <div className="bg-gradient-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-lg border border-[#B8CCF4]/20 p-5">
+      <div className="bg-linear-to-br from-[#B8CCF4]/10 to-[#B8CCF4]/5 rounded-lg border border-[#B8CCF4]/20 p-5">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Capacity Insights</h3>
         <div className="space-y-2">
           {data.insights.map((insight, i) => (
@@ -164,7 +164,7 @@ function StudentFunnel({ data }: { data: Array<{ stage: string; count: number } 
               </div>
               <div className="h-10 bg-gray-100 rounded-lg overflow-hidden relative">
                 <div
-                  className="h-full bg-gradient-to-r from-[#C8A0FE] to-[#102C64] transition-all duration-700 flex items-center justify-end pr-3"
+                  className="h-full bg-linear-to-r from-[#C8A0FE] to-[#102C64] transition-all duration-700 flex items-center justify-end pr-3"
                   style={{ width: `${percentage}%` }}
                 >
                   {percentage > 20 && (

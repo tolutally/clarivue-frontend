@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../Header';
-import { semantic } from '../../utils/colors';
+import { backgrounds, semantic } from '../../utils/colors';
 import { GlobalControls } from './GlobalControls';
 import { GlobalMetricRibbon } from './GlobalMetricRibbon';
 import { AutoInsightsPanel } from './AutoInsightsPanel';
@@ -50,7 +50,7 @@ export function ReportsPage() {
   };
 
   return (
-    <div className={`min-h-screen ${semantic.bgSubtle}`}>
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <Header activeTab="reports" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
@@ -84,7 +84,7 @@ export function ReportsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium transition-colors relative ${
+                className={`px-4 py-3 text-sm font-medium transition-colors relative cursor-pointer ${
                   activeTab === tab.id
                     ? 'text-blue-600'
                     : 'text-gray-600 hover:text-gray-900'

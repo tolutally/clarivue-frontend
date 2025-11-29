@@ -41,7 +41,7 @@ export function Toast({ id, title, description, type = "info", onClose }: ToastP
       `}
     >
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 mt-0.5">{icons[type]}</div>
+        <div className="shrink-0 mt-0.5">{icons[type]}</div>
         <div className="flex-1">
           {title && (
             <h4 className="font-semibold text-sm text-gray-900 mb-1">{title}</h4>
@@ -52,7 +52,7 @@ export function Toast({ id, title, description, type = "info", onClose }: ToastP
         </div>
         <button
           onClick={handleClose}
-          className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+          className="shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close notification"
         >
           <X className="w-4 h-4" />
@@ -69,7 +69,7 @@ export interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onClose }: ToastContainerProps) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
+    <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-3">
       {toasts.map((toast) => (
         <Toast key={toast.id} {...toast} onClose={onClose} />
       ))}

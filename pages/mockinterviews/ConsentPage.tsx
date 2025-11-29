@@ -262,11 +262,12 @@ export function ConsentPage() {
               </Button>
               <Button 
                 type="submit" 
-                disabled={loading || !allRequiredConsentsGiven} 
-                className="gap-2"
+                loading={loading}
+                disabled={!allRequiredConsentsGiven}
+                variant="primary"
+                endIcon={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
               >
-                {loading ? 'Saving...' : 'I Agree & Continue'}
-                <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                I Agree & Continue
               </Button>
             </div>
           </form>

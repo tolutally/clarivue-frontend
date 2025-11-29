@@ -17,7 +17,7 @@ export function SkillGapsMap({ data }: SkillGapsMapProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/20 p-5">
+      <div className="bg-linear-to-br from-[#FE686D]/10 to-[#FE686D]/5 rounded-lg border border-[#FE686D]/20 p-5">
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle className="w-4 h-4 text-[#FE686D]" />
           <h3 className="text-sm font-semibold text-gray-900">Skill Gap Callouts</h3>

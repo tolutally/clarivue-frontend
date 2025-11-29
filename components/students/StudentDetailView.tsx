@@ -37,7 +37,7 @@ export function StudentDetailView({ student, onBack }: StudentDetailViewProps) {
         <span className="font-medium">Back to Students</span>
       </button>
 
-      <div className={`bg-gradient-to-r ${gradients.tertiary} rounded-2xl ${shadows.lg} p-8 text-white`}>
+      <div className={`bg-linear-to-r ${gradients.tertiary} rounded-2xl ${shadows.lg} p-8 text-white`}>
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl font-bold">
             {getInitials(student.name)}

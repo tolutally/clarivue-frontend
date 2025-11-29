@@ -60,9 +60,14 @@ export interface RolePackData {
 }
 
 export interface InterventionData {
-  interventions: Array<{ id: string; name: string; date: string }>;
-  selectedIntervention?: {
+  interventions: Array<{
+    id: string;
     name: string;
+    date: string;
+    highlight?: string;
+    comparisonBlurb?: string;
+    overallImpact?: string;
+    overallSummary?: string;
     beforeAfter: {
       communication: number;
       clarity: number;
@@ -70,7 +75,7 @@ export interface InterventionData {
       redFlagRateAfter: number;
       percentReadyChange: number;
     };
-  };
+  }>;
 }
 
 export const cohortDataMap: Record<string, CohortOutcomesData> = {
@@ -255,21 +260,71 @@ export const mockRolePack: RolePackData = {
 
 export const mockIntervention: InterventionData = {
   interventions: [
-    { id: '1', name: 'STAR Clinic', date: 'Oct 3, 2025' },
-    { id: '2', name: 'Mock Fair', date: 'Sept 18, 2025' },
-    { id: '3', name: 'Behavioral Workshop', date: 'Sept 5, 2025' },
-    { id: '4', name: 'Tech Interview Bootcamp', date: 'Aug 22, 2025' },
-  ],
-  selectedIntervention: {
-    name: 'STAR Clinic – Oct 3',
-    beforeAfter: {
-      communication: 12,
-      clarity: 7,
-      redFlagRateBefore: 14,
-      redFlagRateAfter: 6,
-      percentReadyChange: 9,
+    {
+      id: '1',
+      name: 'STAR Clinic',
+      date: 'Oct 3, 2025',
+      highlight: 'Avg feedback time reduced by 32% per student',
+      comparisonBlurb: 'Compared to non-participants: +9 pts higher readiness gain',
+      overallImpact: 'Strong',
+      overallSummary: 'Positive',
+      beforeAfter: {
+        communication: 12,
+        clarity: 7,
+        redFlagRateBefore: 14,
+        redFlagRateAfter: 6,
+        percentReadyChange: 9,
+      },
     },
-  },
+    {
+      id: '2',
+      name: 'Mock Fair',
+      date: 'Sept 18, 2025',
+      highlight: 'Rapid practice cycles cut time-to-offer by 18%',
+      comparisonBlurb: '+6 pts readiness vs non-participants',
+      overallImpact: 'Moderate',
+      overallSummary: 'Momentum building',
+      beforeAfter: {
+        communication: 9,
+        clarity: 5,
+        redFlagRateBefore: 12,
+        redFlagRateAfter: 7,
+        percentReadyChange: 6,
+      },
+    },
+    {
+      id: '3',
+      name: 'Behavioral Workshop',
+      date: 'Sept 5, 2025',
+      highlight: 'Behavioral drills reduced red flags by 41%',
+      comparisonBlurb: '+5 pts readiness vs control group',
+      overallImpact: 'Targeted',
+      overallSummary: 'Great for confidence',
+      beforeAfter: {
+        communication: 8,
+        clarity: 6,
+        redFlagRateBefore: 16,
+        redFlagRateAfter: 9,
+        percentReadyChange: 5,
+      },
+    },
+    {
+      id: '4',
+      name: 'Tech Interview Bootcamp',
+      date: 'Aug 22, 2025',
+      highlight: 'Pair-programming boosts clarity answers by 6 pts',
+      comparisonBlurb: '+7 pts readiness vs non-attendees',
+      overallImpact: 'High',
+      overallSummary: 'Excellent for technical polish',
+      beforeAfter: {
+        communication: 7,
+        clarity: 6,
+        redFlagRateBefore: 13,
+        redFlagRateAfter: 8,
+        percentReadyChange: 7,
+      },
+    },
+  ],
 };
 
 export const autoInsights = {

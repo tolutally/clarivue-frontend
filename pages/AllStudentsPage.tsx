@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Download, Users } from 'lucide-react';
 import { Header } from '../components/Header';
+import { backgrounds } from '@/utils/colors';
 
 export function AllStudentsPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="min-h-screen bg-[var(--surface-hover)]">
+    <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <Header activeTab="students" onTabChange={(tab) => {
         if (tab === 'overview') navigate('/overview');
         if (tab === 'cohorts') navigate('/cohorts');
