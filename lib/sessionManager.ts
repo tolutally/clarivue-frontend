@@ -30,8 +30,8 @@ export class SessionManager {
   public onSessionAutoEnded: (() => void) | null = null;
 
   constructor(serverUrl?: string) {
-    // Default to localhost:8000 for local Docker setup, or use provided URL
-    this.serverUrl = serverUrl || import.meta.env.VITE_AI_SESSIONS_URL || 'http://localhost:8000';
+    // Use main API URL: https://api.clarivue.io
+    this.serverUrl = serverUrl || 'https://api.clarivue.io/v1';
   }
 
   /**
@@ -172,7 +172,7 @@ export class SessionManager {
       // The session_id in the URL query parameter authenticates the WebRTC connection
       this.pcClient = new PipecatClient({
         transport: new SmallWebRTCTransport({
-          webrtcUrl: `${this.serverUrl}/v1/ai-sessions/${this.sessionId}/offer`,
+          webrtcUrl: `${this.serverUrl}/ai-sessions/${this.sessionId}/offer`,
         }),
         enableMic: true,
         enableCam: false,

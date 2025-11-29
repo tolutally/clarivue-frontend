@@ -54,7 +54,7 @@ export function InterviewRoomPage() {
         setSessionError(null);
         hasInitializedRef.current = true;
 
-        // Create session manager (uses localhost:8000 by default for local Docker)
+        // Create session manager (uses https://api.clarivue.io)
         const sessionManager = new SessionManager();
         sessionManagerRef.current = sessionManager;
 
