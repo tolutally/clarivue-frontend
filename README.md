@@ -2,7 +2,7 @@
 
 AI-Powered Interview Analytics and Student Readiness Platform
 
-## 🚀 Quick Start
+## 🚀 Quick Starts
 
 ### Development
 ```bash
