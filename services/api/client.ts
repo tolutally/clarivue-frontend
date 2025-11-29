@@ -14,7 +14,7 @@ interface ApiErrorResponse {
 
 // Create axios instance with base configuration
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'https://api.clarivue.io/',
+  baseURL: 'https://api.clarivue.io/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -77,14 +77,14 @@ apiClient.interceptors.response.use(
         );
       }
       
-      // if (status === 401) {
-      //   // Unauthorized - clear token and redirect to login
-      //   localStorage.removeItem('auth_token');
-      //   toastDispatcher.error('Session Expired', 'Please log in again');
-      //   if (window.location.pathname !== '/login') {
-      //     window.location.href = '/login';
-      //   }
-      // }
+      if (status === 401) {
+        // Unauthorized - clear token and redirect to login
+        localStorage.removeItem('auth_token');
+        toastDispatcher.error('Session Expired', 'Please log in again');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
       
       // Create error with extracted message
       const errorWithMessage = new Error(errorMessage);

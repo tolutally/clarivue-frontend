@@ -1,4 +1,4 @@
-import aiSessionsClient from '@/services/aiSessions/aiSessions.client';
+import apiClient from '../api/client';
 import type { ApiResponseWrapper } from '@/services/api/types';
 
 export interface CreateJobSubmissionRequest {
@@ -20,8 +20,8 @@ export interface JobSubmission {
 
 class JobSubmissionsService {
   async createJob(data: CreateJobSubmissionRequest): Promise<JobSubmission> {
-    const response = await aiSessionsClient.post<ApiResponseWrapper<JobSubmission>>(
-      '/v1/job-submissions',
+    const response = await apiClient.post<ApiResponseWrapper<JobSubmission>>(
+      '/job-submissions',
       data
     );
     return response.data.data;
@@ -33,18 +33,18 @@ class JobSubmissionsService {
     page: number;
     page_size: number;
   }> {
-    const response = await aiSessionsClient.get<ApiResponseWrapper<{
+    const response = await apiClient.get<ApiResponseWrapper<{
       jobs: JobSubmission[];
       total: number;
       page: number;
       page_size: number;
-    }>>(`/v1/job-submissions?page=${page}&page_size=${pageSize}`);
+    }>>(`/job-submissions?page=${page}&page_size=${pageSize}`);
     return response.data.data;
   }
 
   async getJob(jobId: string): Promise<JobSubmission> {
-    const response = await aiSessionsClient.get<ApiResponseWrapper<JobSubmission>>(
-      `/v1/job-submissions/${jobId}`
+    const response = await apiClient.get<ApiResponseWrapper<JobSubmission>>(
+      `/job-submissions/${jobId}`
     );
     return response.data.data;
   }

@@ -1,4 +1,3 @@
-import aiSessionsClient from '../aiSessions/aiSessions.client';
 import apiClient from '../api/client';
 import type { ApiResponseWrapper } from '../api/types';
 
@@ -130,12 +129,12 @@ class SessionInvitesService {
   }
 
   async verifyToken(data: VerifySessionTokenRequest): Promise<VerifySessionTokenResponse> {
-    const response = await aiSessionsClient.post<ApiResponseWrapper<VerifySessionTokenResponse>>('/v1/session-invites/verify', data);
+    const response = await apiClient.post<ApiResponseWrapper<VerifySessionTokenResponse>>('/session-invites/verify', data);
     return response.data.data;
   }
 
   async startSessionWithJob(jobSubmissionId: string): Promise<StartSessionResponse> {
-    const response = await aiSessionsClient.post<ApiResponseWrapper<StartSessionResponse>>('/v1/session-invites/start-session', {
+    const response = await apiClient.post<ApiResponseWrapper<StartSessionResponse>>('/session-invites/start-session', {
       job_submission_id: jobSubmissionId,
     });
     return response.data.data;

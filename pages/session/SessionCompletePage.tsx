@@ -43,7 +43,17 @@ export function SessionCompletePage() {
       setError('Session ID not found');
       setIsLoading(false);
     }
-  }, []);
+
+    // Cleanup: Remove session token when leaving this page
+    return () => {
+      console.log('SessionCompletePage unmounting - cleaning up session token');
+      localStorage.removeItem('session_access_token');
+      localStorage.removeItem('session_data');
+      localStorage.removeItem('ai_session_id');
+      localStorage.removeItem('session_elapsed_seconds');
+      clearSession();
+    };
+  }, [clearSession]);
 
   const closeSession = async (sessionIdToClose: string) => {
     try {
@@ -207,9 +217,19 @@ export function SessionCompletePage() {
     return 'bg-red-50 border-red-200';
   };
 
+  const cleanupSessionData = () => {
+    console.log('Cleaning up session data before navigation');
+    localStorage.removeItem('session_access_token');
+    localStorage.removeItem('session_data');
+    localStorage.removeItem('ai_session_id');
+    localStorage.removeItem('session_elapsed_seconds');
+    clearSession();
+  };
+
   const handleStartNewSession = () => {
     const originalToken = sessionData?.original_token;
     if (originalToken) {
+      cleanupSessionData();
       window.location.href = `/session/join?token=${originalToken}`;
     } else {
       setError('Unable to start new session. Missing token.');
@@ -217,8 +237,7 @@ export function SessionCompletePage() {
   };
 
   const handleGoHome = () => {
-    clearSession();
-    localStorage.removeItem('session_access_token');
+    cleanupSessionData();
     window.location.href = '/login';
   };
 

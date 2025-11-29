@@ -1,5 +1,5 @@
 import type { ApiResponseWrapper } from '@/services/api/types';
-import aiSessionsClient from '../aiSessions/aiSessions.client';
+import apiClient from '../api/client';
 
 export interface AnalysisData {
   technicalDepthIndex: {
@@ -89,8 +89,8 @@ class AnalysisService {
    */
   async getAnalysis(sessionLogId: string): Promise<AnalysisResponse | null> {
     try {
-      const response = await aiSessionsClient.get<ApiResponseWrapper<AnalysisResponse>>(
-        `/v1/ai-sessions/analysis/${sessionLogId}`
+      const response = await apiClient.get<ApiResponseWrapper<AnalysisResponse>>(
+        `/ai-sessions/analysis/${sessionLogId}`
       );
       return response.data.data;
     } catch (error: any) {
