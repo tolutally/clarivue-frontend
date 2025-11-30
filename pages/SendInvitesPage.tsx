@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Send, CheckCircle, Clock, Users as UsersIcon } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ export function SendInvitesPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToast();
+  const queryClient = useQueryClient();
   
   const { data: cohort, isLoading: cohortLoading } = useCohort(id);
   const { data: membersData, isLoading: membersLoading } = useCohortMembers(id, { page: 1, page_size: 100 });
@@ -21,6 +23,8 @@ export function SendInvitesPage() {
   
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [timeLimit, setTimeLimit] = useState<number>(45);
+  const [isCustomTimeLimit, setIsCustomTimeLimit] = useState<boolean>(false);
+  const [customTimeLimit, setCustomTimeLimit] = useState<number>(45);
   const [numberOfInterviews, setNumberOfInterviews] = useState<number>(1);
   const [description, setDescription] = useState<string>('');
   const [expiresInDays, setExpiresInDays] = useState<number>(30);
@@ -76,15 +80,29 @@ export function SendInvitesPage() {
       const selectedMemberObjects = members.filter(m => selectedMembers.has(m.user._id));
       const userEmails = selectedMemberObjects.map(m => m.user.email);
 
+      const finalTimeLimit = isCustomTimeLimit ? customTimeLimit : timeLimit;
+      
+      if (finalTimeLimit <= 0) {
+        const errorMsg = 'Time limit must be greater than 0';
+        setError(errorMsg);
+        toast.error('Invalid time limit', errorMsg);
+        return;
+      }
+
       await createBatchInvite.mutateAsync({
         cohort_id: id,
         description: description || `Interview invites for ${cohort.name}`,
         expires_in_days: expiresInDays,
         session_type: 'interview',
-        time_limit_minutes: timeLimit,
+        time_limit_minutes: finalTimeLimit,
         total_sessions_allowed: numberOfInterviews,
         user_emails: userEmails,
       });
+
+      // Revalidate the specific cohort to refresh its data
+      if (id) {
+        queryClient.invalidateQueries({ queryKey: ['cohorts', id] });
+      }
 
       const successMsg = `Successfully sent invites to ${selectedMembers.size} member${selectedMembers.size > 1 ? 's' : ''}`;
       setSuccess(successMsg);
@@ -186,17 +204,38 @@ export function SendInvitesPage() {
                   Time Limit per Interview
                 </label>
                 <select
-                  value={timeLimit}
-                  onChange={(e) => setTimeLimit(Number(e.target.value))}
+                  value={isCustomTimeLimit ? 'custom' : timeLimit}
+                  onChange={(e) => {
+                    if (e.target.value === 'custom') {
+                      setIsCustomTimeLimit(true);
+                    } else {
+                      setIsCustomTimeLimit(false);
+                      setTimeLimit(Number(e.target.value));
+                    }
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value={30}>30 minutes</option>
                   <option value={45}>45 minutes</option>
                   <option value={60}>60 minutes</option>
                   <option value={90}>90 minutes</option>
+                  <option value="custom">Custom</option>
                 </select>
+                {isCustomTimeLimit && (
+                  <input
+                    type="number"
+                    value={customTimeLimit}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : Number(e.target.value);
+                      setCustomTimeLimit(value);
+                    }}
+                    min={1}
+                    placeholder="Enter minutes"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mt-2"
+                  />
+                )}
                 <p className="text-xs text-gray-500 mt-1">
-                  Members will have {timeLimit} minutes to complete each interview
+                  Members will have {isCustomTimeLimit ? customTimeLimit : timeLimit} minutes to complete each interview
                 </p>
               </div>
 
@@ -310,7 +349,7 @@ export function SendInvitesPage() {
               <ul className="space-y-2 text-sm text-blue-800">
                 <li>• {selectedMembers.size} member{selectedMembers.size !== 1 ? 's' : ''} will receive invitations</li>
                 <li>• Each member will complete {numberOfInterviews} interview{numberOfInterviews > 1 ? 's' : ''}</li>
-                <li>• Time limit: {timeLimit} minutes per interview</li>
+                <li>• Time limit: {isCustomTimeLimit ? customTimeLimit : timeLimit} minutes per interview</li>
                 <li>• Invites will expire in {expiresInDays} day{expiresInDays !== 1 ? 's' : ''}</li>
                 <li>• Members will receive an email with a unique invitation link</li>
               </ul>

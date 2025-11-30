@@ -38,14 +38,16 @@ export function LoginPage() {
       <form onSubmit={handlePasswordLogin} className="space-y-6">
         <div>
           <label className="text-sm font-medium text-slate-700">Work Email</label>
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <div className="relative mt-3">
+            <span className="pointer-events-none absolute left-4 top-0 bottom-0 flex items-center">
+              <Mail className="w-5 h-5 text-slate-400" />
+            </span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
-              className="w-full bg-slate-100/80 border border-slate-200 text-slate-900 rounded-2xl pl-12 pr-4 py-3 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-400 focus:border-sky-300 mt-3"
+              className="w-full bg-slate-100/80 border border-slate-200 text-slate-900 rounded-2xl pl-12 pr-4 py-3 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-400 focus:border-sky-300"
               required
             />
           </div>
@@ -59,7 +61,9 @@ export function LoginPage() {
             </button>
           </div>
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <span className="pointer-events-none absolute left-4 top-0 bottom-0 flex items-center">
+              <Lock className="w-5 h-5 text-slate-400" />
+            </span>
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -71,7 +75,8 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-500"
+              className="absolute right-4 top-0 bottom-0 flex items-center text-slate-400 hover:text-slate-500 px-1"
+              style={{ height: '100%' }}
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
