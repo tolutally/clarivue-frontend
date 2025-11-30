@@ -28,7 +28,7 @@ env:
   REGISTRY: registry.digitalocean.com
   REGISTRY_NAME: clarivue
   IMAGE_NAME: clarivue-frontend
-  VITE_API_URL: http://clarivue-backend-idwnmj:3001
+  VITE_API_URL: /api
 
 jobs:
   build-and-push:
