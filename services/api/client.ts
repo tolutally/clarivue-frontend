@@ -1,4 +1,8 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { toastDispatcher } from '@/lib/toast-dispatcher';
 
 // API Error Response Format
@@ -14,7 +18,7 @@ interface ApiErrorResponse {
 
 // Create axios instance with base configuration
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'https://api.clarivue.io/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://api.clarivue.io/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -27,12 +31,12 @@ function extractErrorMessage(errorData: any): string {
   if (errorData?.error?.detail) {
     return errorData.error.detail;
   }
-  
+
   // Fall back to message field
   if (errorData?.message) {
     return errorData.message;
   }
-  
+
   // Fall back to generic error message
   return 'An error occurred';
 }
@@ -44,7 +48,7 @@ apiClient.interceptors.request.use(
     const sessionToken = localStorage.getItem('session_access_token');
     const authToken = localStorage.getItem('auth_token');
     const token = sessionToken || authToken;
-    
+
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -64,19 +68,16 @@ apiClient.interceptors.response.use(
       // Server responded with error status
       const status = error.response.status;
       const errorData = error.response.data;
-      
+
       // Extract error message
       const errorMessage = extractErrorMessage(errorData);
       const statusCode = errorData?.status_code || status;
-      
+
       // Show toast notification for errors (except 401 which redirects)
       if (status !== 401) {
-        toastDispatcher.error(
-          errorData?.message || 'Error',
-          errorMessage
-        );
+        toastDispatcher.error(errorData?.message || 'Error', errorMessage);
       }
-      
+
       if (status === 401) {
         // Unauthorized - clear token and redirect to login
         localStorage.removeItem('auth_token');
@@ -85,7 +86,7 @@ apiClient.interceptors.response.use(
           window.location.href = '/login';
         }
       }
-      
+
       // Create error with extracted message
       const errorWithMessage = new Error(errorMessage);
       (errorWithMessage as any).status = statusCode;
@@ -97,11 +98,13 @@ apiClient.interceptors.response.use(
       return Promise.reject(new Error(networkError));
     } else {
       // Something else happened
-      toastDispatcher.error('Error', error.message || 'An unexpected error occurred');
+      toastDispatcher.error(
+        'Error',
+        error.message || 'An unexpected error occurred'
+      );
       return Promise.reject(error);
     }
   }
 );
 
 export default apiClient;
-

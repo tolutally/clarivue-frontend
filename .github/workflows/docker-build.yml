@@ -1,0 +1,111 @@
+# =============================================================================
+# Docker Build & Push to DigitalOcean Container Registry
+# =============================================================================
+# This workflow builds and pushes Docker images for the Clarivue frontend.
+#
+# Image Strategy:
+#   - Push to `production` branch → builds `production` image
+#
+# Images are tagged as:
+#   - registry.digitalocean.com/clarivue/clarivue-frontend:production
+#   - Plus a SHA-tagged version for rollback capability
+#
+# Required Secrets:
+#   - DIGITALOCEAN_ACCESS_TOKEN: DO API token with registry read/write access
+#
+# =============================================================================
+
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - production
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  REGISTRY: registry.digitalocean.com
+  REGISTRY_NAME: clarivue
+  IMAGE_NAME: clarivue-frontend
+  VITE_API_URL: http://clarivue-backend-idwnmj:3001
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ----------------------------------------------------------------------
+      # Checkout code
+      # ----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------------------------
+      # Set build configuration
+      # ----------------------------------------------------------------------
+      - name: Set build configuration
+        id: config
+        run: |
+          echo "image_tag=${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:production" >> $GITHUB_OUTPUT
+          echo "sha_tag=${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:production-${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "📦 Building production image"
+
+      # ----------------------------------------------------------------------
+      # Set up Docker Buildx for improved build performance
+      # ----------------------------------------------------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ----------------------------------------------------------------------
+      # Install and authenticate with DigitalOcean CLI
+      # ----------------------------------------------------------------------
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # ----------------------------------------------------------------------
+      # Login to DigitalOcean Container Registry
+      # ----------------------------------------------------------------------
+      - name: Login to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 1200
+
+      # ----------------------------------------------------------------------
+      # Build and push Docker image
+      # ----------------------------------------------------------------------
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.config.outputs.image_tag }}
+            ${{ steps.config.outputs.sha_tag }}
+          build-args: |
+            VITE_API_URL=${{ env.VITE_API_URL }}
+            VITE_USE_MOCK_API=false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      # ----------------------------------------------------------------------
+      # Output summary
+      # ----------------------------------------------------------------------
+      - name: Build Summary
+        run: |
+          echo "## 🐳 Docker Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | \`production\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| API URL | \`${{ env.VITE_API_URL }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Tag | \`${{ steps.config.outputs.image_tag }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| SHA Tag | \`${{ steps.config.outputs.sha_tag }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pull Command" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "doctl registry login" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ steps.config.outputs.image_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
