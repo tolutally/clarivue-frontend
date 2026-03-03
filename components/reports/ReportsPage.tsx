@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../Header';
 import { backgrounds, semantic } from '../../utils/colors';
+import { navigateFromDashboardTab } from '../../utils/dashboardTabNavigation';
 import { GlobalControls } from './GlobalControls';
 import { GlobalMetricRibbon } from './GlobalMetricRibbon';
 import { AutoInsightsPanel } from './AutoInsightsPanel';
@@ -51,12 +52,7 @@ export function ReportsPage() {
 
   return (
     <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
-      <Header activeTab="reports" onTabChange={(tab) => {
-        if (tab === 'overview') navigate('/overview');
-        if (tab === 'cohorts') navigate('/cohorts');
-        if (tab === 'students') navigate('/students');
-        if (tab === 'reports') navigate('/reports');
-      }} />
+      <Header activeTab="reports" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
       <div className={`${semantic.surface} border-b ${semantic.borderMedium}`}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-2">

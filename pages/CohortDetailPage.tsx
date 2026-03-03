@@ -7,6 +7,7 @@ import { useCohort, useCohortMembers, useDeleteCohort } from '@/hooks/useCohorts
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/ui/toast';
 import { backgrounds } from '@/utils/colors';
+import { navigateFromDashboardTab } from '@/utils/dashboardTabNavigation';
 import type { CohortMember } from '@/services';
 
 type Tab = 'overview' | 'students' | 'settings';
@@ -66,12 +67,7 @@ export function CohortDetailPage() {
   return (
     <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
-      <Header activeTab="cohorts" onTabChange={(tab) => {
-        if (tab === 'overview') navigate('/overview');
-        if (tab === 'cohorts') navigate('/cohorts');
-        if (tab === 'students') navigate('/students');
-        if (tab === 'reports') navigate('/reports');
-      }} />
+      <Header activeTab="cohorts" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <Button
           onClick={() => navigate('/cohorts')}

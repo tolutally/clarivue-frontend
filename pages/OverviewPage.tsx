@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { students, competencies } from '../data/mock-data';
 import { semantic } from '../utils/colors';
+import { navigateFromDashboardTab } from '../utils/dashboardTabNavigation';
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -20,12 +21,7 @@ export function OverviewPage() {
     <div className={`min-h-screen ${semantic.surfaceActive}`}>
       <Header 
         activeTab="overview" 
-        onTabChange={(tab) => {
-          if (tab === 'overview') navigate('/overview');
-          if (tab === 'cohorts') navigate('/cohorts');
-          if (tab === 'students') navigate('/students');
-          if (tab === 'reports') navigate('/reports');
-        }} 
+        onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} 
       />
       
       <div className="max-w-[1600px] mx-auto px-6 py-8">

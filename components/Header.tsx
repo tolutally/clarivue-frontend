@@ -35,7 +35,7 @@ const tabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'cohorts', label: 'Cohorts' },
   { id: 'students', label: 'Students' },
-  { id: 'advisors', label: 'Advisors', disabled: true },
+  { id: 'advisors', label: 'Advisory' },
   { id: 'reports', label: 'Analytics' },
   { id: 'settings', label: 'Settings', disabled: true },
 ];

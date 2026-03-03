@@ -5,6 +5,7 @@ import { Header } from '../components/Header';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/toast';
 import { backgrounds } from '@/utils/colors';
+import { navigateFromDashboardTab } from '@/utils/dashboardTabNavigation';
 import { Button } from '@/components/ui/button';
 import { useBulkAddUsers } from '@/hooks/useCohorts';
 
@@ -174,12 +175,7 @@ export function AddStudentsPage() {
   return (
     <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
-      <Header activeTab="cohorts" onTabChange={(tab) => {
-        if (tab === 'overview') navigate('/overview');
-        if (tab === 'cohorts') navigate('/cohorts');
-        if (tab === 'students') navigate('/students');
-        if (tab === 'reports') navigate('/reports');
-      }} />
+      <Header activeTab="cohorts" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
       <div className="max-w-4xl mx-auto px-6 py-8">
       <Button
           onClick={() => navigate(`/cohorts/${id}`)}

@@ -5,6 +5,7 @@ import { Header } from '../Header';
 import { StudentOverview } from './StudentOverview';
 import { students } from '../../data/mock-data';
 import { backgrounds } from '@/utils/colors';
+import { navigateFromDashboardTab } from '@/utils/dashboardTabNavigation';
 
 const StudentDetailView = lazy(() => import('./StudentDetailView').then(module => ({ default: module.StudentDetailView })));
 
@@ -24,12 +25,7 @@ export function StudentsPage() {
   if (selectedStudent) {
     return (
       <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
-        <Header activeTab="students" onTabChange={(tab) => {
-          if (tab === 'overview') navigate('/overview');
-          if (tab === 'cohorts') navigate('/cohorts');
-          if (tab === 'students') navigate('/students');
-          if (tab === 'reports') navigate('/reports');
-        }} />
+        <Header activeTab="students" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
         <div className="max-w-[1600px] mx-auto px-6 py-8">
           <Suspense fallback={<LoadingFallback />}>
             <StudentDetailView 
@@ -44,12 +40,7 @@ export function StudentsPage() {
 
   return (
     <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
-      <Header activeTab="students" onTabChange={(tab) => {
-        if (tab === 'overview') navigate('/overview');
-        if (tab === 'cohorts') navigate('/cohorts');
-        if (tab === 'students') navigate('/students');
-        if (tab === 'reports') navigate('/reports');
-      }} />
+      <Header activeTab="students" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <div className="space-y-6">
           <div>

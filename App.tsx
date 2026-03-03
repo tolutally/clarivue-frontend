@@ -34,6 +34,7 @@ import { SendInvitesPage } from './pages/SendInvitesPage';
 import { AllStudentsPage } from './pages/AllStudentsPage';
 import { StudentsPage } from './components/students/StudentsPage';
 import { ReportsPage } from './components/reports/ReportsPage';
+import { AdvisorsPage } from './pages/AdvisorsPage';
 import { WelcomePage } from './pages/mockinterviews/WelcomePage';
 import { CompleteProfilePage } from './pages/mockinterviews/CompleteProfilePage';
 import { ConsentPage } from './pages/mockinterviews/ConsentPage';
@@ -214,6 +215,12 @@ export default function App() {
             <Route path="/students" element={
               <DashboardRoute>
                 <StudentsPage />
+              </DashboardRoute>
+            } />
+            
+            <Route path="/advisors" element={
+              <DashboardRoute>
+                <AdvisorsPage />
               </DashboardRoute>
             } />
             
