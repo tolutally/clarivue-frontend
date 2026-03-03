@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/ui/toast';
 import { backgrounds, borders, semantic, semanticTokens } from '@/utils/colors';
+import { navigateFromDashboardTab } from '@/utils/dashboardTabNavigation';
 
 export function CohortsPage() {
   const navigate = useNavigate();
@@ -104,12 +105,7 @@ export function CohortsPage() {
   return (
     <div className={`min-h-screen ${semantic.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
-      <Header activeTab="cohorts" onTabChange={(tab) => {
-        if (tab === 'overview') navigate('/overview');
-        if (tab === 'cohorts') navigate('/cohorts');
-        if (tab === 'students') navigate('/students');
-        if (tab === 'reports') navigate('/reports');
-      }} />
+      <Header activeTab="cohorts" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <div className="flex gap-5 flex-wrap items-center justify-between mb-8">
           <div>

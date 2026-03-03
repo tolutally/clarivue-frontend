@@ -10,6 +10,7 @@ import { useCohort, useCohortMembers } from '@/hooks/useCohorts';
 import { useCreateBatchInvite } from '@/hooks/useSessionInvites';
 import type { CohortMember } from '@/services';
 import { backgrounds } from '@/utils/colors';
+import { navigateFromDashboardTab } from '@/utils/dashboardTabNavigation';
 
 export function SendInvitesPage() {
   const { id } = useParams<{ id: string }>();
@@ -133,12 +134,7 @@ export function SendInvitesPage() {
   if (!cohort || !members || members.length === 0) {
     return (
       <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
-        <Header activeTab="cohorts" onTabChange={(tab) => {
-          if (tab === 'overview') navigate('/overview');
-          if (tab === 'cohorts') navigate('/cohorts');
-          if (tab === 'students') navigate('/students');
-          if (tab === 'reports') navigate('/reports');
-        }} />
+        <Header activeTab="cohorts" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
             <UsersIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
@@ -160,12 +156,7 @@ export function SendInvitesPage() {
   return (
     <div className={`min-h-screen ${backgrounds.surfaceActive}`}>
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
-      <Header activeTab="cohorts" onTabChange={(tab) => {
-        if (tab === 'overview') navigate('/overview');
-        if (tab === 'cohorts') navigate('/cohorts');
-        if (tab === 'students') navigate('/students');
-        if (tab === 'reports') navigate('/reports');
-      }} />
+      <Header activeTab="cohorts" onTabChange={(tab) => navigateFromDashboardTab(navigate, tab)} />
       <div className="max-w-5xl mx-auto px-6 py-8">
         <Button
           onClick={() => navigate(`/cohorts/${id}`)}
